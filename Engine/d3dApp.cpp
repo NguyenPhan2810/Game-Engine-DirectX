@@ -1,16 +1,68 @@
 #include "d3dApp.h"
 
-D3DApp::D3DApp()
-: mDevice(nullptr)
+// An instance of the app is needed because MainWndProc
+// can not access to a method of a class
+D3DApp* gd3dApp = nullptr;
+LRESULT MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return gd3dApp->MsgProc(hWnd, msg, wParam, lParam);
+}
+
+D3DApp::D3DApp(HINSTANCE hInstance)
+: mhAppInstance(hInstance)
+, mhMainWnd(NULL)
+, mDevice(nullptr)
 , mImmediateContext(nullptr)
+, mSwapChain(nullptr)
 , mFullscreen(false)
 , m4xMsaaQuality(0)
 , mEnable4xMsaa(true)
 , mClientHeight(600)
 , mClientWidth(800)
 , mClientRefreshRate(144)
+, mMainWindowCaption()
 {
-	InitDirect3D();
+	// Set a pointer to this instance to get message from MainWndProc
+	gd3dApp = this;
+}
+
+bool D3DApp::Init()
+{
+	if (InitMainWindow())
+		return false;
+
+	if (!InitDirect3D())
+		return false;
+
+	return true;
+}
+
+LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+bool D3DApp::InitMainWindow()
+{
+
+	// Compute window rectangle dimensions based on requested client area dimensions.
+	RECT R = { 0, 0, mClientWidth, mClientHeight };
+	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+	int width = R.right - R.left;
+	int height = R.bottom - R.top;
+
+	mhMainWnd = CreateWindow(L"D3DWndClassName", mMainWindowCaption.c_str(),
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mhAppInstance, 0);
+	if (!mhMainWnd)
+	{
+		MessageBox(0, L"CreateWindow Failed.", 0, 0);
+		return false;
+	}
+
+	ShowWindow(mhMainWnd, SW_SHOW);
+	UpdateWindow(mhMainWnd);
+
+	return true;
 }
 
 bool D3DApp::InitDirect3D()
@@ -78,7 +130,24 @@ bool D3DApp::InitDirect3D()
 	sd.OutputWindow = mhMainWnd;
 	sd.Windowed = !mFullscreen;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Flags = 0; // Default
+	sd.Flags = 0; // Default	
+	
+
+	// Create swap chain
+	IDXGIDevice* dxgiDevice = 0;
+	HR(mDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
+
+	IDXGIAdapter* dxgiAdapter = 0;
+	HR(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
+
+	IDXGIFactory* dxgiFactory = 0;
+	HR(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
+
+	HR(dxgiFactory->CreateSwapChain(mDevice, &sd, &mSwapChain));
+
+	ReleaseCOM(dxgiFactory);
+	ReleaseCOM(dxgiAdapter);
+	ReleaseCOM(dxgiDevice);
 
 #pragma endregion
 

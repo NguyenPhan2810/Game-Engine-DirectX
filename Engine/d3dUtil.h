@@ -8,20 +8,32 @@
 #include <wchar.h>
 #include <iostream>
 
-// ------------------------------
+//----------------------------------------------------------------------------
+// Macro for safe releasing COM object
+//----------------------------------------------------------------------------
+#define ReleaseCOM(x)	\
+{						\
+	if (x)				\
+	{					\
+		x->Release();	\
+		x = nullptr;	\
+	}					\
+}						\
+
+//----------------------------------------------------------------------------
 // HR macro
-// ------------------------------
+//----------------------------------------------------------------------------
 // Error reminder and tracking in Debug mode
 #if defined(DEBUG) | defined(_DEBUG)
 #ifndef HR
-#define HR(x)													\
-	{															\
-		HRESULT hr = (x);										\
-		if(FAILED(hr))											\
-		{														\
-			DXTraceW(__FILEW__, (DWORD)__LINE__, hr, L#x, true);\
-		}														\
-	}
+#define HR(x)												\
+{															\
+	HRESULT hr = (x);										\
+	if(FAILED(hr))											\
+	{														\
+		DXTraceW(__FILEW__, (DWORD)__LINE__, hr, L#x, true);\
+	}														\
+}
 #endif
 
 #else

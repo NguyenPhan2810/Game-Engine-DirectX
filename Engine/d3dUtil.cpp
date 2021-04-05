@@ -52,7 +52,7 @@ HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRE
 		if (nMsgLen > 0)
 			swprintf_s(strBufferMsg, 1024, L"Current call: %ls\n", strMsg);
 
-		swprintf_s(strBuffer, 3000, L"Filename: %ls\n Line Number: %ls\n Error Code Meaning: %ls\n%ls Do you need to debug the current application?",
+		swprintf_s(strBuffer, 3000, L"Filename: %ls\n\n Line Number: %ls\n\n Error Code Meaning: %ls\n\n%ls Do you need to debug the current application?",
 			strBufferFile, strBufferLine, strBufferError, strBufferMsg);
 
 		int nResult = MessageBoxW(GetForegroundWindow(), strBuffer, L"error", MB_YESNO | MB_ICONERROR);
