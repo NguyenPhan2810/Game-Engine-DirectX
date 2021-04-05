@@ -30,6 +30,9 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mMainWindowCaption(L"Game Engine DirectX 11")
 
 , mAppPaused(false)
+, mAppMinimized(false)
+, mAppMaximized(false)
+, mAppResizing(false)
 , mTimer()
 {
 	// Set a pointer to this instance to get message from MainWndProc
@@ -98,6 +101,29 @@ int D3DApp::Run()
 	}
 
 	return msg.wParam;
+}
+
+void D3DApp::Pause()
+{
+	if (!mAppPaused)
+	{
+		mAppPaused = true;
+		mTimer.Stop();
+	}
+}
+
+void D3DApp::Unpause()
+{
+	if (mAppPaused)
+	{
+		mAppPaused = false;
+		mTimer.Start();
+	}
+}
+
+bool D3DApp::IsPaused() const
+{
+	return mAppPaused;
 }
 
 bool D3DApp::Init()
@@ -172,11 +198,6 @@ void D3DApp::OnResize()
 		0.0f, 1.0f };
 
 	mImmediateContext->RSSetViewports(1, &mScreenViewport);
-}
-
-LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 bool D3DApp::InitMainWindow()
@@ -315,4 +336,95 @@ bool D3DApp::InitDirect3D()
 	OnResize();
 
 	return true;
+}
+
+void D3DApp::EventWindowResize(WPARAM wParam)
+{
+	if (wParam == SIZE_MINIMIZED)
+	{
+		Pause();
+		mAppMinimized = true;
+		mAppMaximized = false;
+	}
+	else if (wParam == SIZE_MAXIMIZED)
+	{
+		Unpause();
+		mAppMinimized = false;
+		mAppMaximized = true;
+		OnResize();
+	}
+	else if (wParam == SIZE_RESTORED)
+	{
+		if (mAppMinimized)
+		{
+			Unpause();
+			mAppMinimized = false;
+			OnResize();
+		}
+		else if (mAppMaximized)
+		{
+			Unpause();
+			mAppMaximized = false;
+			OnResize();
+		}
+		else if (mAppResizing)
+		{
+			// This does nothing because the OS will send enormous continuously
+			// events into this due to user resizing the window. So only when 
+			// the user's done resizing then call the OnResize() function
+		}
+		else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
+		{
+			OnResize();
+		}
+	}
+}
+
+
+LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+		// VM_ACTIVATE is sent when window is activated or deactivated.
+		// Pause the game when it deactivates and unpause otherwise.
+	case WM_ACTIVATE:
+	{
+		if (LOWORD(wParam) == WA_INACTIVE)
+			Pause();
+		else
+			Unpause();
+
+		break;
+	}
+	// WM_SIZE is sent when window is resized
+	case WM_SIZE:
+	{
+		mClientWidth = LOWORD(lParam);
+		mClientHeight = HIWORD(lParam);
+
+
+		if (mDevice)
+			EventWindowResize(wParam);
+
+		break;
+	}
+	// WM_ENTERSIZEMOVE is sent when user grab the resize bars
+	case WM_ENTERSIZEMOVE:
+	{
+		mAppResizing = true;
+		break;
+	}
+	// WM_EXITSIZEMOVE is sent when user release the resize bars
+	// Reset everything based on the new window dimensions
+	case WM_EXITSIZEMOVE:
+	{
+		mAppResizing = false;
+		OnResize();
+		break;
+	}
+	default:
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+
+	return NULL;
 }

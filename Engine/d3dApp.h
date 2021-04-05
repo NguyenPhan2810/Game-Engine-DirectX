@@ -14,6 +14,9 @@ public:
 	float     AspectRatio()const;
 
 	int Run();
+	void Pause();
+	void Unpause();
+	bool IsPaused() const;
 	
 	virtual bool Init();
 	virtual void OnResize();
@@ -25,6 +28,7 @@ protected:
 	bool InitMainWindow();
 	bool InitDirect3D();
 
+	void EventWindowResize(WPARAM wParam);
 
 protected:
 	HINSTANCE mhAppInstance;
@@ -32,6 +36,9 @@ protected:
 	UINT m4xMsaaQuality;
 
 	bool mAppPaused;
+	bool mAppMinimized;
+	bool mAppMaximized;
+	bool mAppResizing;
 
 	GameTimer mTimer;
 
