@@ -34,6 +34,7 @@ void GameTimer::Reset()
     mDeltaTime = -1;
     mPausedTime = 0;
     mStopped = false;
+    mBaseTime = now();
     mCurrentTime = now();
     mPrevTime = mCurrentTime;
 }
@@ -91,5 +92,5 @@ std::chrono::system_clock::time_point GameTimer::now()
 
 double GameTimer::TimeDiff(std::chrono::system_clock::time_point before, std::chrono::system_clock::time_point after)
 {
-    return (after - before).count();
+    return std::chrono::duration<double>((after - before)).count();
 }

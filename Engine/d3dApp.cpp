@@ -28,9 +28,77 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mClientWidth(800)
 , mClientRefreshRate(144)
 , mMainWindowCaption(L"Game Engine DirectX 11")
+
+, mAppPaused(false)
+, mTimer()
 {
 	// Set a pointer to this instance to get message from MainWndProc
 	gd3dApp = this;
+}
+
+D3DApp::~D3DApp()
+{
+	ReleaseCOM(mSwapChain);
+	ReleaseCOM(mDepthStencilView);
+	ReleaseCOM(mRenderTargetView);
+	ReleaseCOM(mDepthStencilBuffer);
+
+	// Restore default settings
+	if (mImmediateContext)
+		mImmediateContext->ClearState();
+
+	ReleaseCOM(mImmediateContext);
+	ReleaseCOM(mDevice);
+}
+
+HINSTANCE D3DApp::AppInst() const
+{
+	return mhAppInstance;
+}
+
+HWND D3DApp::MainWnd() const
+{
+	return mhMainWnd;
+}
+
+float D3DApp::AspectRatio() const
+{
+	return (float)mClientWidth / mClientHeight;
+}
+
+int D3DApp::Run()
+{
+	MSG msg{ 0 };
+
+	mTimer.Reset();
+
+	while (msg.message != WM_QUIT)
+	{
+		// If there are Window messages then process them.
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		// Otherwise, do animation/game stuff.
+		else
+		{
+			mTimer.Tick();
+
+			if (!mAppPaused)
+			{
+				CalculateFrameStats();
+				UpdateScene(mTimer.DeltaTime());
+				DrawScene();
+			}	
+			else
+			{
+				Sleep(1);
+			}
+		}
+	}
+
+	return msg.wParam;
 }
 
 bool D3DApp::Init()
@@ -248,4 +316,32 @@ bool D3DApp::InitDirect3D()
 	OnResize();
 
 	return true;
+}
+
+void D3DApp::CalculateFrameStats()
+{
+	// Code computes the average frames per second, and also the 
+	// average time it takes to render one frame.  These stats 
+	// are appended to the window caption bar.
+
+	static int frameCnt = 0;
+	static float timeElapsed = 0.0f;
+
+	frameCnt++;
+
+	// Compute averages over one second period.
+	if ((mTimer.TotalTime() - timeElapsed) >= 1.0f)
+	{
+		float fps = (float)frameCnt; // fps = frameCnt / 1
+
+		std::wostringstream outs;
+		outs.precision(6);
+		outs << mMainWindowCaption << L"    "
+			<< L"FPS: " << fps;
+		SetWindowText(mhMainWnd, outs.str().c_str());
+
+		// Reset for next average.
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}
 }
