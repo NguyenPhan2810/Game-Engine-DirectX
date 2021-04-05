@@ -25,7 +25,6 @@ protected:
 	bool InitMainWindow();
 	bool InitDirect3D();
 
-	void CalculateFrameStats();
 
 protected:
 	HINSTANCE mhAppInstance;

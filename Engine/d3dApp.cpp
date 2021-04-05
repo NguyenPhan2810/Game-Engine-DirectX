@@ -87,7 +87,6 @@ int D3DApp::Run()
 
 			if (!mAppPaused)
 			{
-				CalculateFrameStats();
 				UpdateScene(mTimer.DeltaTime());
 				DrawScene();
 			}	
@@ -316,32 +315,4 @@ bool D3DApp::InitDirect3D()
 	OnResize();
 
 	return true;
-}
-
-void D3DApp::CalculateFrameStats()
-{
-	// Code computes the average frames per second, and also the 
-	// average time it takes to render one frame.  These stats 
-	// are appended to the window caption bar.
-
-	static int frameCnt = 0;
-	static float timeElapsed = 0.0f;
-
-	frameCnt++;
-
-	// Compute averages over one second period.
-	if ((mTimer.TotalTime() - timeElapsed) >= 1.0f)
-	{
-		float fps = (float)frameCnt; // fps = frameCnt / 1
-
-		std::wostringstream outs;
-		outs.precision(6);
-		outs << mMainWindowCaption << L"    "
-			<< L"FPS: " << fps;
-		SetWindowText(mhMainWnd, outs.str().c_str());
-
-		// Reset for next average.
-		frameCnt = 0;
-		timeElapsed += 1.0f;
-	}
 }
