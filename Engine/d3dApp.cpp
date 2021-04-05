@@ -1,4 +1,5 @@
 #include "d3dApp.h"
+#include <windowsx.h>
 
 // An instance of the app is needed because MainWndProc
 // can not access to a method of a class
@@ -26,6 +27,8 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mEnable4xMsaa(true)
 , mClientHeight(600)
 , mClientWidth(800)
+, mClientMinWidth(200)
+, mClientMinHeight(200)
 , mClientRefreshRate(144)
 , mMainWindowCaption(L"Game Engine DirectX 11")
 
@@ -394,25 +397,25 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		else
 			Unpause();
 
-		break;
+		return NULL;
 	}
 	// WM_SIZE is sent when window is resized
 	case WM_SIZE:
 	{
+		// Update window dimensions
 		mClientWidth = LOWORD(lParam);
 		mClientHeight = HIWORD(lParam);
-
 
 		if (mDevice)
 			EventWindowResize(wParam);
 
-		break;
+		return NULL;
 	}
 	// WM_ENTERSIZEMOVE is sent when user grab the resize bars
 	case WM_ENTERSIZEMOVE:
 	{
 		mAppResizing = true;
-		break;
+		return NULL;
 	}
 	// WM_EXITSIZEMOVE is sent when user release the resize bars
 	// Reset everything based on the new window dimensions
@@ -420,11 +423,40 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		mAppResizing = false;
 		OnResize();
-		break;
+		return NULL;
 	}
+	// WM_DESTROY is sent when the window is being destroy (alt-f4 or red X button...)
+	case WM_DESTROY:
+	{
+		PostQuitMessage(0);
+		return NULL;
+	}
+	// WM_MENUCHAR is sent when a menu is active and user press a key that does
+	// not correspond to anything
+	case WM_MENUCHAR:
+		// Don't beep when user press alt-enter.
+		return MAKELRESULT(0, MNC_CLOSE);
+
+	// Catch this message so to prevent the window from becoming too small.
+	case WM_GETMINMAXINFO:
+		((MINMAXINFO*)lParam)->ptMinTrackSize.x = mClientMinWidth;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.y = mClientMinHeight;
+		return 0;
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_MOUSEMOVE:
+		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
 	default:
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
-
-	return NULL;
 }

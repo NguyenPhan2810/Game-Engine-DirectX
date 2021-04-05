@@ -1,7 +1,5 @@
 #include "d3dApp.h"
 
-#include <iostream>
-
 class InitDirect3DApp : public D3DApp
 {
 public:
@@ -25,6 +23,12 @@ public:
 		mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		HR(mSwapChain->Present(0, 0));
+	}
+
+
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) override
+	{
+		std::cout << x << " " << y << "\n";
 	}
 };
 

@@ -24,6 +24,10 @@ public:
 	virtual void DrawScene() = 0;
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
+
 protected:
 	bool InitMainWindow();
 	bool InitDirect3D();
@@ -56,6 +60,8 @@ protected:
 	bool mEnable4xMsaa;
 	int mClientWidth;
 	int mClientHeight;
+	int mClientMinWidth;
+	int mClientMinHeight;
 	bool mFullscreen;
 	UINT mClientRefreshRate;
 };
