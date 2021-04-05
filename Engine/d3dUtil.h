@@ -6,7 +6,7 @@
 #include <cassert>
 #include <sal.h>
 #include <wchar.h>
-#include <iostream>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // Macro for safe releasing COM object

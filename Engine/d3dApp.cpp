@@ -140,69 +140,6 @@ bool D3DApp::Init()
 	return true;
 }
 
-void D3DApp::OnResize()
-{
-	assert(mDevice);
-	assert(mImmediateContext);
-	assert(mSwapChain);
-
-	// Release old views because they hold refs to the back buffers
-	// which is going to be destroyed
-
-	ReleaseCOM(mRenderTargetView);
-	ReleaseCOM(mDepthStencilBuffer);
-	ReleaseCOM(mDepthStencilView);
-
-	// Resize swap chain (Backbuffer) and recreate render target view
-	ID3D11Texture2D* backBuffer = nullptr;
-	HR(mSwapChain->ResizeBuffers(1, mClientWidth, mClientHeight, mBackBufferFormat, 0));
-	HR(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer));
-	HR(mDevice->CreateRenderTargetView(backBuffer, nullptr, &mRenderTargetView));
-
-	// GetBuffer increase COM ref count to back buffer
-	// so release it as it is not in need anymore
-	ReleaseCOM(backBuffer); 
-
-	// Recreate Depth/Stencil buffer and view
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-
-	depthStencilDesc.Width = mClientWidth;
-	depthStencilDesc.Height = mClientHeight;
-	depthStencilDesc.MipLevels = 1; // For depth/stencil buffer 1 level is enough
-	depthStencilDesc.ArraySize = 1; // For depth/stencil buffer 1 texture is needed in 1 texture array
-	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT; // Only GPU is able to read/write, CPU isn't
-	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0; // As CPU doesn't have access to this resource in VRAM
-	depthStencilDesc.MiscFlags = 0; // Default
-
-	// 4X MSAA -- must match up with swap chain MSAA values
-	if (mEnable4xMsaa)
-	{
-		depthStencilDesc.SampleDesc.Count = 4;
-		depthStencilDesc.SampleDesc.Quality = m4xMsaaQuality - 1; // Use maximum quality
-	}
-	else
-	{
-		depthStencilDesc.SampleDesc.Count = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-	}
-
-	HR(mDevice->CreateTexture2D(&depthStencilDesc, nullptr, &mDepthStencilBuffer));
-	HR(mDevice->CreateDepthStencilView(mDepthStencilBuffer, nullptr, &mDepthStencilView));
-
-	// Bind the render target view and depth/stencil view created above to the pipeline
-	mImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
-
-	// Set viewport
-	mScreenViewport = D3D11_VIEWPORT{ 0.0f, 0.0f, 
-		(float)mClientWidth, (float)mClientHeight, 
-		0.0f, 1.0f };
-
-	mImmediateContext->RSSetViewports(1, &mScreenViewport);
-}
-
 bool D3DApp::InitMainWindow()
 {
 	WNDCLASS wc;
@@ -255,11 +192,11 @@ bool D3DApp::InitDirect3D()
 
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT hr = D3D11CreateDevice(
-		NULL, // Use primary display adapter
+		nullptr, // Use primary display adapter
 		D3D_DRIVER_TYPE_HARDWARE,
-		NULL, // Always use hardware for rendering
+		nullptr, // Always use hardware for rendering
 		createDeviceFlags,
-		NULL, 0, // Default feature array
+		nullptr, 0, // Default feature array
 		D3D11_SDK_VERSION,
 		&mDevice,
 		&featureLevel,
@@ -328,6 +265,9 @@ bool D3DApp::InitDirect3D()
 
 	HR(dxgiFactory->CreateSwapChain(mDevice, &sd, &mSwapChain));
 
+	// Disable alt_enter
+	//HR(dxgiFactory->MakeWindowAssociation(mhMainWnd, DXGI_MWA_NO_ALT_ENTER));
+
 	ReleaseCOM(dxgiFactory);
 	ReleaseCOM(dxgiAdapter);
 	ReleaseCOM(dxgiDevice);
@@ -339,6 +279,69 @@ bool D3DApp::InitDirect3D()
 	OnResize();
 
 	return true;
+}
+
+void D3DApp::OnResize()
+{
+	assert(mDevice);
+	assert(mImmediateContext);
+	assert(mSwapChain);
+
+	// Release old views because they hold refs to the back buffers
+	// which is going to be destroyed
+
+	ReleaseCOM(mRenderTargetView);
+	ReleaseCOM(mDepthStencilBuffer);
+	ReleaseCOM(mDepthStencilView);
+
+	// Resize swap chain (Backbuffer) and recreate render target view
+	ID3D11Texture2D* backBuffer = nullptr;
+	HR(mSwapChain->ResizeBuffers(1, mClientWidth, mClientHeight, mBackBufferFormat, 0));
+	HR(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer));
+	HR(mDevice->CreateRenderTargetView(backBuffer, nullptr, &mRenderTargetView));
+
+	// GetBuffer increase COM ref count to back buffer
+	// so release it as it is not in need anymore
+	ReleaseCOM(backBuffer);
+
+	// Recreate Depth/Stencil buffer and view
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+
+	depthStencilDesc.Width = mClientWidth;
+	depthStencilDesc.Height = mClientHeight;
+	depthStencilDesc.MipLevels = 1; // For depth/stencil buffer 1 level is enough
+	depthStencilDesc.ArraySize = 1; // For depth/stencil buffer 1 texture is needed in 1 texture array
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT; // Only GPU is able to read/write, CPU isn't
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0; // As CPU doesn't have access to this resource in VRAM
+	depthStencilDesc.MiscFlags = 0; // Default
+
+	// 4X MSAA -- must match up with swap chain MSAA values
+	if (mEnable4xMsaa)
+	{
+		depthStencilDesc.SampleDesc.Count = 4;
+		depthStencilDesc.SampleDesc.Quality = m4xMsaaQuality - 1; // Use maximum quality
+	}
+	else
+	{
+		depthStencilDesc.SampleDesc.Count = 1;
+		depthStencilDesc.SampleDesc.Quality = 0;
+	}
+
+	HR(mDevice->CreateTexture2D(&depthStencilDesc, nullptr, &mDepthStencilBuffer));
+	HR(mDevice->CreateDepthStencilView(mDepthStencilBuffer, nullptr, &mDepthStencilView));
+
+	// Bind the render target view and depth/stencil view created above to the pipeline
+	mImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+
+	// Set viewport
+	mScreenViewport = D3D11_VIEWPORT{ 0.0f, 0.0f,
+		(float)mClientWidth, (float)mClientHeight,
+		0.0f, 1.0f };
+
+	mImmediateContext->RSSetViewports(1, &mScreenViewport);
 }
 
 void D3DApp::EventWindowResize(WPARAM wParam)
