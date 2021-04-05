@@ -18,6 +18,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mRenderTargetView(nullptr)
 , mDepthStencilView(nullptr)
 , mDepthStencilBuffer(nullptr)
+, mScreenViewport()
 , mBackBufferFormat(DXGI_FORMAT_B8G8R8A8_UNORM)
 
 , mFullscreen(false)
@@ -92,8 +93,18 @@ void D3DApp::OnResize()
 		depthStencilDesc.SampleDesc.Quality = 0;
 	}
 
-	mDevice->CreateTexture2D(&depthStencilDesc, nullptr, &mDepthStencilBuffer);
-	//mDevice->CreateDepthStencilView(&depthStencilDesc,)
+	HR(mDevice->CreateTexture2D(&depthStencilDesc, nullptr, &mDepthStencilBuffer));
+	HR(mDevice->CreateDepthStencilView(mDepthStencilBuffer, nullptr, &mDepthStencilView));
+
+	// Bind the render target view and depth/stencil view created above to the pipeline
+	mImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+
+	// Set viewport
+	mScreenViewport = D3D11_VIEWPORT{ 0.0f, 0.0f, 
+		(float)mClientWidth, (float)mClientHeight, 
+		0.0f, 1.0f };
+
+	mImmediateContext->RSSetViewports(1, &mScreenViewport);
 }
 
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

@@ -26,6 +26,7 @@ protected:
 	ID3D11RenderTargetView* mRenderTargetView;
 	ID3D11DepthStencilView* mDepthStencilView;
 	ID3D11Texture2D* mDepthStencilBuffer;
+	D3D11_VIEWPORT mScreenViewport;
 
 	DXGI_FORMAT mBackBufferFormat;
 
