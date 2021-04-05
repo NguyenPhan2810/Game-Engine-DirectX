@@ -4,7 +4,7 @@
 
 int main()
 {
-	D3DApp theAPP();
+	D3DApp theAPP;
 
 	return 0;
 }

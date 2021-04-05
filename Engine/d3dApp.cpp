@@ -1,5 +1,4 @@
 #include "d3dApp.h"
-#include <cassert>
 
 D3DApp::D3DApp()
 {
@@ -43,6 +42,7 @@ bool D3DApp::InitDirect3D()
 
 	HR(mDevice->CheckMultisampleQualityLevels(
 		DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality));
+
 	assert(m4xMsaaQuality > 0);
 #pragma endregion
 
