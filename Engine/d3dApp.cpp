@@ -11,16 +11,21 @@ LRESULT MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 D3DApp::D3DApp(HINSTANCE hInstance)
 : mhAppInstance(hInstance)
 , mhMainWnd(NULL)
+
 , mDevice(nullptr)
 , mImmediateContext(nullptr)
 , mSwapChain(nullptr)
+, mRenderTargetView(nullptr)
+
+, mBackBufferFormat(DXGI_FORMAT_B8G8R8A8_UNORM)
+
 , mFullscreen(false)
 , m4xMsaaQuality(0)
 , mEnable4xMsaa(true)
 , mClientHeight(600)
 , mClientWidth(800)
 , mClientRefreshRate(144)
-, mMainWindowCaption()
+, mMainWindowCaption(L"Game Engine DirectX 11")
 {
 	// Set a pointer to this instance to get message from MainWndProc
 	gd3dApp = this;
@@ -28,13 +33,37 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 
 bool D3DApp::Init()
 {
-	if (InitMainWindow())
+	if (!InitMainWindow())
 		return false;
 
 	if (!InitDirect3D())
 		return false;
 
 	return true;
+}
+
+void D3DApp::OnResize()
+{
+	assert(mDevice);
+	assert(mImmediateContext);
+	assert(mSwapChain);
+
+	// Release old views because they hold refs to the back buffers
+	// which is going to be destroyed
+
+	ReleaseCOM(mRenderTargetView);
+
+	// Resize swap chain (Backbuffer) and recreate render target view
+	ID3D11Texture2D* backBuffer = nullptr;
+	HR(mSwapChain->ResizeBuffers(1, mClientWidth, mClientHeight, mBackBufferFormat, 0));
+	HR(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer));
+	HR(mDevice->CreateRenderTargetView(backBuffer, nullptr, &mRenderTargetView));
+
+	// GetBuffer increase COM ref count to back buffer
+	// so release it as it is not in need anymore
+	ReleaseCOM(backBuffer); 
+
+
 }
 
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -44,6 +73,23 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 bool D3DApp::InitMainWindow()
 {
+	WNDCLASS wc;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = MainWndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = mhAppInstance;
+	wc.hIcon = LoadIcon(0, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(0, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+	wc.lpszMenuName = 0;
+	wc.lpszClassName = L"D3DWndClassName";
+
+	if (!RegisterClass(&wc))
+	{
+		MessageBox(0, L"RegisterClass Failed.", 0, 0);
+		return false;
+	}
 
 	// Compute window rectangle dimensions based on requested client area dimensions.
 	RECT R = { 0, 0, mClientWidth, mClientHeight };
@@ -112,7 +158,7 @@ bool D3DApp::InitDirect3D()
 	sd.BufferDesc.Width = mClientWidth;
 	sd.BufferDesc.Height = mClientHeight;
 	sd.BufferDesc.RefreshRate = DXGI_RATIONAL{ mClientRefreshRate, 1 };
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.Format = mBackBufferFormat;
 	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
@@ -150,6 +196,10 @@ bool D3DApp::InitDirect3D()
 	ReleaseCOM(dxgiDevice);
 
 #pragma endregion
+
+	// The remaining codes are needed for initialization as also for resizing
+	// window, So just call it here like the window is resizing from null to existance
+	OnResize();
 
 	return true;
 }
