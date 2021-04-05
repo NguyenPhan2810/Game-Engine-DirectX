@@ -24,6 +24,8 @@ protected:
 	IDXGISwapChain* mSwapChain;
 	ID3D11DeviceContext* mImmediateContext;
 	ID3D11RenderTargetView* mRenderTargetView;
+	ID3D11DepthStencilView* mDepthStencilView;
+	ID3D11Texture2D* mDepthStencilBuffer;
 
 	DXGI_FORMAT mBackBufferFormat;
 

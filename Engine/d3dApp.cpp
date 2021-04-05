@@ -16,7 +16,8 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mImmediateContext(nullptr)
 , mSwapChain(nullptr)
 , mRenderTargetView(nullptr)
-
+, mDepthStencilView(nullptr)
+, mDepthStencilBuffer(nullptr)
 , mBackBufferFormat(DXGI_FORMAT_B8G8R8A8_UNORM)
 
 , mFullscreen(false)
@@ -52,6 +53,8 @@ void D3DApp::OnResize()
 	// which is going to be destroyed
 
 	ReleaseCOM(mRenderTargetView);
+	ReleaseCOM(mDepthStencilBuffer);
+	ReleaseCOM(mDepthStencilView);
 
 	// Resize swap chain (Backbuffer) and recreate render target view
 	ID3D11Texture2D* backBuffer = nullptr;
@@ -63,7 +66,34 @@ void D3DApp::OnResize()
 	// so release it as it is not in need anymore
 	ReleaseCOM(backBuffer); 
 
+	// Recreate Depth/Stencil buffer and view
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
+	depthStencilDesc.Width = mClientWidth;
+	depthStencilDesc.Height = mClientHeight;
+	depthStencilDesc.MipLevels = 1; // For depth/stencil buffer 1 level is enough
+	depthStencilDesc.ArraySize = 1; // For depth/stencil buffer 1 texture is needed in 1 texture array
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT; // Only GPU is able to read/write, CPU isn't
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0; // As CPU doesn't have access to this resource in VRAM
+	depthStencilDesc.MiscFlags = 0; // Default
+
+	// 4X MSAA -- must match up with swap chain MSAA values
+	if (mEnable4xMsaa)
+	{
+		depthStencilDesc.SampleDesc.Count = 4;
+		depthStencilDesc.SampleDesc.Quality = m4xMsaaQuality - 1; // Use maximum quality
+	}
+	else
+	{
+		depthStencilDesc.SampleDesc.Count = 1;
+		depthStencilDesc.SampleDesc.Quality = 0;
+	}
+
+	mDevice->CreateTexture2D(&depthStencilDesc, nullptr, &mDepthStencilBuffer);
+	//mDevice->CreateDepthStencilView(&depthStencilDesc,)
 }
 
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -94,6 +124,8 @@ bool D3DApp::InitMainWindow()
 	// Compute window rectangle dimensions based on requested client area dimensions.
 	RECT R = { 0, 0, mClientWidth, mClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+
+	// Calculate width height after adjustment
 	int width = R.right - R.left;
 	int height = R.bottom - R.top;
 
@@ -163,12 +195,15 @@ bool D3DApp::InitDirect3D()
 	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
 	// 4X MSAA
-	if (!mEnable4xMsaa)
-		sd.SampleDesc = DXGI_SAMPLE_DESC{ 1, 0 };
-	else
+	if (mEnable4xMsaa)
 	{
 		sd.SampleDesc.Count = 4;
 		sd.SampleDesc.Quality = m4xMsaaQuality - 1; // Use maximum quality
+	}
+	else
+	{
+		sd.SampleDesc.Count = 1;
+		sd.SampleDesc.Quality = 0;
 	}
 
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
