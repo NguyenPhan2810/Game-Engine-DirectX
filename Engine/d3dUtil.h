@@ -7,6 +7,7 @@
 #include <sal.h>
 #include <wchar.h>
 #include <vector>
+#include <string>
 
 //----------------------------------------------------------------------------
 // Macro for safe releasing COM object

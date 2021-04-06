@@ -8,6 +8,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 
 void NPGameEngine::UpdateScene(float dt)
 {
+	LogOut << "Hello " << dt << "\n";
 }
 
 void NPGameEngine::DrawScene()

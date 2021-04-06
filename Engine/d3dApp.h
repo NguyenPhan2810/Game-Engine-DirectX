@@ -34,6 +34,10 @@ protected:
 
 	void EventWindowResize(WPARAM wParam);
 
+public:
+	// Convenience way to log to Output
+	std::wstringstream LogOut;
+
 protected:
 	HINSTANCE mhAppInstance;
 	HWND mhMainWnd;
