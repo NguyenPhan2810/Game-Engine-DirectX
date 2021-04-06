@@ -1,8 +1,9 @@
 #pragma once
 
-#include <windows.h> // must be included before xnamath.n
-#include <xnamath.h>
+
+#include <d3dx11effect.h>
 #include <D3DX11.h>
+#include <xnamath.h>
 #include <cassert>
 #include <sal.h>
 #include <wchar.h>

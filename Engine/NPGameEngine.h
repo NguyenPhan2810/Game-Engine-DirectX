@@ -1,5 +1,5 @@
 #pragma once
-#include "d3dUtil.h"
+
 #include "d3dApp.h"
 
 struct Vertex
@@ -20,9 +20,14 @@ public:
 
 private:
 	void BuildGeometryBuffers();
+	void BuildShaders();
 
 private:
 	ID3D11Buffer* mBoxVertexBuffer;
 	ID3D11Buffer* mBoxIndexBuffer;
+
+	ID3DX11Effect* mFX;
+	ID3DX11EffectTechnique* mTech;
+	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
 };
 

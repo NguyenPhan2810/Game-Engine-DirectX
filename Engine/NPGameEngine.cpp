@@ -1,3 +1,4 @@
+
 #include "NPGameEngine.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
@@ -17,6 +18,9 @@ bool NPGameEngine::Init()
 		return false;
 
 	BuildGeometryBuffers();
+	BuildShaders();
+
+	return true;
 }
 
 void NPGameEngine::UpdateScene(float dt)
@@ -98,16 +102,51 @@ void NPGameEngine::BuildGeometryBuffers()
 	};
 
 	D3D11_BUFFER_DESC ibd;
-	vbd.ByteWidth = sizeof(indices);
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
+	ibd.ByteWidth = sizeof(indices);
+	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+	ibd.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA indexInitData;
 	indexInitData.pSysMem = indices;
 
 	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mBoxIndexBuffer));
 #pragma endregion
+}
+
+void NPGameEngine::BuildShaders()
+{
+	DWORD shaderFlags = 0;
+#if defined(DEBUG) || defined(_DEBUG)
+	shaderFlags |= D3D10_SHADER_DEBUG;
+	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
+#endif
+
+	ID3D10Blob* compiledShader = nullptr;
+	ID3D10Blob* compilationMsgs = nullptr;
+
+	HR(D3DX11CompileFromFile(L"FX/color.fx",
+		0, 0, 0,
+		"fx_5_0",
+		shaderFlags, 0, 0,
+		&compiledShader, &compilationMsgs,
+		0));
+
+	// Catch messages
+	if (compilationMsgs)
+	{
+		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
+		ReleaseCOM(compilationMsgs);
+	}
+
+	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
+		0, mDevice, &mFX));
+
+	// Shader compilation done
+	ReleaseCOM(compiledShader);
+
+	mTech = mFX->GetTechniqueByName("ColorTech");
+	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
 }
