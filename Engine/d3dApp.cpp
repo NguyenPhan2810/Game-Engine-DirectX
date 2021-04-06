@@ -83,6 +83,10 @@ int D3DApp::Run()
 
 	mTimer.Reset();
 
+	float timeSinceLastUpdate = 0;
+	float timePerFrame = 1.0f / mClientRefreshRate;
+	float deltaTime = 0;
+
 	while (!mAppQuit)
 	{
 		// If there are Window messages then process them.
@@ -95,16 +99,32 @@ int D3DApp::Run()
 				mAppQuit = true;
 		}
 
-		mTimer.Tick();
 
-		if (!mAppPaused)
+		if (mAppPaused)
 		{
-			UpdateScene(mTimer.DeltaTime());
-			DrawScene();
+			continue;
 		}
-		else
-		{
 
+		// Time control
+		mTimer.Tick();
+		deltaTime = mTimer.DeltaTime();
+		timeSinceLastUpdate += deltaTime;
+
+
+		// Update scene as fast as client refresh rate
+		// So that the dt is fixed for physic or something require fixed step time
+		if (timeSinceLastUpdate >= timePerFrame)
+		{
+			UpdateScene(timePerFrame);
+			timeSinceLastUpdate -= timePerFrame;
+		}
+		
+		// Draw scene as fast as possible
+		// If the draw step takes long time to execute
+		// Then UpdateScene will update several times between frames
+		if (timeSinceLastUpdate < timePerFrame)
+		{
+			DrawScene();
 		}
 	}
 
