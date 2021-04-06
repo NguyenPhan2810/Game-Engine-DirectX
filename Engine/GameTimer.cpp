@@ -2,7 +2,8 @@
 
 
 GameTimer::GameTimer()
-: mDeltaTime(-1.0)
+: mTotalTime(0.0)
+, mDeltaTime(-1.0)
 , mPausedTime(0.0)
 , mBaseTime()
 , mStopTime()
@@ -12,16 +13,19 @@ GameTimer::GameTimer()
 {
 }
 
-float GameTimer::TotalTime() const
+float GameTimer::TotalTime()
 {
-    if (mStopped)
+    if (mTotalTime == 0)
     {
-        return TimeDiff(mBaseTime, mStopTime) - mPausedTime;
+        // Here I recalculate total time instead of adding it each tick
+        // because it will reduce floating point error during addition
+        if (mStopped)
+            mTotalTime = TimeDiff(mBaseTime, mStopTime) - mPausedTime;
+        else
+            mTotalTime = TimeDiff(mBaseTime, mCurrentTime) - mPausedTime;
     }
-    else
-    {
-        return TimeDiff(mBaseTime, mCurrentTime) - mPausedTime;
-    }
+
+    return mTotalTime;
 }
 
 float GameTimer::DeltaTime() const
@@ -68,6 +72,7 @@ void GameTimer::Tick()
         return;
     }
 
+    mTotalTime = 0;
 
     mCurrentTime = now();
     

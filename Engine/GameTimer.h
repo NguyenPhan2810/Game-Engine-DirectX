@@ -8,7 +8,7 @@ class GameTimer
 public:
 	GameTimer();
 
-	float TotalTime() const;
+	float TotalTime();
 	float DeltaTime() const;
 
 	void Reset(); // Call before main loop
@@ -36,4 +36,9 @@ protected:
 	std::chrono::system_clock::time_point mCurrentTime;
 
 	bool mStopped;
+
+private:
+	// Store total time so method TotalTime doesnt have to recalculate
+	// everytime it's called during a frame
+	double mTotalTime;
 };

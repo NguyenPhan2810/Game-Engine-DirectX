@@ -386,7 +386,6 @@ void D3DApp::EventWindowResize(WPARAM wParam)
 	}
 }
 
-
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -417,6 +416,7 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	// WM_ENTERSIZEMOVE is sent when user grab the resize bars
 	case WM_ENTERSIZEMOVE:
 	{
+		Pause();
 		mAppResizing = true;
 		return NULL;
 	}
@@ -424,6 +424,7 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	// Reset everything based on the new window dimensions
 	case WM_EXITSIZEMOVE:
 	{
+		Unpause();
 		mAppResizing = false;
 		OnResize();
 		return NULL;

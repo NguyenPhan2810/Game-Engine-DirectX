@@ -5,13 +5,19 @@ class InitDirect3DApp : public D3DApp
 public:
 	InitDirect3DApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
+	, mColor(0, 0, 0, 1)
 	{
 
 	}
 
 	virtual void UpdateScene(float dt = 0) override
 	{
-
+		auto output = std::to_wstring(mTimer.TotalTime());
+		output += L"\n";
+		OutputDebugString(output.c_str());
+		mColor.r = 255 * abs(sin(2 * mTimer.TotalTime()));
+		mColor.g = 255 * abs(sin(3 * mTimer.TotalTime()));
+		mColor.b = 255 * abs(sin(4 * mTimer.TotalTime()));
 	}
 
 	virtual void DrawScene() override
@@ -19,17 +25,15 @@ public:
 		assert(mImmediateContext);
 		assert(mSwapChain);
 
-		mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Black));
+		auto clearColor = XMLoadColor(&mColor);
+		mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&clearColor));
 		mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		HR(mSwapChain->Present(0, 0));
 	}
 
-
-	virtual void OnMouseMove(WPARAM btnState, int x, int y) override
-	{
-
-	}
+private:
+	XMCOLOR mColor;
 };
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
