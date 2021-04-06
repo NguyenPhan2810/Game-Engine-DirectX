@@ -43,6 +43,7 @@ void NPGameEngine::DrawScene()
 
 void NPGameEngine::BuildGeometryBuffers()
 {
+#pragma region Create vertex buffer		
 	Vertex cubeVertices[] =
 	{
 		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), (const float*)&Colors::White   },
@@ -55,7 +56,6 @@ void NPGameEngine::BuildGeometryBuffers()
 		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), (const float*)&Colors::Magenta }
 	};
 
-	// Create vertex buffer
 	D3D11_BUFFER_DESC vbd;
 	vbd.ByteWidth = sizeof(cubeVertices);
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -64,8 +64,50 @@ void NPGameEngine::BuildGeometryBuffers()
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA vInitData;
-	vInitData.pSysMem = cubeVertices;
+	D3D11_SUBRESOURCE_DATA vertexInitData;
+	vertexInitData.pSysMem = cubeVertices;
 
-	HR(mDevice->CreateBuffer(&vbd, &vInitData, &mBoxVertexBuffer));
+	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mBoxVertexBuffer));
+#pragma endregion
+
+#pragma region Create index buffer
+	UINT indices[] = {
+		// front face
+		0, 1, 2,
+		0, 2, 3,
+
+		// back face
+		4, 6, 5,
+		4, 7, 6,
+
+		// left face
+		4, 5, 1,
+		4, 1, 0,
+
+		// right face
+		3, 2, 6,
+		3, 6, 7,
+
+		// top face
+		1, 5, 6,
+		1, 6, 2,
+
+		// bottom face
+		4, 0, 3,
+		4, 3, 7
+	};
+
+	D3D11_BUFFER_DESC ibd;
+	vbd.ByteWidth = sizeof(indices);
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA indexInitData;
+	indexInitData.pSysMem = indices;
+
+	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mBoxIndexBuffer));
+#pragma endregion
 }

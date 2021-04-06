@@ -23,6 +23,6 @@ private:
 
 private:
 	ID3D11Buffer* mBoxVertexBuffer;
-
+	ID3D11Buffer* mBoxIndexBuffer;
 };
 
