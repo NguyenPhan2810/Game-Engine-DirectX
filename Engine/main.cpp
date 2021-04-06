@@ -25,10 +25,15 @@ public:
 		assert(mImmediateContext);
 		assert(mSwapChain);
 
+		// Clear buffer
 		auto clearColor = XMLoadColor(&mColor);
 		mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&clearColor));
 		mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+		// Draw
+		mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// Present buffer
 		HR(mSwapChain->Present(0, 0));
 	}
 

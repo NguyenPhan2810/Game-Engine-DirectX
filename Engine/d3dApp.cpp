@@ -390,14 +390,14 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-		// VM_ACTIVATE is sent when window is activated or deactivated.
-		// Pause the game when it deactivates and unpause otherwise.
+	// VM_ACTIVATE is sent when window is activated or deactivated.
+	// Pause the game when it deactivates and unpause otherwise.
 	case WM_ACTIVATE:
 	{
-		if (LOWORD(wParam) == WA_INACTIVE)
+		/*if (LOWORD(wParam) == WA_INACTIVE)
 			Pause();
 		else
-			Unpause();
+			Unpause();*/
 
 		return NULL;
 	}
