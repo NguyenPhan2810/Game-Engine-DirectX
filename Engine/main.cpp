@@ -12,12 +12,9 @@ public:
 
 	virtual void UpdateScene(float dt = 0) override
 	{
-		auto output = std::to_wstring(mTimer.TotalTime());
-		output += L"\n";
-		OutputDebugString(output.c_str());
-		mColor.r = 255 * abs(sin(2 * mTimer.TotalTime()));
-		mColor.g = 255 * abs(sin(3 * mTimer.TotalTime()));
-		mColor.b = 255 * abs(sin(4 * mTimer.TotalTime()));
+		mColor.r = 50 + 150 * abs(sin(0.4 * mTimer.TotalTime()));
+		mColor.g = 50 + 150 * abs(sin(0.8 * mTimer.TotalTime()));
+		mColor.b = 50 + 150 * abs(sin(0.5 * mTimer.TotalTime()));
 	}
 
 	virtual void DrawScene() override

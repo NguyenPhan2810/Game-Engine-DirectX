@@ -62,6 +62,6 @@ protected:
 	int mClientHeight;
 	int mClientMinWidth;
 	int mClientMinHeight;
-	bool mFullscreen;
+	bool mStartFullscreen;
 	UINT mClientRefreshRate;
 };

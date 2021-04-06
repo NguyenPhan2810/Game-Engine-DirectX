@@ -22,7 +22,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mScreenViewport()
 , mBackBufferFormat(DXGI_FORMAT_B8G8R8A8_UNORM)
 
-, mFullscreen(false)
+, mStartFullscreen(false)
 , m4xMsaaQuality(0)
 , mEnable4xMsaa(true)
 , mClientHeight(600)
@@ -44,6 +44,10 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 
 D3DApp::~D3DApp()
 {
+	// Can't release swap chain in fullscreen
+	assert(mSwapChain);
+	HR(mSwapChain->SetFullscreenState(FALSE, NULL));
+
 	ReleaseCOM(mSwapChain);
 	ReleaseCOM(mDepthStencilView);
 	ReleaseCOM(mRenderTargetView);
@@ -53,8 +57,8 @@ D3DApp::~D3DApp()
 	if (mImmediateContext)
 		mImmediateContext->ClearState();
 
-	ReleaseCOM(mImmediateContext);
 	ReleaseCOM(mDevice);
+	ReleaseCOM(mImmediateContext);
 }
 
 HINSTANCE D3DApp::AppInst() const
@@ -69,7 +73,7 @@ HWND D3DApp::MainWnd() const
 
 float D3DApp::AspectRatio() const
 {
-	return (float)mClientWidth / mClientHeight;
+	return static_cast<float>(mClientWidth) / mClientHeight;
 }
 
 int D3DApp::Run()
@@ -98,7 +102,7 @@ int D3DApp::Run()
 			}	
 			else
 			{
-				Sleep(1);
+
 			}
 		}
 	}
@@ -248,7 +252,7 @@ bool D3DApp::InitDirect3D()
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = 1; // Double buffer
 	sd.OutputWindow = mhMainWnd;
-	sd.Windowed = !mFullscreen;
+	sd.Windowed = !mStartFullscreen;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0; // Default	
 	
@@ -354,24 +358,24 @@ void D3DApp::EventWindowResize(WPARAM wParam)
 	}
 	else if (wParam == SIZE_MAXIMIZED)
 	{
+		OnResize();
 		Unpause();
 		mAppMinimized = false;
 		mAppMaximized = true;
-		OnResize();
 	}
 	else if (wParam == SIZE_RESTORED)
 	{
 		if (mAppMinimized)
 		{
+			OnResize();
 			Unpause();
 			mAppMinimized = false;
-			OnResize();
 		}
 		else if (mAppMaximized)
 		{
+			OnResize();
 			Unpause();
 			mAppMaximized = false;
-			OnResize();
 		}
 		else if (mAppResizing)
 		{
