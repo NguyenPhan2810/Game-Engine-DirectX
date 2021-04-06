@@ -43,6 +43,7 @@ protected:
 	bool mAppMinimized;
 	bool mAppMaximized;
 	bool mAppResizing;
+	bool mAppQuit;
 
 	GameTimer mTimer;
 
@@ -56,6 +57,8 @@ protected:
 
 	DXGI_FORMAT mBackBufferFormat;
 
+
+	// Derived class should initialize this
 	std::wstring mMainWindowCaption;
 	bool mEnable4xMsaa;
 	int mClientWidth;

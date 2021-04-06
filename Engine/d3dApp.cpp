@@ -32,6 +32,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mClientRefreshRate(144)
 , mMainWindowCaption(L"Game Engine DirectX 11")
 
+, mAppQuit(false)
 , mAppPaused(false)
 , mAppMinimized(false)
 , mAppMaximized(false)
@@ -82,28 +83,28 @@ int D3DApp::Run()
 
 	mTimer.Reset();
 
-	while (msg.message != WM_QUIT)
+	while (!mAppQuit)
 	{
 		// If there are Window messages then process them.
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+
+			if (msg.message == WM_QUIT)
+				mAppQuit = true;
 		}
-		// Otherwise, do animation/game stuff.
+
+		mTimer.Tick();
+
+		if (!mAppPaused)
+		{
+			UpdateScene(mTimer.DeltaTime());
+			DrawScene();
+		}
 		else
 		{
-			mTimer.Tick();
 
-			if (!mAppPaused)
-			{
-				UpdateScene(mTimer.DeltaTime());
-				DrawScene();
-			}	
-			else
-			{
-
-			}
 		}
 	}
 
