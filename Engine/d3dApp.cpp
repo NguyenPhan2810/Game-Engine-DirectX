@@ -90,8 +90,8 @@ int D3DApp::Run()
 	while (!mAppQuit)
 	{
 		// Log everything in prev frame
-		OutputDebugStringW(LogOut.str().c_str());
-		LogOut.clear();
+		OutputDebugStringW(Log.str().c_str());
+		Log.clear();
 
 		// If there are Window messages then process them.
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))

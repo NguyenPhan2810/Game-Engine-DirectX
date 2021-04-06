@@ -36,7 +36,7 @@ protected:
 
 public:
 	// Convenience way to log to Output
-	std::wstringstream LogOut;
+	std::wstringstream Log;
 
 protected:
 	HINSTANCE mhAppInstance;
