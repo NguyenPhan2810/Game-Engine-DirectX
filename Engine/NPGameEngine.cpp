@@ -1,5 +1,6 @@
 
 #include "NPGameEngine.h"
+#include "d3dx11effect.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)

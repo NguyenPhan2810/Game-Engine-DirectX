@@ -1,6 +1,6 @@
 #pragma once
 
-#include <d3dx11effect.h>
+#include "d3dx11effect.h"
 #include <d3dcompiler.h>
 #include <D3DX11.h>
 #include <xnamath.h>
