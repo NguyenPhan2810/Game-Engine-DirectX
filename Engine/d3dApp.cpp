@@ -91,7 +91,7 @@ int D3DApp::Run()
 	{
 		// Log everything in prev frame
 		OutputDebugStringW(Log.str().c_str());
-		Log.clear();
+		Log.str(L"");
 
 		// If there are Window messages then process them.
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))

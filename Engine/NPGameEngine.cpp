@@ -3,6 +3,11 @@
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
+, mBoxVertexBuffer(nullptr)
+, mBoxIndexBuffer(nullptr)
+, mFX(nullptr)
+, mTech(nullptr)
+, mfxWorldViewProj(nullptr)
 {
 	mMainWindowCaption = L"NP Game Engine v0.1";
 }
@@ -143,10 +148,15 @@ void NPGameEngine::BuildShaders()
 
 	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
 		0, mDevice, &mFX));
+	
 
 	// Shader compilation done
 	ReleaseCOM(compiledShader);
 
-	mTech = mFX->GetTechniqueByName("ColorTech");
-	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	Log << "Here's mFX: " << mFX << std::endl;
+	if (mFX)
+	{
+		mTech = mFX->GetTechniqueByName("ColorTech");
+		mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	}
 }
