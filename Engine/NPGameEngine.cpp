@@ -116,7 +116,7 @@ void NPGameEngine::BuildGeometryBuffers()
 	GeometryGenerator geoGen;
 	//geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
 	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
-	geoGen.CreateSphere(0.5f, 20, 20, sphere);
+	geoGen.CreateGeoSphere(0.5f, 3, sphere);
 	//geoGen.CreateGeosphere(0.5f, 2, sphere);
 	geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20, cylinder);
 
@@ -352,7 +352,7 @@ void NPGameEngine::DrawScene()
 	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set up
-	mImmediateContext->RSSetState(mWireframeRS);
+	//mImmediateContext->RSSetState(mWireframeRS);
 	mImmediateContext->IASetInputLayout(mInputLayout);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
