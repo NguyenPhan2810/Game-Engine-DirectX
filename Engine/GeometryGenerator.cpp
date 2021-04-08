@@ -197,8 +197,8 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 #pragma region Generate vertices
 	UINT vertCount = m * n;
 
-	const float dx = lengthX / (m - 1);
-	const float dz = lengthZ / (n - 1);
+	const float dx = lengthX / (n - 1);
+	const float dz = lengthZ / (m - 1);
 
 	meshData.vertices.resize(vertCount);
 
