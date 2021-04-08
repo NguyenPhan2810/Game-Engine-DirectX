@@ -33,9 +33,9 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
 
-	//XMMATRIX boxScale = XMMatrixScaling(2.0f, 1.0f, 2.0f);
-	//XMMATRIX boxOffset = XMMatrixTranslation(0.0f, 0.5f, 0.0f);
-	//XMStoreFloat4x4(&mBoxWorld, XMMatrixMultiply(boxScale, boxOffset));
+	XMMATRIX boxScale = XMMatrixScaling(2.0f, 1.0f, 2.0f);
+	XMMATRIX boxOffset = XMMatrixTranslation(0.0f, 0.5f, 0.0f);
+	XMStoreFloat4x4(&mBoxWorld, XMMatrixMultiply(boxScale, boxOffset));
 
 	XMMATRIX centerSphereScale = XMMatrixScaling(2.0f, 2.0f, 2.0f);
 	XMMATRIX centerSphereOffset = XMMatrixTranslation(0.0f, 2.0f, 0.0f);
@@ -108,44 +108,43 @@ void NPGameEngine::InitRasterizerState()
 
 void NPGameEngine::BuildGeometryBuffers()
 {
-	//GeometryGenerator::MeshData box;
+	GeometryGenerator::MeshData box;
 	GeometryGenerator::MeshData grid;
 	GeometryGenerator::MeshData sphere;
 	GeometryGenerator::MeshData cylinder;
 
 	GeometryGenerator geoGen;
-	//geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
+	geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
 	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
 	geoGen.CreateGeoSphere(0.5f, 3, sphere);
-	//geoGen.CreateGeosphere(0.5f, 2, sphere);
 	geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20, cylinder);
 
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
-	//mBoxVertexOffset = 0;
-	mGridVertexOffset = 0;
+	mBoxVertexOffset = 0;
+	mGridVertexOffset = box.vertices.size();
 	mSphereVertexOffset = mGridVertexOffset + grid.vertices.size();
 	mCylinderVertexOffset = mSphereVertexOffset + sphere.vertices.size();
 
 	// Cache the index count of each object.
-	//mBoxIndexCount = box.indices.size();
+	mBoxIndexCount = box.indices.size();
 	mGridIndexCount = grid.indices.size();
 	mSphereIndexCount = sphere.indices.size();
 	mCylinderIndexCount = cylinder.indices.size();
 
 	// Cache the starting index for each object in the concatenated index buffer.
-	//mBoxIndexOffset = 0;
-	mGridIndexOffset = 0;
+	mBoxIndexOffset = 0;
+	mGridIndexOffset = mBoxIndexCount;
 	mSphereIndexOffset = mGridIndexOffset + mGridIndexCount;
 	mCylinderIndexOffset = mSphereIndexOffset + mSphereIndexCount;
 
 	UINT totalVertexCount =
-		//box.vertices.size() +
+		box.vertices.size() +
 		grid.vertices.size() +
 		sphere.vertices.size() +
 		cylinder.vertices.size();
 
 	UINT totalIndexCount =
-		//mBoxIndexCount +
+		mBoxIndexCount +
 		mGridIndexCount +
 		mSphereIndexCount +
 		mCylinderIndexCount;
@@ -160,11 +159,11 @@ void NPGameEngine::BuildGeometryBuffers()
 	XMFLOAT4 black(0.0f, 0.0f, 0.0f, 1.0f);
 
 	UINT k = 0;
-	//for (size_t i = 0; i < box.vertices.size(); ++i, ++k)
-	//{
-	//	vertices[k].Pos = box.vertices[i].position;
-	//	vertices[k].Color = black;
-	//}
+	for (size_t i = 0; i < box.vertices.size(); ++i, ++k)
+	{
+		vertices[k].Pos = box.vertices[i].position;
+		vertices[k].Color = black;
+	}
 
 	for (size_t i = 0; i < grid.vertices.size(); ++i, ++k)
 	{
@@ -201,7 +200,7 @@ void NPGameEngine::BuildGeometryBuffers()
 	//
 
 	std::vector<UINT> indices;
-	//indices.insert(indices.end(), box.indices.begin(), box.indices.end());
+	indices.insert(indices.end(), box.indices.begin(), box.indices.end());
 	indices.insert(indices.end(), grid.indices.begin(), grid.indices.end());
 	indices.insert(indices.end(), sphere.indices.begin(), sphere.indices.end());
 	indices.insert(indices.end(), cylinder.indices.begin(), cylinder.indices.end());
@@ -352,7 +351,6 @@ void NPGameEngine::DrawScene()
 	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set up
-	//mImmediateContext->RSSetState(mWireframeRS);
 	mImmediateContext->IASetInputLayout(mInputLayout);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -372,25 +370,30 @@ void NPGameEngine::DrawScene()
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
 		// Draw the grid.
+		mImmediateContext->RSSetState(mWireframeRS);
 		XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
 		XMMATRIX worldViewProj = world * viewProj;
 		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 		mImmediateContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
 
+		mImmediateContext->RSSetState(0);
 		// Draw the box.
-		//world = XMLoadFloat4x4(&mBoxWorld);
-		//mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-		//mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-		//mImmediateContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
+		world = XMLoadFloat4x4(&mBoxWorld);
+		worldViewProj = world * viewProj;
+		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+		mImmediateContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
 
 		// Draw center sphere.
+		mImmediateContext->RSSetState(mWireframeRS);
 		world = XMLoadFloat4x4(&mCenterSphere);
 		worldViewProj = world * viewProj;
 		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 		mImmediateContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
 
+		mImmediateContext->RSSetState(0);
 		// Draw the cylinders.
 		for (int i = 0; i < 10; ++i)
 		{

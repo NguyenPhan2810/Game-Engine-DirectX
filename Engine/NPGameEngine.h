@@ -50,24 +50,24 @@ private:
 	// transform grid from local space to world
 	XMFLOAT4X4 mSphereWorld[10];
 	XMFLOAT4X4 mCylWorld[10];
-	//XMFLOAT4X4 mBoxWorld;
+	XMFLOAT4X4 mBoxWorld;
 	XMFLOAT4X4 mGridWorld;
 	XMFLOAT4X4 mCenterSphere;
 
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
 
-	//int mBoxVertexOffset;
+	int mBoxVertexOffset;
 	int mGridVertexOffset;
 	int mSphereVertexOffset;
 	int mCylinderVertexOffset;
 
-	//UINT mBoxIndexOffset;
+	UINT mBoxIndexOffset;
 	UINT mGridIndexOffset;
 	UINT mSphereIndexOffset;
 	UINT mCylinderIndexOffset;
 
-	//UINT mBoxIndexCount;
+	UINT mBoxIndexCount;
 	UINT mGridIndexCount;
 	UINT mSphereIndexCount;
 	UINT mCylinderIndexCount;
