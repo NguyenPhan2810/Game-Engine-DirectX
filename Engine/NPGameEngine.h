@@ -29,6 +29,8 @@ private:
 	void UpdateViewMatrix();
 
 private:
+	void InitRasterizerState();
+
 	void BuildGeometryBuffers();
 	void BuildShaders();
 	void BuildVertexlayout();
@@ -37,12 +39,13 @@ private:
 	ID3D11Buffer* mVertexBuffer;
 	ID3D11Buffer* mIndexBuffer;
 
-
 	ID3DX11Effect* mFX;
 	ID3DX11EffectTechnique* mTech;
 	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
 
 	ID3D11InputLayout* mInputLayout;
+	ID3D11RasterizerState* mWireframeRS;
+	ID3D11RasterizerState* mSolidRS;
 
 	// transform grid from local space to world
 	XMFLOAT4X4 mGridWorld;

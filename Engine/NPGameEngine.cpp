@@ -12,6 +12,8 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mTech(nullptr)
 , mfxWorldViewProj(nullptr)
 , mInputLayout(nullptr)
+, mWireframeRS(nullptr)
+, mSolidRS(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
 , mCamRadius(50.0f)
@@ -36,6 +38,8 @@ NPGameEngine::~NPGameEngine()
 	ReleaseCOM(mIndexBuffer);
 	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
+	ReleaseCOM(mWireframeRS);
+	ReleaseCOM(mSolidRS);
 }
 
 bool NPGameEngine::Init()
@@ -43,6 +47,7 @@ bool NPGameEngine::Init()
 	if (!D3DApp::Init())
 		return false;
 
+	InitRasterizerState();
 	BuildGeometryBuffers();
 	BuildShaders();
 	BuildVertexlayout();
@@ -63,12 +68,31 @@ void GetNewVector(const GeometryGenerator::Vertex& vert, Vertex& newVertex)
 	newVertex.Color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);;
 }
 
+void NPGameEngine::InitRasterizerState()
+{
+	D3D11_RASTERIZER_DESC wireframeRD, solidRD;
+
+	ZeroMemory(&wireframeRD, sizeof(D3D11_RASTERIZER_DESC));
+	ZeroMemory(&solidRD, sizeof(D3D11_RASTERIZER_DESC));
+
+	solidRD.DepthClipEnable = TRUE;
+	solidRD.CullMode = D3D11_CULL_BACK;
+	solidRD.FillMode = D3D11_FILL_SOLID;
+
+	wireframeRD.DepthClipEnable = TRUE;
+	wireframeRD.FillMode = D3D11_FILL_WIREFRAME;
+	wireframeRD.CullMode = D3D11_CULL_NONE;
+
+	HR(mDevice->CreateRasterizerState(&wireframeRD, &mWireframeRS));
+	HR(mDevice->CreateRasterizerState(&solidRD, &mSolidRS));
+}
+
 void NPGameEngine::BuildGeometryBuffers()
 {
 	GeometryGenerator::MeshData gridData;
 	GeometryGenerator geogen;
 
-	geogen.CreateCylinder(10, 6, 20, 5, 5, gridData);
+	geogen.CreateSphere(25, 25, 25, gridData);
 
 	auto& vertexData = gridData.vertices;
 	auto& indexData = gridData.indices;
@@ -226,6 +250,8 @@ void NPGameEngine::UpdateViewMatrix()
 
 void NPGameEngine::UpdateScene(float dt)
 {
+	mCamTheta += dt;
+
 	UpdateViewMatrix();
 }
 
@@ -258,6 +284,7 @@ void NPGameEngine::DrawScene()
 
 	for (uint32_t p = 0; p < techDesc.Passes; ++p)
 	{
+		mImmediateContext->RSSetState(mWireframeRS);
 		mfxWorldViewProj->SetMatrix(reinterpret_cast<const float*>(&worldViewProj));
 		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 		mImmediateContext->DrawIndexed(mGridIndexCount, 0, 0);

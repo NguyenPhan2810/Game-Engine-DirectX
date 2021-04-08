@@ -37,6 +37,12 @@ public:
 		std::vector<UINT> indices;
 	};
 
+	///<summary>
+	/// Creates a sphere centered at the origin with the given radius.  The
+	/// slices and stacks parameters control the degree of tessellation.
+	///</summary>
+	void CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData);
+
 	/// <summary>
 	/// Generate a grid from top-left to bot-right lies in XZ plane
 	///  with m rows and n column
@@ -63,5 +69,12 @@ private:
 	/// faceUp set to true will create triangle be seen from top culling bottom
 	/// </summary>
 	void CreateCylinderCap(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp);
+
+	/// <summary>
+	/// Create a ring of vertices not contains any faces only edges.
+	/// A ring is centered about the origin and lies in the XZ plane
+	/// faceUp set to true will create triangle be seen from top culling bottom
+	/// </summary>
+	void CreateRingVertex(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp = true);
 };
 
