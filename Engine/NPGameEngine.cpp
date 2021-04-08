@@ -14,7 +14,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mInputLayout(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
-, mCamRadius(100.0f)
+, mCamRadius(50.0f)
 , mCamFOV(70.0f)
 , mCamNear(1.0f)
 , mCamFar(1000.0f)
@@ -51,42 +51,16 @@ bool NPGameEngine::Init()
 }
 
 // Apply height and color to a vertex of a grid
-void GetGridHeightColor(const GeometryGenerator::Vertex& vert, Vertex& newVertex)
+void GetNewVector(const GeometryGenerator::Vertex& vert, Vertex& newVertex)
 {
 	auto x = vert.position.x;
 	auto z = vert.position.z;
-	auto y = 0.3f * (x * sinf(0.1f * x) + 70 * cosf(0.1f * z));
+	auto y = vert.position.y;
 
 	newVertex.Pos.x = x;
 	newVertex.Pos.y = y;
 	newVertex.Pos.z = z;
-
-	// Color the vertex based on its height.
-	if (y < -10.0f)
-	{
-		// Sandy beach color.
-		newVertex.Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
-	}
-	else if (y < 5.0f)
-	{
-		// Light yellow-green.
-		newVertex.Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	}
-	else if (y < 12.0f)
-	{
-		// Dark yellow-green.
-		newVertex.Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-	}
-	else if (y < 20.0f)
-	{
-		// Dark brown.
-		newVertex.Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-	}
-	else
-	{
-		// White snow.
-		newVertex.Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	}
+	newVertex.Color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);;
 }
 
 void NPGameEngine::BuildGeometryBuffers()
@@ -94,7 +68,7 @@ void NPGameEngine::BuildGeometryBuffers()
 	GeometryGenerator::MeshData gridData;
 	GeometryGenerator geogen;
 
-	geogen.CreateGrid(200, 200, 50, 50, gridData);
+	geogen.CreateCylinder(10, 6, 20, 5, 5, gridData);
 
 	auto& vertexData = gridData.vertices;
 	auto& indexData = gridData.indices;
@@ -105,7 +79,7 @@ void NPGameEngine::BuildGeometryBuffers()
 	std::vector<Vertex> vertices(vertexData.size());
 	size_t vertN = vertices.size();
 	for (size_t i = 0 ; i < vertN; ++i)
-		GetGridHeightColor(vertexData[i], vertices[i]);
+		GetNewVector(vertexData[i], vertices[i]);
 
 	// Create vertex buffer
 	D3D11_BUFFER_DESC vbd;

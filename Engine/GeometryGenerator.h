@@ -38,13 +38,30 @@ public:
 	};
 
 	/// <summary>
-	/// Generate a grid lies in XZ plane
+	/// Generate a grid from top-left to bot-right lies in XZ plane
+	///  with m rows and n column
+	///       Z ^            
+	///         |            
+	///         |       X    
+	/// ---------------->   
+	///         |            
+	///         |            
+	///         |      
 	/// </summary>
-	/// <param name="lengthX"> grid's length in X axis </param>
-	/// <param name="lengthZ"> grid's length in Z axis </param>
-	/// <param name="m"> number of vertices divided in Z direction </param>
-	/// <param name="n"> number of vertices divided in X direction </param>
-	/// <param name="meshData"> mesh generated </param>
 	void CreateGrid(float lengthX, float lengthZ, UINT m, UINT n, MeshData& meshData);
+
+	/// <summary>
+	/// Create a cylinder parallel to y axis and centered about the origin
+	/// The sliceCount and stackCount control level of tessellation
+	/// </summary>
+	void CreateCylinder(float bottomRadius, float topRadius, float height, UINT sliceCount,
+		UINT stackCount, MeshData& meshData);
+
+private:
+	/// <summary>
+	/// Create a seperate cylinder cap vertices that doesnt connect toe the cylinder it self
+	/// faceUp set to true will create triangle be seen from top culling bottom
+	/// </summary>
+	void CreateCylinderCap(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp);
 };
 
