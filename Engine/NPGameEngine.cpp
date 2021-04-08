@@ -1,6 +1,7 @@
 
 #include "NPGameEngine.h"
 #include "d3dx11effect.h"
+#include "MathHelper.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
@@ -10,8 +11,22 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mTech(nullptr)
 , mfxWorldViewProj(nullptr)
 , mInputLayout(nullptr)
+, mCamPhi(0.25f * MathHelper::Pi)
+, mCamTheta(1.5f * MathHelper::Pi)
+, mCamRadius(5.0f)
+, mCamFOV(70.0f)
+, mCamNear(1.0f)
+, mCamFar(1000.0f)
+, mMouseSensitivity(0.25f)
 {
 	mMainWindowCaption = L"NP Game Engine v0.1";
+
+	XMMATRIX I = XMMatrixIdentity();
+	XMStoreFloat4x4(&mWorld, I);
+	XMStoreFloat4x4(&mView, I);
+	XMStoreFloat4x4(&mProj, I);
+
+	mLastMousePos = POINT{ 0 };
 }
 
 NPGameEngine::~NPGameEngine()
@@ -32,32 +47,6 @@ bool NPGameEngine::Init()
 	BuildVertexlayout();
 
 	return true;
-}
-
-void NPGameEngine::OnResize()
-{
-	D3DApp::OnResize();
-}
-
-void NPGameEngine::UpdateScene(float dt)
-{
-
-}
-
-void NPGameEngine::DrawScene()
-{
-	assert(mImmediateContext);
-	assert(mSwapChain);
-
-	// Clear buffer
-	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
-	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Draw
-	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Present buffer
-	HR(mSwapChain->Present(0, 0));
 }
 
 void NPGameEngine::BuildGeometryBuffers()
@@ -158,7 +147,7 @@ void NPGameEngine::BuildShaders()
 
 	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
 		0, mDevice, &mFX));
-	
+
 
 	// Shader compilation done
 	ReleaseCOM(compiledShader);
@@ -182,4 +171,111 @@ void NPGameEngine::BuildVertexlayout()
 	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(mDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
 		passDesc.IAInputSignatureSize, &mInputLayout));
+}
+
+void NPGameEngine::OnResize()
+{
+	D3DApp::OnResize();
+
+	// The window resized, so update the aspect ratio and recompute the projection matrix.
+	UpdateProjMatrix();
+}
+
+void NPGameEngine::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
+
+	// Only this window can capture the mouse input
+	SetCapture(mhMainWnd);
+}
+
+void NPGameEngine::OnMouseUp(WPARAM btnState, int x, int y)
+{
+	ReleaseCapture();
+}
+
+void NPGameEngine::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(mMouseSensitivity * static_cast<float>(x - mLastMousePos.x));
+		float dy = XMConvertToRadians(mMouseSensitivity * static_cast<float>(y - mLastMousePos.y));
+
+		// Update angles based on input to orbit camera around box.
+		mCamTheta -= dx;
+		mCamPhi -= dy;
+
+		// Restrict the angle mPhi.
+		mCamPhi = MathHelper::Clamp(mCamPhi, 0.1f, MathHelper::Pi - 0.1f);
+	}
+
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
+}
+
+void NPGameEngine::UpdateProjMatrix()
+{
+	XMMATRIX P = XMMatrixPerspectiveFovLH(mCamFOV * MathHelper::Pi / 180.0f, AspectRatio(), mCamNear, mCamFar);
+	XMStoreFloat4x4(&mProj, P);
+}
+
+void NPGameEngine::UpdateViewMatrix()
+{
+	// Convert Spherical to Cartesian coordinates.
+	float x = mCamRadius * sinf(mCamPhi) * cosf(mCamTheta);
+	float z = mCamRadius * sinf(mCamPhi) * sinf(mCamTheta);
+	float y = mCamRadius * cosf(mCamPhi);
+
+	// Build the view matrix.
+	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&mView, V);
+}
+
+void NPGameEngine::UpdateScene(float dt)
+{
+	UpdateViewMatrix();
+}
+
+void NPGameEngine::DrawScene()
+{
+	assert(mImmediateContext);
+	assert(mSwapChain);
+
+	// Clear buffer
+	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
+	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Set up
+	mImmediateContext->IASetInputLayout(mInputLayout);
+	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	mImmediateContext->IASetVertexBuffers(0, 1, &mBoxVertexBuffer, &stride, &offset);
+	mImmediateContext->IASetIndexBuffer(mBoxIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Update constant in shader
+	XMMATRIX world = XMLoadFloat4x4(&mWorld);
+	XMMATRIX view = XMLoadFloat4x4(&mView);
+	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX worldViewProj = world * view * proj;
+	mfxWorldViewProj->SetMatrix(reinterpret_cast<const float*>(&worldViewProj));
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	mTech->GetDesc(&techDesc);
+
+	for (uint32_t p = 0; p < techDesc.Passes; ++p)
+	{
+		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+		mImmediateContext->DrawIndexed(36, 0, 0);
+	}
+
+	// Present buffer
+	HR(mSwapChain->Present(0, 0));
 }

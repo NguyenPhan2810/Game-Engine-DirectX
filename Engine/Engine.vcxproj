@@ -176,12 +176,14 @@
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="NPGameEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="MathHelper.h" />
     <ClInclude Include="NPGameEngine.h" />
   </ItemGroup>
   <ItemGroup>
