@@ -43,6 +43,12 @@ public:
 	///</summary>
 	void CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData);
 
+	///<summary>
+	/// Creates a geosphere centered at the origin with the given radius.  The
+	/// slices and stacks parameters control the degree of tessellation.
+	///</summary>
+	void CreateGeoSphere(float radius, UINT nSubdivisions, MeshData& meshData);
+
 	/// <summary>
 	/// Generate a grid from top-left to bot-right lies in XZ plane
 	///  with m rows and n column
@@ -64,6 +70,11 @@ public:
 		UINT stackCount, MeshData& meshData);
 
 private:
+	/// <summary>
+	/// Subdivide a triangle into 4 sub-triangles
+	/// </summary>
+	void Subdivide(MeshData& meshData);
+
 	/// <summary>
 	/// Create a seperate cylinder cap vertices that doesnt connect toe the cylinder it self
 	/// faceUp set to true will create triangle be seen from top culling bottom

@@ -16,7 +16,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mSolidRS(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
-, mCamRadius(50.0f)
+, mCamRadius(10.0f)
 , mCamFOV(70.0f)
 , mCamNear(1.0f)
 , mCamFar(1000.0f)
@@ -81,7 +81,7 @@ void NPGameEngine::InitRasterizerState()
 
 	wireframeRD.DepthClipEnable = TRUE;
 	wireframeRD.FillMode = D3D11_FILL_WIREFRAME;
-	wireframeRD.CullMode = D3D11_CULL_NONE;
+	wireframeRD.CullMode = D3D11_CULL_BACK;
 
 	HR(mDevice->CreateRasterizerState(&wireframeRD, &mWireframeRS));
 	HR(mDevice->CreateRasterizerState(&solidRD, &mSolidRS));
@@ -92,7 +92,7 @@ void NPGameEngine::BuildGeometryBuffers()
 	GeometryGenerator::MeshData gridData;
 	GeometryGenerator geogen;
 
-	geogen.CreateSphere(25, 25, 25, gridData);
+	geogen.CreateGeoSphere(5, 4, gridData);
 
 	auto& vertexData = gridData.vertices;
 	auto& indexData = gridData.indices;
@@ -250,8 +250,6 @@ void NPGameEngine::UpdateViewMatrix()
 
 void NPGameEngine::UpdateScene(float dt)
 {
-	mCamTheta += dt;
-
 	UpdateViewMatrix();
 }
 
