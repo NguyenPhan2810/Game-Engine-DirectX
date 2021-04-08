@@ -2,18 +2,19 @@
 #include "NPGameEngine.h"
 #include "d3dx11effect.h"
 #include "MathHelper.h"
+#include "GeometryGenerator.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
-, mBoxVertexBuffer(nullptr)
-, mBoxIndexBuffer(nullptr)
+, mVertexBuffer(nullptr)
+, mIndexBuffer(nullptr)
 , mFX(nullptr)
 , mTech(nullptr)
 , mfxWorldViewProj(nullptr)
 , mInputLayout(nullptr)
-, mCamPhi(0.25f * MathHelper::Pi)
+, mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
-, mCamRadius(5.0f)
+, mCamRadius(100.0f)
 , mCamFOV(70.0f)
 , mCamNear(1.0f)
 , mCamFar(1000.0f)
@@ -22,17 +23,17 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 	mMainWindowCaption = L"NP Game Engine v0.1";
 
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mWorld, I);
 	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
+	XMStoreFloat4x4(&mGridWorld, I);
 
 	mLastMousePos = POINT{ 0 };
 }
 
 NPGameEngine::~NPGameEngine()
 {
-	ReleaseCOM(mBoxVertexBuffer);
-	ReleaseCOM(mBoxIndexBuffer);
+	ReleaseCOM(mVertexBuffer);
+	ReleaseCOM(mIndexBuffer);
 	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
 }
@@ -49,75 +50,87 @@ bool NPGameEngine::Init()
 	return true;
 }
 
+// Apply height and color to a vertex of a grid
+void GetGridHeightColor(const GeometryGenerator::Vertex& vert, Vertex& newVertex)
+{
+	auto x = vert.position.x;
+	auto z = vert.position.z;
+	auto y = 0.3f * (x * sinf(0.1f * x) + 70 * cosf(0.1f * z));
+
+	newVertex.Pos.x = x;
+	newVertex.Pos.y = y;
+	newVertex.Pos.z = z;
+
+	// Color the vertex based on its height.
+	if (y < -10.0f)
+	{
+		// Sandy beach color.
+		newVertex.Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
+	}
+	else if (y < 5.0f)
+	{
+		// Light yellow-green.
+		newVertex.Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	}
+	else if (y < 12.0f)
+	{
+		// Dark yellow-green.
+		newVertex.Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
+	}
+	else if (y < 20.0f)
+	{
+		// Dark brown.
+		newVertex.Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
+	}
+	else
+	{
+		// White snow.
+		newVertex.Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+}
+
 void NPGameEngine::BuildGeometryBuffers()
 {
-#pragma region Create vertex buffer		
-	Vertex cubeVertices[] =
-	{
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), (const float*)&Colors::White   },
-		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), (const float*)&Colors::Black   },
-		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), (const float*)&Colors::Red     },
-		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), (const float*)&Colors::Green   },
-		{ XMFLOAT3(-1.0f, -1.0f, +1.0f), (const float*)&Colors::Blue    },
-		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), (const float*)&Colors::Yellow  },
-		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), (const float*)&Colors::Cyan    },
-		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), (const float*)&Colors::Magenta }
-	};
+	GeometryGenerator::MeshData gridData;
+	GeometryGenerator geogen;
 
+	geogen.CreateGrid(200, 200, 50, 50, gridData);
+
+	auto& vertexData = gridData.vertices;
+	auto& indexData = gridData.indices;
+
+	mGridIndexCount = indexData.size();
+
+	// Prepare vertices for vertex buffer
+	std::vector<Vertex> vertices(vertexData.size());
+	size_t vertN = vertices.size();
+	for (size_t i = 0 ; i < vertN; ++i)
+		GetGridHeightColor(vertexData[i], vertices[i]);
+
+	// Create vertex buffer
 	D3D11_BUFFER_DESC vbd;
-	vbd.ByteWidth = sizeof(cubeVertices);
+	vbd.ByteWidth = vertices.size() * sizeof(Vertex);
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
-
 	D3D11_SUBRESOURCE_DATA vertexInitData;
-	vertexInitData.pSysMem = cubeVertices;
+	vertexInitData.pSysMem = vertices.data();
+	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
 
-	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mBoxVertexBuffer));
-#pragma endregion
-
-#pragma region Create index buffer
-	UINT indices[] = {
-		// front face
-		0, 1, 2,
-		0, 2, 3,
-
-		// back face
-		4, 6, 5,
-		4, 7, 6,
-
-		// left face
-		4, 5, 1,
-		4, 1, 0,
-
-		// right face
-		3, 2, 6,
-		3, 6, 7,
-
-		// top face
-		1, 5, 6,
-		1, 6, 2,
-
-		// bottom face
-		4, 0, 3,
-		4, 3, 7
-	};
-
+	// Create index buffer
 	D3D11_BUFFER_DESC ibd;
-	ibd.ByteWidth = sizeof(indices);
+	ibd.ByteWidth = indexData.size() * sizeof(UINT);
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
 	ibd.StructureByteStride = 0;
-
 	D3D11_SUBRESOURCE_DATA indexInitData;
-	indexInitData.pSysMem = indices;
+	indexInitData.pSysMem = indexData.data();
 
-	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mBoxIndexBuffer));
-#pragma endregion
+	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mIndexBuffer));
 }
 
 void NPGameEngine::BuildShaders()
@@ -257,23 +270,23 @@ void NPGameEngine::DrawScene()
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	mImmediateContext->IASetVertexBuffers(0, 1, &mBoxVertexBuffer, &stride, &offset);
-	mImmediateContext->IASetIndexBuffer(mBoxIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	mImmediateContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
+	mImmediateContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Update constant in shader
-	XMMATRIX world = XMLoadFloat4x4(&mWorld);
+	XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
 	XMMATRIX view = XMLoadFloat4x4(&mView);
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX worldViewProj = world * view * proj;
-	mfxWorldViewProj->SetMatrix(reinterpret_cast<const float*>(&worldViewProj));
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	mTech->GetDesc(&techDesc);
 
 	for (uint32_t p = 0; p < techDesc.Passes; ++p)
 	{
+		mfxWorldViewProj->SetMatrix(reinterpret_cast<const float*>(&worldViewProj));
 		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-		mImmediateContext->DrawIndexed(36, 0, 0);
+		mImmediateContext->DrawIndexed(mGridIndexCount, 0, 0);
 	}
 
 	// Present buffer

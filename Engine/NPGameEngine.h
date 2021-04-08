@@ -34,8 +34,9 @@ private:
 	void BuildVertexlayout();
 
 private:
-	ID3D11Buffer* mBoxVertexBuffer;
-	ID3D11Buffer* mBoxIndexBuffer;
+	ID3D11Buffer* mVertexBuffer;
+	ID3D11Buffer* mIndexBuffer;
+
 
 	ID3DX11Effect* mFX;
 	ID3DX11EffectTechnique* mTech;
@@ -43,7 +44,11 @@ private:
 
 	ID3D11InputLayout* mInputLayout;
 
-	XMFLOAT4X4 mWorld;
+	// transform grid from local space to world
+	XMFLOAT4X4 mGridWorld;
+
+	UINT mGridIndexCount;
+
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
 
