@@ -36,7 +36,8 @@ protected:
 
 public:
 	// Convenience way to log to Output
-	std::wstringstream Log;
+	// It works like cout but to output debug window each cycle
+	std::wstringstream Output;
 
 protected:
 	HINSTANCE mhAppInstance;

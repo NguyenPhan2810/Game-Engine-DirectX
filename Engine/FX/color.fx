@@ -17,6 +17,7 @@ struct VertexOut
 	float4 Color : COLOR;
 };
 
+// Vertex shader
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
@@ -30,6 +31,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
 
+// Pixel shader
 float4 PS(VertexOut pin) : SV_Target
 {
 	return pin.Color;

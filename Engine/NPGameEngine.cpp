@@ -9,6 +9,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mFX(nullptr)
 , mTech(nullptr)
 , mfxWorldViewProj(nullptr)
+, mInputLayout(nullptr)
 {
 	mMainWindowCaption = L"NP Game Engine v0.1";
 }
@@ -16,6 +17,9 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 NPGameEngine::~NPGameEngine()
 {
 	ReleaseCOM(mBoxVertexBuffer);
+	ReleaseCOM(mBoxIndexBuffer);
+	ReleaseCOM(mFX);
+	ReleaseCOM(mInputLayout);
 }
 
 bool NPGameEngine::Init()
@@ -25,8 +29,14 @@ bool NPGameEngine::Init()
 
 	BuildGeometryBuffers();
 	BuildShaders();
+	BuildVertexlayout();
 
 	return true;
+}
+
+void NPGameEngine::OnResize()
+{
+	D3DApp::OnResize();
 }
 
 void NPGameEngine::UpdateScene(float dt)
@@ -40,7 +50,6 @@ void NPGameEngine::DrawScene()
 	assert(mSwapChain);
 
 	// Clear buffer
-
 	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
 	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -154,10 +163,23 @@ void NPGameEngine::BuildShaders()
 	// Shader compilation done
 	ReleaseCOM(compiledShader);
 
-	Log << "Here's mFX: " << mFX << std::endl;
 	if (mFX)
 	{
 		mTech = mFX->GetTechniqueByName("ColorTech");
 		mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
 	}
+}
+
+void NPGameEngine::BuildVertexlayout()
+{
+	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+
+	D3DX11_PASS_DESC passDesc;
+	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	HR(mDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
+		passDesc.IAInputSignatureSize, &mInputLayout));
 }

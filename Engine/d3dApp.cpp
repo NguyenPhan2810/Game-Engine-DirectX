@@ -19,7 +19,6 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mRenderTargetView(nullptr)
 , mDepthStencilView(nullptr)
 , mDepthStencilBuffer(nullptr)
-, mScreenViewport()
 , mBackBufferFormat(DXGI_FORMAT_B8G8R8A8_UNORM)
 
 , mStartFullscreen(false)
@@ -39,6 +38,8 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mAppResizing(false)
 , mTimer()
 {
+	ZeroMemory(&mScreenViewport, sizeof(D3D11_VIEWPORT));
+
 	// Set a pointer to this instance to get message from MainWndProc
 	gd3dApp = this;
 }
@@ -90,8 +91,11 @@ int D3DApp::Run()
 	while (!mAppQuit)
 	{
 		// Log everything in prev frame
-		OutputDebugStringW(Log.str().c_str());
-		Log.str(L"");
+		if (Output.str().length() > 0)
+		{
+			OutputDebugStringW(Output.str().c_str());
+			Output.str(L"");
+		}
 
 		// If there are Window messages then process them.
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -277,6 +281,8 @@ bool D3DApp::InitDirect3D()
 	sd.BufferCount = 1; // Double buffer
 	sd.OutputWindow = mhMainWnd;
 	sd.Windowed = !mStartFullscreen;
+	// Should consider using modern swap effect
+	// https://devblogs.microsoft.com/directx/dxgi-flip-model/
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0; // Default	
 	

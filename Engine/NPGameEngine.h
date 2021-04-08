@@ -15,12 +15,15 @@ public:
 	~NPGameEngine();
 
 	bool Init() override;
+
+	void OnResize() override;
 	void UpdateScene(float dt = 0) override;
 	void DrawScene() override;
 
 private:
 	void BuildGeometryBuffers();
 	void BuildShaders();
+	void BuildVertexlayout();
 
 private:
 	ID3D11Buffer* mBoxVertexBuffer;
@@ -29,5 +32,7 @@ private:
 	ID3DX11Effect* mFX;
 	ID3DX11EffectTechnique* mTech;
 	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
+
+	ID3D11InputLayout* mInputLayout;
 };
 
