@@ -13,11 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="FX">
-      <UniqueIdentifier>{b7ed2174-bf46-4fc7-b637-32d21fd341a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Helper Files">
       <UniqueIdentifier>{c5b4d46e-2528-4d21-8fcc-c1c4e2621798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\FX">
+      <UniqueIdentifier>{b7ed2174-bf46-4fc7-b637-32d21fd341a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demos">
+      <UniqueIdentifier>{a71e3064-5ae1-4918-91bc-19289d949630}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +48,9 @@
     <ClCompile Include="BaseObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DemoSkull.cpp">
+      <Filter>Demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -71,10 +77,13 @@
     <ClInclude Include="GlobalDefinitions.h">
       <Filter>Helper Files</Filter>
     </ClInclude>
+    <ClInclude Include="DemoSkull.h">
+      <Filter>Demos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FX\color.fx">
-      <Filter>FX</Filter>
+      <Filter>Resource Files\FX</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

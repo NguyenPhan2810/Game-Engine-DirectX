@@ -9,6 +9,7 @@
 #include <wchar.h>
 #include <vector>
 #include <string>
+#include <map>
 
 //----------------------------------------------------------------------------
 // Macro for safe releasing COM object

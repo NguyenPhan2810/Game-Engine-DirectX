@@ -1,4 +1,5 @@
-#include "NPGameEngine.h"
+#include "DemoSkull.h"
+
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ PSTR szCmdLine, _In_ int iCmdShow) 
@@ -8,7 +9,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	NPGameEngine gameEngine(hInstance);
+	DemoSkull gameEngine(hInstance);
 
 	if (!gameEngine.Init())
 		return -1;

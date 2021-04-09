@@ -10,6 +10,8 @@ public:
 	BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext);
 	~BaseObject();
 
+	static std::vector<BaseObject*> GetAllObjects();
+
 	virtual void Update(float dt);
 	virtual void Draw();
 	
@@ -35,7 +37,11 @@ protected:
 	XMMATRIX mWorldMatrix;
 
 private:
-	//std::vector<BaseObject*> mParent;
-	//std::vector<BaseObject*> mChildren;
+	UINT mId;
+	static UINT mIdBase;
+	static std::map<UINT, BaseObject*> mAllObjectsMap; // Map ID to object's pointer
+
+	static bool mAllObjectsChanged;
+	static std::vector<BaseObject*> mAllObjectsVec; // Convience way to get all objects outside the class
 };
 

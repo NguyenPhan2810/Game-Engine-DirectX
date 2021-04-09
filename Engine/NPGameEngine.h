@@ -9,28 +9,27 @@ public:
 	NPGameEngine(HINSTANCE hInstance);
 	~NPGameEngine();
 
-	bool Init() override;
+	virtual bool Init() override;
+	virtual void OnResize() override;
+	virtual void UpdateScene(float dt = 0) override;
+	virtual void DrawScene() override;
 
-	void OnResize() override;
-	void UpdateScene(float dt = 0) override;
-	void DrawScene() override;
-
-	void OnMouseDown(WPARAM btnState, int x, int y) override;
-	void OnMouseUp(WPARAM btnState, int x, int y) override;
-	void OnMouseMove(WPARAM btnState, int x, int y) override;
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
+	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
 
 private:
 	void UpdateProjMatrix();
 	void UpdateViewMatrix();
 
-private:
-	void InitRasterizerState();
+protected:
+	virtual void InitRasterizerState();
 
-	void BuildGeometryBuffers();
-	void BuildShaders();
-	void BuildVertexlayout();
+	virtual void BuildGeometryBuffers();
+	virtual void BuildShaders();
+	virtual void BuildVertexlayout();
 
-private:
+protected:
 	ID3DX11Effect* mFX;
 	ID3DX11EffectTechnique* mTech;
 	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
@@ -38,12 +37,6 @@ private:
 	ID3D11InputLayout* mInputLayout;
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;
-
-	BaseObject* mCenterObject;
-	BaseObject* mGridObject;
-	BaseObject* mCenterBox;
-	std::vector<BaseObject*> mCylinders;
-	std::vector<BaseObject*> mSpheres;
 
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
@@ -56,6 +49,8 @@ private:
 	float mCamFar;
 
 	float mMouseSensitivity;
+
+private:
 	POINT mLastMousePos;
 };
 

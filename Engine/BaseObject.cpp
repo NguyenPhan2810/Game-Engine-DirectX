@@ -1,5 +1,10 @@
 #include "BaseObject.h"
 
+UINT BaseObject::mIdBase = 0;
+bool BaseObject::mAllObjectsChanged = false;
+std::map<UINT, BaseObject*> BaseObject::mAllObjectsMap;
+std::vector<BaseObject*> BaseObject::mAllObjectsVec;
+
 BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext)
 : mVertexBuffer(nullptr)
 , mIndexBuffer(nullptr)
@@ -8,17 +13,40 @@ BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateConte
 , mDevice(device)
 , mImmediateContext(immediateContext)
 {
+	mAllObjectsChanged = true;
+
+	mId = mIdBase;
+	mIdBase++;
+	mAllObjectsMap[mId] = this;
+
 	mWorldMatrix = XMMatrixIdentity();
 }
 
 BaseObject::~BaseObject()
 {
+	mAllObjectsChanged = true;
+	mAllObjectsMap.erase(mId);
+
 	ReleaseCOM(mVertexBuffer);
 	ReleaseCOM(mIndexBuffer);
 }
 
+std::vector<BaseObject*>  BaseObject::GetAllObjects()
+{
+	if (mAllObjectsChanged)
+	{
+		// Remake the vector
+		mAllObjectsVec.clear();
+		for (const auto& obj : mAllObjectsMap)
+			mAllObjectsVec.push_back(obj.second);
+	}
+
+	return mAllObjectsVec;
+}
+
 void BaseObject::Update(float dt)
 {
+
 }
 
 void BaseObject::Draw()

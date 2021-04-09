@@ -34,16 +34,6 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 
 NPGameEngine::~NPGameEngine()
 {
-	delete mCenterObject;
-	delete mGridObject;
-	delete mCenterBox;
-	for (auto p : mCylinders)
-		delete p;
-	mCylinders.clear();
-	for (auto p : mSpheres)
-		delete p;
-	mSpheres.clear();
-
 	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mWireframeRS);
@@ -84,55 +74,7 @@ void NPGameEngine::InitRasterizerState()
 
 void NPGameEngine::BuildGeometryBuffers()
 {
-	GeometryGenerator::MeshData box;
-	GeometryGenerator::MeshData grid;
-	GeometryGenerator::MeshData sphere;
-	GeometryGenerator::MeshData geoSphere;
-	GeometryGenerator::MeshData cylinder;
-	GeometryGenerator::MeshData skull;
-
-	GeometryGenerator geoGen;
-	geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
-	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
-	geoGen.CreateGeoSphere(0.5, 2, geoSphere);
-	geoGen.CreateSphere(0.5f, 10, 10, sphere);
-	geoGen.CreateCylinder(1, 0.3f, 3.0f, 20, 20, cylinder);
-	geoGen.CreateFromFile(L"Models/skull.txt", skull);
-	mGridObject = new BaseObject(mDevice, mImmediateContext);
-	mGridObject->LoadGeometry(grid);
-
-	mCenterObject = new BaseObject(mDevice, mImmediateContext);
-	mCenterObject->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->Scale(XMFLOAT3(0.7, 0.7, 0.7));
-	mCenterObject->LoadGeometry(skull);
-
-	mCenterBox = new BaseObject(mDevice, mImmediateContext);
-	mCenterBox->Translate(XMFLOAT3(0, 0.5, 0));
-	mCenterBox->Scale(XMFLOAT3(2, 1, 2));
-	mCenterBox->LoadGeometry(box);
-
-	for (int i = 0; i < 5; ++i)
-	{
-		auto cylinder1 = new BaseObject(mDevice, mImmediateContext);
-		cylinder1->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
-		cylinder1->LoadGeometry(cylinder);
-		auto cylinder2 = new BaseObject(mDevice, mImmediateContext);
-		cylinder2->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
-		cylinder2->LoadGeometry(cylinder);
-
-		mCylinders.push_back(cylinder1);
-		mCylinders.push_back(cylinder2);
-
-		auto sphere1 = new BaseObject(mDevice, mImmediateContext);
-		sphere1->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
-		sphere1->LoadGeometry(sphere);
-		auto sphere2 = new BaseObject(mDevice, mImmediateContext);
-		sphere2->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
-		sphere2->LoadGeometry(sphere);
-
-		mSpheres.push_back(sphere1);
-		mSpheres.push_back(sphere2);
-	}
+	
 }
 
 void NPGameEngine::BuildShaders()
@@ -259,9 +201,6 @@ void NPGameEngine::UpdateScene(float dt)
 
 void NPGameEngine::DrawScene()
 {
-	assert(mImmediateContext);
-	assert(mSwapChain);
-
 	// Clear buffer
 	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
 	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -277,46 +216,18 @@ void NPGameEngine::DrawScene()
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX viewProj = view * proj;
 	XMMATRIX worldViewProj;
+	auto allObjects = BaseObject::GetAllObjects();
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	mTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		// Draw grid
-		worldViewProj = mGridObject->LocalToWorldMatrix() * viewProj;
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-		mGridObject->Draw();
-
-		// Draw the center box
-		worldViewProj = mCenterBox->LocalToWorldMatrix() * viewProj;
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-		mCenterBox->Draw();
-
-
-		// Draw the scenter phere.
-		worldViewProj = mCenterObject->LocalToWorldMatrix() * viewProj;
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-		mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-		mCenterObject->Draw();
-
-		// Draw the cylinder
-		for (auto pCylinder : mCylinders)
+		for (auto obj : allObjects)
 		{
-			worldViewProj = pCylinder->LocalToWorldMatrix() * viewProj;
+			worldViewProj = obj->LocalToWorldMatrix() * viewProj;
 			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-			pCylinder->Draw();
-		}
-
-		// Draw the sphere
-		for (auto pSphere : mSpheres)
-		{
-			worldViewProj = pSphere->LocalToWorldMatrix() * viewProj;
-			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-			pSphere->Draw();
+			obj->Draw();
 		}
 	}
 
