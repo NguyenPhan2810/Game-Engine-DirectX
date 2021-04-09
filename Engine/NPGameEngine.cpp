@@ -23,7 +23,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 {
 	mClientWidth = 1080;
 	mClientHeight = 720;
-	mMainWindowCaption = L"NP Game Engine v0.1";
+	mMainWindowCaption = L"NP Game Engine";
 
 	mLastMousePos = POINT{ 0 };
 
@@ -113,6 +113,11 @@ void NPGameEngine::BuildShaders()
 	{
 		mTech = mFX->GetTechniqueByName("ColorTech");
 		mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+		mfxWorld = mFX->GetVariableByName("gWorld")->AsMatrix();
+		mfxWorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+		mfxEyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
+		mfxDirLight = mFX->GetVariableByName("gDirLight");
+		mfxMaterial = mFX->GetVariableByName("gMaterial");
 	}
 }
 
@@ -120,8 +125,8 @@ void NPGameEngine::BuildVertexlayout()
 {
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
-		{"position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	D3DX11_PASS_DESC passDesc;

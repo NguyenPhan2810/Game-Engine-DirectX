@@ -101,9 +101,15 @@
     <ClInclude Include="DemoSkull.h">
       <Filter>Demos\Skull</Filter>
     </ClInclude>
+    <ClInclude Include="LightHelper.h">
+      <Filter>Helper Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="FX\color.fx">
+    <FxCompile Include="FX\LightHelper.fx">
+      <Filter>Resource Files\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="FX\Lighting.fx">
       <Filter>Resource Files\FX</Filter>
     </FxCompile>
   </ItemGroup>

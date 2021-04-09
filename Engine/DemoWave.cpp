@@ -8,6 +8,19 @@ DemoWave::DemoWave(HINSTANCE hInstance)
 {
 	mCamRadius = 70;
 
+	// Directional light.
+	mDirLight.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLight.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight.direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	mLandMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	mLandMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	mLandMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	mWaveMat.ambient = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	mWaveMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	mWaveMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
 }
 
 DemoWave::~DemoWave()
@@ -60,13 +73,59 @@ void DemoWave::UpdateScene(float dt)
 	for (UINT i = 0; i < mWaves.VertexCount(); ++i)
 	{
 		v[i].Pos = mWaves[i];
-		v[i].Color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		v[i].Normal = mWaves.Normal(i);
 	}
 
 	mImmediateContext->Unmap(waveVertexBuffer, 0);
 }
 
-void GetGridHeightColor(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& newVertex)
+void DemoWave::DrawScene()
+{
+	// Clear buffer
+	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
+	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Set up
+	mImmediateContext->IASetInputLayout(mInputLayout);
+	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//mImmediateContext->RSSetState(mWireframeRS);
+
+	// Set constants
+
+	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
+
+	XMMATRIX view = XMLoadFloat4x4(&mView);
+	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX viewProj = view * proj;
+	XMMATRIX worldViewProj;
+	auto allObjects = BaseObject::GetAllObjects();
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	mTech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		for (auto obj : allObjects)
+		{
+			// Update constants
+			worldViewProj = obj->LocalToWorldMatrix() * viewProj;
+			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+			// Set state and draw
+			if (obj->renderWireframe)
+				mImmediateContext->RSSetState(mWireframeRS);
+			else
+				mImmediateContext->RSSetState(mSolidRS);
+
+			obj->Draw();
+		}
+	}
+
+	// Present buffer
+	HR(mSwapChain->Present(0, 0));
+}
+
+void GetHillVertex(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& newVertex)
 {
 	auto x = vert.position.x;
 	auto z = vert.position.z;
@@ -76,32 +135,12 @@ void GetGridHeightColor(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& 
 	newVertex.Pos.y = y;
 	newVertex.Pos.z = z;
 
-	// Color the vertex based on its height.
-	if (y < -10.0f)
-	{
-		// Sandy beach color.
-		newVertex.Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
-	}
-	else if (y < 5.0f)
-	{
-		// Light yellow-green.
-		newVertex.Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	}
-	else if (y < 12.0f)
-	{
-		// Dark yellow-green.
-		newVertex.Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-	}
-	else if (y < 20.0f)
-	{
-		// Dark brown.
-		newVertex.Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-	}
-	else
-	{
-		// White snow.
-		newVertex.Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	}
+	// n = (-df/dx, 1, -df/dz)
+	XMFLOAT3 n(
+		-0.03f * z * cosf(0.1f * x) - 0.3f * cosf(0.1f * z),
+		1.0f,
+		-0.3f * sinf(0.1f * x) + 0.03f * x * sinf(0.1f * z));
+	newVertex.Normal = n;
 }
 
 void DemoWave::BuildGeometryBuffers()
@@ -120,7 +159,7 @@ void DemoWave::BuildGeometryBuffers()
 	std::vector<GLOBDEF::Vertex> vertices;
 	for (auto& vert : grid.vertices)
 	{
-		GetGridHeightColor(vert, newVert);
+		GetHillVertex(vert, newVert);
 		vertices.push_back(newVert);
 	}
 
@@ -135,11 +174,10 @@ void DemoWave::BuildGeometryBuffers()
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
 	mCenterObject->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->Scale(XMFLOAT3(2, 2, 2));
+	mCenterObject->Scale(XMFLOAT3(4, 4, 4));
 	mCenterObject->LoadGeometry(skull);
 
 	mWaveMesh = new BaseObject(mDevice, mImmediateContext);
-	mWaveMesh->renderWireframe = true;
 	mWaveMesh->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };

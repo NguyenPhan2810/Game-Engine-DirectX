@@ -33,6 +33,13 @@ protected:
 	ID3DX11Effect* mFX;
 	ID3DX11EffectTechnique* mTech;
 	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
+	ID3DX11EffectMatrixVariable* mfxWorld;
+	ID3DX11EffectMatrixVariable* mfxWorldInvTranspose;
+	ID3DX11EffectVectorVariable* mfxEyePosW;
+	ID3DX11EffectVariable* mfxDirLight;
+	//ID3DX11EffectVariable* mfxPointLight;
+	//ID3DX11EffectVariable* mfxSpotLight;
+	ID3DX11EffectVariable* mfxMaterial;
 
 	ID3D11InputLayout* mInputLayout;
 	ID3D11RasterizerState* mWireframeRS;
