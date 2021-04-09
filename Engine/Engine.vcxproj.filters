@@ -51,6 +51,9 @@
     <ClCompile Include="DemoSkull.cpp">
       <Filter>Demos</Filter>
     </ClCompile>
+    <ClCompile Include="DemoWave.cpp">
+      <Filter>Demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -78,6 +81,9 @@
       <Filter>Helper Files</Filter>
     </ClInclude>
     <ClInclude Include="DemoSkull.h">
+      <Filter>Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoWave.h">
       <Filter>Demos</Filter>
     </ClInclude>
   </ItemGroup>

@@ -73,17 +73,7 @@ void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
 
 	// Create vertex buffer
 
-	D3D11_BUFFER_DESC vbd;
-	vbd.ByteWidth = mVertexCount * sizeof(Vertex);
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA vertexInitData;
-	vertexInitData.pSysMem = vertices.data();
-
-	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
+	CreateVertexBuffer(vertices);
 
 	// Create index buffer
 	mIndexCount = meshData.indices.size();
@@ -101,6 +91,23 @@ void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
 	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mIndexBuffer));
 }
 
+void BaseObject::CreateVertexBuffer(const std::vector<Vertex>& meshData, D3D11_USAGE usage)
+{
+	ReleaseCOM(mVertexBuffer);
+	
+	// Create vertex buffer
+	D3D11_BUFFER_DESC vbd;
+	vbd.ByteWidth = mVertexCount * sizeof(Vertex);
+	vbd.Usage = usage;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.StructureByteStride = 0;
+	D3D11_SUBRESOURCE_DATA vertexInitData;
+	vertexInitData.pSysMem = meshData.data();
+
+	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
+}
 
 void BaseObject::Translate(const XMFLOAT3& displacement)
 {

@@ -208,7 +208,7 @@ void NPGameEngine::DrawScene()
 	// Set up
 	mImmediateContext->IASetInputLayout(mInputLayout);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	mImmediateContext->RSSetState(mWireframeRS);
+	//mImmediateContext->RSSetState(mWireframeRS);
 
 	// Set constants
 

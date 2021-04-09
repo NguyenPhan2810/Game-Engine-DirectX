@@ -1,4 +1,5 @@
 #include "DemoSkull.h"
+#include "DemoWave.h"
 
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
@@ -9,10 +10,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	DemoSkull gameEngine(hInstance);
+	DemoWave theApp(hInstance);
 
-	if (!gameEngine.Init())
+	if (!theApp.Init())
 		return -1;
 
-	return gameEngine.Run();
+	return theApp.Run();
 }

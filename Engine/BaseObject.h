@@ -17,6 +17,7 @@ public:
 	
 public:
 	void LoadGeometry(const GeometryGenerator::MeshData meshData);
+	void CreateVertexBuffer(const std::vector<Vertex>& meshData, D3D11_USAGE usage = D3D11_USAGE_IMMUTABLE);
 
 	void Translate(const XMFLOAT3& displacement);
 	void Rorate(const XMFLOAT3& rotationOrigin, float radian);
