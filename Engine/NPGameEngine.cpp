@@ -15,8 +15,8 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mSolidRS(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
-, mCamRadius(10.0f)
-, mCamFOV(70.0f)
+, mCamRadius(100.0f)
+, mCamFOV(45.0f)
 , mCamNear(1.0f)
 , mCamFar(1000.0f)
 , mMouseSensitivity(0.25f)
@@ -224,9 +224,17 @@ void NPGameEngine::DrawScene()
 	{
 		for (auto obj : allObjects)
 		{
+			// Update constants
 			worldViewProj = obj->LocalToWorldMatrix() * viewProj;
 			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+			// Set state and draw
+			if (obj->renderWireframe)
+				mImmediateContext->RSSetState(mWireframeRS);
+			else
+				mImmediateContext->RSSetState(mSolidRS);
+
 			obj->Draw();
 		}
 	}

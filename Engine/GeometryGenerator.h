@@ -1,6 +1,7 @@
 #pragma once
 
 #include "d3dUtil.h"
+#include "GlobalDefinitions.h"
 
 class GeometryGenerator
 {
@@ -38,14 +39,19 @@ public:
 	};
 
 	///<summary>
+	/// Copy position from source to vertices
+	///</summary>
+	static void ConvertToGlobVertex(std::vector<GeometryGenerator::Vertex>& source, std::vector<GLOBDEF::Vertex>& vertices);
+
+	///<summary>
 	/// Creates a mesh from simple file
 	///</summary>
-	void CreateFromFile(const std::wstring& filepath, MeshData& meshData);
+	static void CreateFromFile(const std::wstring& filepath, MeshData& meshData);
 
 	///<summary>
 	/// Creates a box centered at the origin with the given dimensions.
 	///</summary>
-	void CreateBox(float width, float height, float depth, MeshData& meshData);
+	static void CreateBox(float width, float height, float depth, MeshData& meshData);
 
 	///<summary>
 	/// Creates a sphere centered at the origin with the given radius.  The
@@ -70,7 +76,7 @@ public:
 	///         |            
 	///         |      
 	/// </summary>
-	void CreateGrid(float lengthX, float lengthZ, UINT m, UINT n, MeshData& meshData);
+	static void CreateGrid(float lengthX, float lengthZ, UINT m, UINT n, MeshData& meshData);
 
 	/// <summary>
 	/// Create a cylinder parallel to y axis and centered about the origin

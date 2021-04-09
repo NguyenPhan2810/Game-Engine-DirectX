@@ -2,6 +2,18 @@
 #include <map>
 #include <fstream>
 
+void GeometryGenerator::ConvertToGlobVertex(std::vector<GeometryGenerator::Vertex>& source, std::vector<GLOBDEF::Vertex>& vertices)
+{
+	size_t n = source.size();
+	vertices.resize(n);
+	for (UINT i = 0; i < n; ++i)
+	{
+		vertices[i].Pos = source[i].position;
+		vertices[i].Color = XMFLOAT4(0.5, 0.5, 0.5, 1);
+	}
+
+}
+
 void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& meshData)
 {
 	std::ifstream fin(filepath);

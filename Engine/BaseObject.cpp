@@ -12,6 +12,7 @@ BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateConte
 , mVertexCount(0)
 , mDevice(device)
 , mImmediateContext(immediateContext)
+, renderWireframe(false)
 {
 	mAllObjectsChanged = true;
 
@@ -51,11 +52,10 @@ void BaseObject::Update(float dt)
 
 void BaseObject::Draw()
 {
-	UINT stride = sizeof(Vertex);
+	UINT stride = sizeof(GLOBDEF::Vertex);
 	UINT offset = 0;
 	mImmediateContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
 	mImmediateContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
 	mImmediateContext->DrawIndexed(mIndexCount, 0, 0);
 }
 
@@ -63,50 +63,71 @@ void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
 {
 	mVertexCount = meshData.vertices.size();
 
-	XMFLOAT4 black(0.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT4 gray(0.5f, 0.5f, 0.5f, 1.0f);
 
-	std::vector<Vertex> vertices;
+	std::vector<GLOBDEF::Vertex> vertices;
 	for (UINT i = 0; i < mVertexCount; ++i)
 	{
-		vertices.push_back(Vertex{ meshData.vertices[i].position, black });
+		vertices.push_back(GLOBDEF::Vertex{ meshData.vertices[i].position, gray });
 	}
 
 	// Create vertex buffer
+	D3D11_BUFFER_DESC vbd{ 0 };
+	vbd.ByteWidth = mVertexCount * sizeof(GLOBDEF::Vertex);
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-	CreateVertexBuffer(vertices);
+	CreateVertexBuffer(vertices, vbd);
 
 	// Create index buffer
 	mIndexCount = meshData.indices.size();
 
-	D3D11_BUFFER_DESC ibd;
+	D3D11_BUFFER_DESC ibd{ 0 };
 	ibd.ByteWidth = mIndexCount * sizeof(UINT);
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = 0;
-	ibd.MiscFlags = 0;
-	ibd.StructureByteStride = 0;
+
+	CreateIndexBuffer(meshData.indices, ibd);
+}
+
+void BaseObject::CreateVertexBuffer(const std::vector<GLOBDEF::Vertex>& vertexData, D3D11_BUFFER_DESC vbd)
+{
+	ReleaseCOM(mVertexBuffer);
+	
+	D3D11_SUBRESOURCE_DATA vertexInitData;
+	vertexInitData.pSysMem = vertexData.data();
+
+	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
+}
+
+void BaseObject::CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd)
+{
+	ReleaseCOM(mIndexBuffer);
+
 	D3D11_SUBRESOURCE_DATA indexInitData;
-	indexInitData.pSysMem = meshData.indices.data();
+	indexInitData.pSysMem = indexData.data();
 
 	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mIndexBuffer));
 }
 
-void BaseObject::CreateVertexBuffer(const std::vector<Vertex>& meshData, D3D11_USAGE usage)
+ID3D11Buffer* BaseObject::GetVertexBuffer()
 {
-	ReleaseCOM(mVertexBuffer);
-	
-	// Create vertex buffer
-	D3D11_BUFFER_DESC vbd;
-	vbd.ByteWidth = mVertexCount * sizeof(Vertex);
-	vbd.Usage = usage;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA vertexInitData;
-	vertexInitData.pSysMem = meshData.data();
+	return mVertexBuffer;
+}
 
-	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
+UINT BaseObject::GetVertexCount() const
+{
+	return mVertexCount;
+}
+
+ID3D11Buffer* BaseObject::GetIndexBuffer()
+{
+	return mIndexBuffer;
+}
+
+UINT BaseObject::GetIndexCount() const
+{
+	return mIndexCount;
 }
 
 void BaseObject::Translate(const XMFLOAT3& displacement)

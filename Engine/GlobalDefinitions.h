@@ -2,8 +2,13 @@
 
 #include "d3dUtil.h"
 
-struct Vertex
+class GLOBDEF
 {
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+public:
+	struct Vertex
+	{
+		XMFLOAT3 Pos;
+		XMFLOAT4 Color;
+	};
 };
+

@@ -179,9 +179,11 @@
     <ClCompile Include="DemoWave.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
+    <ClCompile Include="GlobalDefinitions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="NPGameEngine.cpp" />
+    <ClCompile Include="Waves.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObject.h" />
@@ -194,6 +196,7 @@
     <ClInclude Include="GlobalDefinitions.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="NPGameEngine.h" />
+    <ClInclude Include="Waves.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FX\color.fx" />

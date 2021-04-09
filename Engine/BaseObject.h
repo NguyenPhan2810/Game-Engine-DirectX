@@ -17,13 +17,22 @@ public:
 	
 public:
 	void LoadGeometry(const GeometryGenerator::MeshData meshData);
-	void CreateVertexBuffer(const std::vector<Vertex>& meshData, D3D11_USAGE usage = D3D11_USAGE_IMMUTABLE);
+	void CreateVertexBuffer(const std::vector<GLOBDEF::Vertex>& vertexData, D3D11_BUFFER_DESC vbd);
+	void CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd);
+
+	ID3D11Buffer* GetVertexBuffer();
+	UINT GetVertexCount() const;
+	ID3D11Buffer* GetIndexBuffer();
+	UINT GetIndexCount() const;
 
 	void Translate(const XMFLOAT3& displacement);
 	void Rorate(const XMFLOAT3& rotationOrigin, float radian);
 	void Scale(const XMFLOAT3& scaleElements);
 
 	XMMATRIX LocalToWorldMatrix() const;
+
+public:
+	bool renderWireframe;
 
 protected:
 	ID3D11Device* mDevice;

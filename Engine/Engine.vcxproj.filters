@@ -22,6 +22,12 @@
     <Filter Include="Demos">
       <UniqueIdentifier>{a71e3064-5ae1-4918-91bc-19289d949630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demos\Waves">
+      <UniqueIdentifier>{d9c89271-5c38-43aa-aa84-9aa57de38c2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demos\Skull">
+      <UniqueIdentifier>{5ab398af-c0d5-465d-b73e-a3896c7fd4cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -48,11 +54,17 @@
     <ClCompile Include="BaseObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DemoSkull.cpp">
-      <Filter>Demos</Filter>
+    <ClCompile Include="Waves.cpp">
+      <Filter>Demos\Waves</Filter>
     </ClCompile>
     <ClCompile Include="DemoWave.cpp">
-      <Filter>Demos</Filter>
+      <Filter>Demos\Waves</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoSkull.cpp">
+      <Filter>Demos\Skull</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalDefinitions.cpp">
+      <Filter>Helper Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,11 +92,14 @@
     <ClInclude Include="GlobalDefinitions.h">
       <Filter>Helper Files</Filter>
     </ClInclude>
-    <ClInclude Include="DemoSkull.h">
-      <Filter>Demos</Filter>
+    <ClInclude Include="Waves.h">
+      <Filter>Demos\Waves</Filter>
     </ClInclude>
     <ClInclude Include="DemoWave.h">
-      <Filter>Demos</Filter>
+      <Filter>Demos\Waves</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoSkull.h">
+      <Filter>Demos\Skull</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
