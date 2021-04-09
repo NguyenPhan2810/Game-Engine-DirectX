@@ -16,6 +16,9 @@
     <Filter Include="FX">
       <UniqueIdentifier>{b7ed2174-bf46-4fc7-b637-32d21fd341a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helper Files">
+      <UniqueIdentifier>{c5b4d46e-2528-4d21-8fcc-c1c4e2621798}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,19 +27,22 @@
     <ClCompile Include="d3dApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="d3dUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NPGameEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MathHelper.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="d3dUtil.cpp">
+      <Filter>Helper Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Helper Files</Filter>
     </ClCompile>
     <ClCompile Include="GeometryGenerator.cpp">
+      <Filter>Helper Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Helper Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,20 +50,26 @@
     <ClInclude Include="d3dApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="d3dUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NPGameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>Helper Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Helper Files</Filter>
+    </ClInclude>
     <ClInclude Include="MathHelper.h">
-      <Filter>Header Files</Filter>
+      <Filter>Helper Files</Filter>
     </ClInclude>
     <ClInclude Include="GeometryGenerator.h">
+      <Filter>Helper Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalDefinitions.h">
+      <Filter>Helper Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

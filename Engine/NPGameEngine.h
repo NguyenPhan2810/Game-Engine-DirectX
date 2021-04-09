@@ -1,12 +1,7 @@
 #pragma once
 
 #include "d3dApp.h"
-
-struct Vertex
-{
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
+#include "BaseObject.h"
 
 class NPGameEngine : public D3DApp
 {
@@ -36,9 +31,6 @@ private:
 	void BuildVertexlayout();
 
 private:
-	ID3D11Buffer* mVertexBuffer;
-	ID3D11Buffer* mIndexBuffer;
-
 	ID3DX11Effect* mFX;
 	ID3DX11EffectTechnique* mTech;
 	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
@@ -47,30 +39,14 @@ private:
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;
 
-	// transform grid from local space to world
-	XMFLOAT4X4 mSphereWorld[10];
-	XMFLOAT4X4 mCylWorld[10];
-	XMFLOAT4X4 mBoxWorld;
-	XMFLOAT4X4 mGridWorld;
-	XMFLOAT4X4 mCenterSphere;
+	BaseObject* mCenterObject;
+	BaseObject* mGridObject;
+	BaseObject* mCenterBox;
+	std::vector<BaseObject*> mCylinders;
+	std::vector<BaseObject*> mSpheres;
 
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
-
-	int mBoxVertexOffset;
-	int mGridVertexOffset;
-	int mSphereVertexOffset;
-	int mCylinderVertexOffset;
-
-	UINT mBoxIndexOffset;
-	UINT mGridIndexOffset;
-	UINT mSphereIndexOffset;
-	UINT mCylinderIndexOffset;
-
-	UINT mBoxIndexCount;
-	UINT mGridIndexCount;
-	UINT mSphereIndexCount;
-	UINT mCylinderIndexCount;
 
 	float mCamTheta;
 	float mCamPhi;

@@ -1,5 +1,51 @@
 #include "GeometryGenerator.h"
 #include <map>
+#include <fstream>
+
+void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& meshData)
+{
+	std::ifstream fin(filepath);
+
+	if (!fin)
+	{
+		MessageBox(0, filepath.c_str(), 0, 0);
+		return;
+	}
+
+	UINT vcount = 0;
+	UINT tcount = 0;
+	std::string ignore;
+
+	fin >> ignore >> vcount;
+	fin >> ignore >> tcount;
+	fin >> ignore >> ignore >> ignore >> ignore;
+
+	float nx, ny, nz;
+
+	std::vector<Vertex>& vertices = meshData.vertices;
+	vertices.resize(vcount);
+	for (UINT i = 0; i < vcount; ++i)
+	{
+		fin >> vertices[i].position.x >> vertices[i].position.y >> vertices[i].position.z;
+
+		// Normal not used in this demo.
+		fin >> nx >> ny >> nz;
+	}
+
+	fin >> ignore;
+	fin >> ignore;
+	fin >> ignore;
+
+	UINT skullIndexCount = 3 * tcount;
+	std::vector<UINT>& indices = meshData.indices;
+	indices.resize(skullIndexCount);
+	for (UINT i = 0; i < tcount; ++i)
+	{
+		fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
+	}
+
+	fin.close();
+}
 
 void GeometryGenerator::CreateBox(float width, float height, float depth, MeshData& meshData)
 {

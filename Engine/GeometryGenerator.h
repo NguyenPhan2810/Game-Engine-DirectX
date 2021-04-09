@@ -38,6 +38,11 @@ public:
 	};
 
 	///<summary>
+	/// Creates a mesh from simple file
+	///</summary>
+	void CreateFromFile(const std::wstring& filepath, MeshData& meshData);
+
+	///<summary>
 	/// Creates a box centered at the origin with the given dimensions.
 	///</summary>
 	void CreateBox(float width, float height, float depth, MeshData& meshData);
