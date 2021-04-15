@@ -41,6 +41,8 @@ protected:
 	//ID3DX11EffectVariable* mfxSpotLight;
 	ID3DX11EffectVariable* mfxMaterial;
 
+	DirectionalLight mDirLight;
+
 	ID3D11InputLayout* mInputLayout;
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;

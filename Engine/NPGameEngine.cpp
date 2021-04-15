@@ -4,6 +4,7 @@
 #include "MathHelper.h"
 #include "GeometryGenerator.h"
 #include "GlobalDefinitions.h"
+#include "LightHelper.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
@@ -88,7 +89,7 @@ void NPGameEngine::BuildShaders()
 	ID3D10Blob* compiledShader = nullptr;
 	ID3D10Blob* compilationMsgs = nullptr;
 
-	HR(D3DX11CompileFromFile(L"FX/color.fx",
+	HR(D3DX11CompileFromFile(L"FX/Lighting.fx",
 		0, 0, 0,
 		"fx_5_0",
 		shaderFlags, 0, 0,
@@ -220,8 +221,19 @@ void NPGameEngine::DrawScene()
 	XMMATRIX view = XMLoadFloat4x4(&mView);
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX viewProj = view * proj;
-	XMMATRIX worldViewProj;
 	auto allObjects = BaseObject::GetAllObjects();
+
+
+	// Set per frame constants.
+	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mfxDirLmDirLightight));
+	//mfxPointLight->SetRawValue(&mPointLight, 0, sizeof(mPointLight));
+	//mfxSpotLight->SetRawValue(&mSpotLight, 0, sizeof(mSpotLight));
+	mfxEyePosW->SetRawValue(&mfxEyePosW, 0, sizeof(mfxEyePosW));
+
+	Material tempMat;
+	tempMat.ambient = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	tempMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	tempMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	mTech->GetDesc(&techDesc);
@@ -230,8 +242,15 @@ void NPGameEngine::DrawScene()
 		for (auto obj : allObjects)
 		{
 			// Update constants
-			worldViewProj = obj->LocalToWorldMatrix() * viewProj;
+			XMMATRIX world = obj->LocalToWorldMatrix();
+			XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+			XMMATRIX worldViewProj = world * viewProj;
+
+			mfxWorld->SetMatrix(reinterpret_cast<float*>(&world));
+			mfxWorldInvTranspose->SetMatrix(reinterpret_cast<float*>(&worldInvTranspose));
 			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+			mfxMaterial->SetRawValue(&tempMat, 0, sizeof(tempMat));
+
 			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 
 			// Set state and draw

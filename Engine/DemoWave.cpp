@@ -55,8 +55,8 @@ void DemoWave::UpdateScene(float dt)
 	{
 		t_base += 0.25f;
 
-		DWORD i = 5 + rand() % (X - 5);
-		DWORD j = 5 + rand() % (Z - 5);
+		DWORD i = 5 + rand() % (X - 10);
+		DWORD j = 5 + rand() % (Z - 10);
 
 		float r = MathHelper::RandF(5.0f, 10.0f);
 
@@ -79,51 +79,51 @@ void DemoWave::UpdateScene(float dt)
 	mImmediateContext->Unmap(waveVertexBuffer, 0);
 }
 
-void DemoWave::DrawScene()
-{
-	// Clear buffer
-	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
-	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Set up
-	mImmediateContext->IASetInputLayout(mInputLayout);
-	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//mImmediateContext->RSSetState(mWireframeRS);
-
-	// Set constants
-
-	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
-
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	XMMATRIX viewProj = view * proj;
-	XMMATRIX worldViewProj;
-	auto allObjects = BaseObject::GetAllObjects();
-
-	D3DX11_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
-	for (UINT p = 0; p < techDesc.Passes; ++p)
-	{
-		for (auto obj : allObjects)
-		{
-			// Update constants
-			worldViewProj = obj->LocalToWorldMatrix() * viewProj;
-			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-
-			// Set state and draw
-			if (obj->renderWireframe)
-				mImmediateContext->RSSetState(mWireframeRS);
-			else
-				mImmediateContext->RSSetState(mSolidRS);
-
-			obj->Draw();
-		}
-	}
-
-	// Present buffer
-	HR(mSwapChain->Present(0, 0));
-}
+//void DemoWave::DrawScene()
+//{
+//	// Clear buffer
+//	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
+//	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+//
+//	// Set up
+//	mImmediateContext->IASetInputLayout(mInputLayout);
+//	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	//mImmediateContext->RSSetState(mWireframeRS);
+//
+//	// Set constants
+//
+//	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
+//
+//	XMMATRIX view = XMLoadFloat4x4(&mView);
+//	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+//	XMMATRIX viewProj = view * proj;
+//	XMMATRIX worldViewProj;
+//	auto allObjects = BaseObject::GetAllObjects();
+//
+//	D3DX11_TECHNIQUE_DESC techDesc;
+//	mTech->GetDesc(&techDesc);
+//	for (UINT p = 0; p < techDesc.Passes; ++p)
+//	{
+//		for (auto obj : allObjects)
+//		{
+//			// Update constants
+//			worldViewProj = obj->LocalToWorldMatrix() * viewProj;
+//			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+//			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+//
+//			// Set state and draw
+//			if (obj->renderWireframe)
+//				mImmediateContext->RSSetState(mWireframeRS);
+//			else
+//				mImmediateContext->RSSetState(mSolidRS);
+//
+//			obj->Draw();
+//		}
+//	}
+//
+//	// Present buffer
+//	HR(mSwapChain->Present(0, 0));
+//}
 
 void GetHillVertex(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& newVertex)
 {

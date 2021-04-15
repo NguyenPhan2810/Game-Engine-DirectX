@@ -63,12 +63,10 @@ void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
 {
 	mVertexCount = meshData.vertices.size();
 
-	XMFLOAT4 gray(0.5f, 0.5f, 0.5f, 1.0f);
-
 	std::vector<GLOBDEF::Vertex> vertices;
 	for (UINT i = 0; i < mVertexCount; ++i)
 	{
-		vertices.push_back(GLOBDEF::Vertex{ meshData.vertices[i].position, gray });
+		vertices.push_back(GLOBDEF::Vertex{ meshData.vertices[i].position, meshData.vertices[i].normal });
 	}
 
 	// Create vertex buffer

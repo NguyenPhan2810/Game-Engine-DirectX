@@ -9,7 +9,7 @@ void GeometryGenerator::ConvertToGlobVertex(std::vector<GeometryGenerator::Verte
 	for (UINT i = 0; i < n; ++i)
 	{
 		vertices[i].Pos = source[i].position;
-		vertices[i].Color = XMFLOAT4(0.5, 0.5, 0.5, 1);
+		vertices[i].Normal = source[i].normal;
 	}
 
 }

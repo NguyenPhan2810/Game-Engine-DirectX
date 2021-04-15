@@ -129,10 +129,7 @@ int D3DApp::Run()
 		// Draw scene as fast as possible
 		// If the draw step takes long time to execute
 		// Then UpdateScene will update several times between frames
-		if (timeSinceLastUpdate < timePerFrame)
-		{
-			DrawScene();
-		}
+		DrawScene();
 	}
 
 	return msg.wParam;

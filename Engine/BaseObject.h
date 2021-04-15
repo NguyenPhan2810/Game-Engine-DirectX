@@ -30,6 +30,7 @@ public:
 	void Scale(const XMFLOAT3& scaleElements);
 
 	XMMATRIX LocalToWorldMatrix() const;
+	
 
 public:
 	bool renderWireframe;

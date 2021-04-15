@@ -12,14 +12,13 @@ public:
 
 	virtual bool Init() override;
 	virtual void UpdateScene(float dt = 0) override;
-	virtual void DrawScene() override;
+	//virtual void DrawScene() override;
 
 protected:
 	virtual void BuildGeometryBuffers() override;
 
 protected:
 	Waves mWaves;
-	DirectionalLight mDirLight;
 
 	Material mLandMat;
 	Material mWaveMat;
