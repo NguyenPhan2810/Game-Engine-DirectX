@@ -177,6 +177,7 @@
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="DemoSkull.cpp" />
     <ClCompile Include="DemoWave.cpp" />
+    <ClCompile Include="Effects.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="GlobalDefinitions.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="DemoSkull.h" />
     <ClInclude Include="DemoWave.h" />
+    <ClInclude Include="Effects.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="GlobalDefinitions.h" />

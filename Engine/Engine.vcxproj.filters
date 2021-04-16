@@ -66,6 +66,9 @@
     <ClCompile Include="GlobalDefinitions.cpp">
       <Filter>Helper Files</Filter>
     </ClCompile>
+    <ClCompile Include="Effects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="LightHelper.h">
       <Filter>Helper Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Effects.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

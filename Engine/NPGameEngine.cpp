@@ -79,35 +79,7 @@ void NPGameEngine::BuildGeometryBuffers()
 
 void NPGameEngine::BuildShaders()
 {
-	DWORD shaderFlags = 0;
-#if defined(DEBUG) || defined(_DEBUG)
-	shaderFlags |= D3D10_SHADER_DEBUG;
-	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif
-
-	ID3D10Blob* compiledShader = nullptr;
-	ID3D10Blob* compilationMsgs = nullptr;
-
-	HR(D3DX11CompileFromFile(L"FX/Lighting.fx",
-		0, 0, 0,
-		"fx_5_0",
-		shaderFlags, 0, 0,
-		&compiledShader, &compilationMsgs,
-		0));
-
-	// Catch messages
-	if (compilationMsgs)
-	{
-		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
-		ReleaseCOM(compilationMsgs);
-	}
-
-	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
-		0, mDevice, &mFX));
-
-
-	// Shader compilation done
-	ReleaseCOM(compiledShader);
+	
 
 	if (mFX)
 	{
