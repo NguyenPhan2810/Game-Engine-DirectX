@@ -117,6 +117,7 @@ void NPGameEngine::BuildShaders()
 		mfxWorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
 		mfxEyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
 		mfxDirLight = mFX->GetVariableByName("gDirLight");
+		mfxPointLight = mFX->GetVariableByName("gPointLight");
 		mfxMaterial = mFX->GetVariableByName("gMaterial");
 	}
 }
@@ -205,6 +206,7 @@ void NPGameEngine::UpdateScene(float dt)
 	float z = mCamRadius * sinf(mCamPhi) * sinf(mCamTheta);
 	float y = mCamRadius * cosf(mCamPhi);
 
+
 	mEyePosW = XMFLOAT3(x, y, z);
 	UpdateViewMatrix();
 }
@@ -230,7 +232,7 @@ void NPGameEngine::DrawScene()
 
 	// Set per frame constants.
 	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
-	//mfxPointLight->SetRawValue(&mPointLight, 0, sizeof(mPointLight));
+	mfxPointLight->SetRawValue(&mPointLight, 0, sizeof(mPointLight));
 	//mfxSpotLight->SetRawValue(&mSpotLight, 0, sizeof(mSpotLight));
 	mfxEyePosW->SetRawValue(&mEyePosW, 0, sizeof(mEyePosW));
 

@@ -3,16 +3,45 @@
 #define X 400
 #define Z 400
 
+float GetHillHeight(float x, float z)
+{
+	return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
+}
+
+void GetHillVertex(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& newVertex)
+{
+	auto x = vert.position.x;
+	auto z = vert.position.z;
+	auto y = GetHillHeight(x, z);
+
+	newVertex.Pos.x = x;
+	newVertex.Pos.y = y;
+	newVertex.Pos.z = z;
+
+	// n = (-df/dx, 1, -df/dz)
+	XMFLOAT3 n(
+		-0.03f * z * cosf(0.1f * x) - 0.3f * cosf(0.1f * z),
+		1.0f,
+		-0.3f * sinf(0.1f * x) + 0.03f * x * sinf(0.1f * z));
+	newVertex.Normal = n;
+}
+
 DemoWave::DemoWave(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 {
 	mCamRadius = 70;
 
 	// Directional light.
-	mDirLight.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLight.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mDirLight.specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	mDirLight.ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f);
+	mDirLight.diffuse = XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
+	mDirLight.specular = XMFLOAT4(0.03f, 0.03f, 0.03f, 1.0f);
 	mDirLight.direction = XMFLOAT3(0.4f, -0.8f, 0.57735f);
+
+	mPointLight.ambient = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	mPointLight.diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	mPointLight.specular = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	mPointLight.att = XMFLOAT3(1.0f, 0.1f, 0.0f);
+	mPointLight.range = 2500.0f;
 }
 
 DemoWave::~DemoWave()
@@ -68,6 +97,11 @@ void DemoWave::UpdateScene(float dt)
 	}
 
 	mImmediateContext->Unmap(waveVertexBuffer, 0);
+
+
+	mPointLight.position.x = 40.0f * cosf(0.8f * mTimer.TotalTime());
+	mPointLight.position.z = 40.0f * sinf(0.8f * mTimer.TotalTime());
+	mPointLight.position.y = 20;
 }
 
 //void DemoWave::DrawScene()
@@ -115,24 +149,6 @@ void DemoWave::UpdateScene(float dt)
 //	// Present buffer
 //	HR(mSwapChain->Present(0, 0));
 //}
-
-void GetHillVertex(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& newVertex)
-{
-	auto x = vert.position.x;
-	auto z = vert.position.z;
-	auto y = 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
-
-	newVertex.Pos.x = x;
-	newVertex.Pos.y = y;
-	newVertex.Pos.z = z;
-
-	// n = (-df/dx, 1, -df/dz)
-	XMFLOAT3 n(
-		-0.03f * z * cosf(0.1f * x) - 0.3f * cosf(0.1f * z),
-		1.0f,
-		-0.3f * sinf(0.1f * x) + 0.03f * x * sinf(0.1f * z));
-	newVertex.Normal = n;
-}
 
 void DemoWave::BuildGeometryBuffers()
 {
