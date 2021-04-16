@@ -11,16 +11,8 @@ DemoWave::DemoWave(HINSTANCE hInstance)
 	// Directional light.
 	mDirLight.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	mDirLight.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mDirLight.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mDirLight.direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-
-	mLandMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	mLandMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	mLandMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
-
-	mWaveMat.ambient = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	mWaveMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	mWaveMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
+	mDirLight.specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	mDirLight.direction = XMFLOAT3(0.4f, -0.8f, 0.57735f);
 }
 
 DemoWave::~DemoWave()
@@ -51,15 +43,14 @@ void DemoWave::UpdateScene(float dt)
 	// Every quarter second, generate a random wave.
 	//
 	static float t_base = 0.0f;
-	if ((mTimer.TotalTime() - t_base) >= 0.05f)
+	if ((mTimer.TotalTime() - t_base) >= 0.01f)
 	{
 		t_base += 0.25f;
 
 		DWORD i = 5 + rand() % (X - 10);
 		DWORD j = 5 + rand() % (Z - 10);
 
-		float r = MathHelper::RandF(5.0f, 10.0f);
-
+		float r = MathHelper::RandF(1.0f, 2.5f);
 		mWaves.Disturb(i, j, r);
 	}
 
@@ -148,11 +139,15 @@ void DemoWave::BuildGeometryBuffers()
 	GeometryGenerator::MeshData grid;
 	GeometryGenerator::MeshData wave;
 	GeometryGenerator::MeshData skull;
+	GeometryGenerator::MeshData box;
+	GeometryGenerator::MeshData geoSphere;
 
 
 	GeometryGenerator geoGen;
 	geoGen.CreateGrid(X, Z, 50, 50, grid);
 	geoGen.CreateGrid(X, Z, X, Z, wave);
+	geoGen.CreateBox(1, 1, 1, box);
+	geoGen.CreateGeoSphere(1, 3, geoSphere);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
 	GLOBDEF::Vertex newVert;
@@ -173,8 +168,8 @@ void DemoWave::BuildGeometryBuffers()
 	mGridObject->CreateVertexBuffer(vertices, gridVBD);
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
-	mCenterObject->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->Scale(XMFLOAT3(4, 4, 4));
+	mCenterObject->Translate(XMFLOAT3(0, 10, 0));
+	mCenterObject->Scale(XMFLOAT3(3.5, 3.5, 3.5));
 	mCenterObject->LoadGeometry(skull);
 
 	mWaveMesh = new BaseObject(mDevice, mImmediateContext);
@@ -188,4 +183,20 @@ void DemoWave::BuildGeometryBuffers()
 
 	GeometryGenerator::ConvertToGlobVertex(wave.vertices, vertices);
 	mWaveMesh->CreateVertexBuffer(vertices, waveVBD);
+
+	// Build mat
+	auto& landMat = mGridObject->GetMaterial();
+	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	auto& waveMat = mWaveMesh->GetMaterial();
+	waveMat.ambient = XMFLOAT4(0.1f, 0.3f, 0.4f, 1.0f);
+	waveMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	waveMat.specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 60.0f);
+
+	auto& cubeMat = mCenterObject->GetMaterial();
+	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	cubeMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 }

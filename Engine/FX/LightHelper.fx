@@ -43,8 +43,8 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L,
 	// Flatten to avoid dynamic branching.
     [flatten] if (diffuseFactor > 0.0f)
     {
-        float3 v = reflect(L.Direction, normal);
-        float specFactor = pow(max(0, dot(v, toEye)), mat.specular.w);
+        float3 v = reflect(-lightVec, normal);
+        float specFactor = pow(max(0.0f, dot(v, toEye)), mat.specular.w);
 
         diffuse = diffuseFactor * (mat.diffuse * L.Diffuse);
         spec = specFactor * (mat.specular * L.Specular);

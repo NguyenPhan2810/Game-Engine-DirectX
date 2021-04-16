@@ -3,6 +3,7 @@
 #include "d3dUtil.h"
 #include "GeometryGenerator.h"
 #include "GlobalDefinitions.h"
+#include "LightHelper.h"
 
 class BaseObject
 {
@@ -31,6 +32,7 @@ public:
 
 	XMMATRIX LocalToWorldMatrix() const;
 	
+	Material& GetMaterial();
 
 public:
 	bool renderWireframe;
@@ -46,6 +48,8 @@ protected:
 	UINT mIndexCount;
 
 	XMMATRIX mWorldMatrix;
+
+	Material mMaterial;
 
 private:
 	UINT mId;

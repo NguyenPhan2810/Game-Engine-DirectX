@@ -39,9 +39,7 @@ void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& m
 	for (UINT i = 0; i < vcount; ++i)
 	{
 		fin >> vertices[i].position.x >> vertices[i].position.y >> vertices[i].position.z;
-
-		// Normal not used in this demo.
-		fin >> nx >> ny >> nz;
+		fin >> vertices[i].normal.x >> vertices[i].normal.y >> vertices[i].normal.z;
 	}
 
 	fin >> ignore;
@@ -255,6 +253,8 @@ void GeometryGenerator::CreateGeoSphere(float radius, UINT nSubdivisions, MeshDa
 	for (UINT i = 0; i < nVertices; ++i)
 	{
 		auto& pos = meshData.vertices[i].position;
+		auto& normal = meshData.vertices[i].normal;
+
 		// Normalize vector
 		XMVECTOR n = XMVector3Normalize(XMLoadFloat3(&pos));
 
@@ -262,6 +262,7 @@ void GeometryGenerator::CreateGeoSphere(float radius, UINT nSubdivisions, MeshDa
 		XMVECTOR p = n * radius;
 		
 		XMStoreFloat3(&pos, p);
+		XMStoreFloat3(&normal, n);
 	}
 }
 
@@ -334,6 +335,7 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 {
 	float halfX = lengthX * 0.5f;
 	float halfZ = lengthZ * 0.5f;
+	XMFLOAT3 normal = XMFLOAT3(0, 1, 0);
 
 #pragma region Generate vertices
 	UINT vertCount = m * n;
@@ -353,6 +355,7 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 			auto& vert = meshData.vertices[iv];
 
 			vert.position = XMFLOAT3(x, 0.0, z);
+			vert.normal = normal;
 
 			iv++;
 			x += dx;

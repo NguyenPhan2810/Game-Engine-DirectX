@@ -150,3 +150,8 @@ XMMATRIX BaseObject::LocalToWorldMatrix() const
 {
 	return mWorldMatrix;
 }
+
+Material& BaseObject::GetMaterial()
+{
+	return mMaterial;
+}

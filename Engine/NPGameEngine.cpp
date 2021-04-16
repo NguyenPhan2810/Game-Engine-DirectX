@@ -4,7 +4,6 @@
 #include "MathHelper.h"
 #include "GeometryGenerator.h"
 #include "GlobalDefinitions.h"
-#include "LightHelper.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
@@ -16,8 +15,8 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mSolidRS(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
-, mCamRadius(100.0f)
-, mCamFOV(45.0f)
+, mCamRadius(200.0f)
+, mCamFOV(70.0f)
 , mCamNear(1.0f)
 , mCamFar(1000.0f)
 , mMouseSensitivity(0.25f)
@@ -127,7 +126,7 @@ void NPGameEngine::BuildVertexlayout()
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	D3DX11_PASS_DESC passDesc;
@@ -202,6 +201,11 @@ void NPGameEngine::UpdateViewMatrix()
 
 void NPGameEngine::UpdateScene(float dt)
 {
+	float x = mCamRadius * sinf(mCamPhi) * cosf(mCamTheta);
+	float z = mCamRadius * sinf(mCamPhi) * sinf(mCamTheta);
+	float y = mCamRadius * cosf(mCamPhi);
+
+	mEyePosW = XMFLOAT3(x, y, z);
 	UpdateViewMatrix();
 }
 
@@ -225,15 +229,10 @@ void NPGameEngine::DrawScene()
 
 
 	// Set per frame constants.
-	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mfxDirLmDirLightight));
+	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
 	//mfxPointLight->SetRawValue(&mPointLight, 0, sizeof(mPointLight));
 	//mfxSpotLight->SetRawValue(&mSpotLight, 0, sizeof(mSpotLight));
-	mfxEyePosW->SetRawValue(&mfxEyePosW, 0, sizeof(mfxEyePosW));
-
-	Material tempMat;
-	tempMat.ambient = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	tempMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	tempMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
+	mfxEyePosW->SetRawValue(&mEyePosW, 0, sizeof(mEyePosW));
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	mTech->GetDesc(&techDesc);
@@ -245,11 +244,12 @@ void NPGameEngine::DrawScene()
 			XMMATRIX world = obj->LocalToWorldMatrix();
 			XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
 			XMMATRIX worldViewProj = world * viewProj;
+			const Material& material = obj->GetMaterial();
 
 			mfxWorld->SetMatrix(reinterpret_cast<float*>(&world));
 			mfxWorldInvTranspose->SetMatrix(reinterpret_cast<float*>(&worldInvTranspose));
 			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-			mfxMaterial->SetRawValue(&tempMat, 0, sizeof(tempMat));
+			mfxMaterial->SetRawValue(&material, 0, sizeof(material));
 
 			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 

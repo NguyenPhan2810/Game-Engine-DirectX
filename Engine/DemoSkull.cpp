@@ -3,6 +3,11 @@
 DemoSkull::DemoSkull(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 {
+	mCamRadius = 10;
+	mDirLight.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLight.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight.direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
 }
 
 DemoSkull::~DemoSkull()

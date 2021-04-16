@@ -20,9 +20,6 @@ protected:
 protected:
 	Waves mWaves;
 
-	Material mLandMat;
-	Material mWaveMat;
-
 	BaseObject* mWaveMesh;
 	BaseObject* mCenterObject;
 	BaseObject* mGridObject;

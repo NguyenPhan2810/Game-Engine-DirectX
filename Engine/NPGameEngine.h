@@ -2,6 +2,7 @@
 
 #include "d3dApp.h"
 #include "BaseObject.h"
+#include "LightHelper.h"
 
 class NPGameEngine : public D3DApp
 {
@@ -49,6 +50,7 @@ protected:
 
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
+	XMFLOAT3 mEyePosW;
 
 	float mCamTheta;
 	float mCamPhi;
