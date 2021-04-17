@@ -18,7 +18,7 @@ public:
 	
 public:
 	void LoadGeometry(const GeometryGenerator::MeshData meshData);
-	void CreateVertexBuffer(const std::vector<GLOBDEF::Vertex>& vertexData, D3D11_BUFFER_DESC vbd);
+	void CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexData, D3D11_BUFFER_DESC vbd);
 	void CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd);
 
 	ID3D11Buffer* GetVertexBuffer();

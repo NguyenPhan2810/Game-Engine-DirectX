@@ -28,6 +28,9 @@
     <Filter Include="Demos\Skull">
       <UniqueIdentifier>{5ab398af-c0d5-465d-b73e-a3896c7fd4cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Precompiled Header">
+      <UniqueIdentifier>{c1720695-23eb-45d5-bfc9-58e4f13eb71e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,11 +66,14 @@
     <ClCompile Include="DemoSkull.cpp">
       <Filter>Demos\Skull</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalDefinitions.cpp">
-      <Filter>Helper Files</Filter>
-    </ClCompile>
     <ClCompile Include="Effects.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Precompiled Header</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +98,6 @@
     <ClInclude Include="BaseObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalDefinitions.h">
-      <Filter>Helper Files</Filter>
-    </ClInclude>
     <ClInclude Include="Waves.h">
       <Filter>Demos\Waves</Filter>
     </ClInclude>
@@ -109,6 +112,12 @@
     </ClInclude>
     <ClInclude Include="Effects.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Precompiled Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

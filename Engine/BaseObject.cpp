@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "BaseObject.h"
+
 
 UINT BaseObject::mIdBase = 0;
 bool BaseObject::mAllObjectsChanged = false;
@@ -52,7 +54,7 @@ void BaseObject::Update(float dt)
 
 void BaseObject::Draw()
 {
-	UINT stride = sizeof(GLOBDEF::Vertex);
+	UINT stride = sizeof(Vertex::PosNormal);
 	UINT offset = 0;
 	mImmediateContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
 	mImmediateContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -63,15 +65,15 @@ void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
 {
 	mVertexCount = meshData.vertices.size();
 
-	std::vector<GLOBDEF::Vertex> vertices;
+	std::vector<Vertex::PosNormal> vertices;
 	for (UINT i = 0; i < mVertexCount; ++i)
 	{
-		vertices.push_back(GLOBDEF::Vertex{ meshData.vertices[i].position, meshData.vertices[i].normal });
+		vertices.push_back(Vertex::PosNormal{ meshData.vertices[i].position, meshData.vertices[i].normal });
 	}
 
 	// Create vertex buffer
 	D3D11_BUFFER_DESC vbd{ 0 };
-	vbd.ByteWidth = mVertexCount * sizeof(GLOBDEF::Vertex);
+	vbd.ByteWidth = mVertexCount * sizeof(Vertex::PosNormal);
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
@@ -88,7 +90,7 @@ void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
 	CreateIndexBuffer(meshData.indices, ibd);
 }
 
-void BaseObject::CreateVertexBuffer(const std::vector<GLOBDEF::Vertex>& vertexData, D3D11_BUFFER_DESC vbd)
+void BaseObject::CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexData, D3D11_BUFFER_DESC vbd)
 {
 	ReleaseCOM(mVertexBuffer);
 	

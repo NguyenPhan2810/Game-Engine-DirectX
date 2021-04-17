@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 
 #include "d3dx11effect.h"
 #include <d3dcompiler.h>
@@ -14,14 +15,12 @@
 //----------------------------------------------------------------------------
 // Macro for safe releasing COM object
 //----------------------------------------------------------------------------
-#define ReleaseCOM(x)	\
-{						\
-	if (x)				\
-	{					\
-		x->Release();	\
-		x = nullptr;	\
-	}					\
-}						\
+#define ReleaseCOM(x) { if(x){ x->Release(); x = nullptr; } }
+
+//----------------------------------------------------------------------------
+// Macro for deleting object
+//----------------------------------------------------------------------------
+#define SafeDelete(x) { delete x; x = nullptr; }
 
 //----------------------------------------------------------------------------
 // Error reminder and tracking in Debug mode

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "d3dApp.h"
 #include <windowsx.h>
 

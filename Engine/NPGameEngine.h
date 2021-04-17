@@ -25,27 +25,12 @@ private:
 
 protected:
 	virtual void InitRasterizerState();
-
 	virtual void BuildGeometryBuffers();
-	virtual void BuildShaders();
-	virtual void BuildVertexlayout();
 
 protected:
-	ID3DX11Effect* mFX;
-	ID3DX11EffectTechnique* mTech;
-	ID3DX11EffectMatrixVariable* mfxWorldViewProj;
-	ID3DX11EffectMatrixVariable* mfxWorld;
-	ID3DX11EffectMatrixVariable* mfxWorldInvTranspose;
-	ID3DX11EffectVectorVariable* mfxEyePosW;
-	ID3DX11EffectVariable* mfxDirLight;
-	ID3DX11EffectVariable* mfxPointLight;
-	//ID3DX11EffectVariable* mfxSpotLight;
-	ID3DX11EffectVariable* mfxMaterial;
-
 	DirectionalLight mDirLight;
 	PointLight mPointLight;
 
-	ID3D11InputLayout* mInputLayout;
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;
 

@@ -82,7 +82,7 @@ float4 PS(VertexOut pin) : SV_Target
     return litColor;
 }
 
-technique11 ColorTech
+technique11 LightingTech
 {
 	pass P0
 	{

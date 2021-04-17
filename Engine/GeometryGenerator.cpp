@@ -1,8 +1,9 @@
+#include "stdafx.h"
 #include "GeometryGenerator.h"
 #include <map>
 #include <fstream>
 
-void GeometryGenerator::ConvertToGlobVertex(std::vector<GeometryGenerator::Vertex>& source, std::vector<GLOBDEF::Vertex>& vertices)
+void GeometryGenerator::ConvertToPosNormal(std::vector<GeometryGenerator::Vertex>& source, std::vector<PosNormal>& vertices)
 {
 	size_t n = source.size();
 	vertices.resize(n);
@@ -11,7 +12,6 @@ void GeometryGenerator::ConvertToGlobVertex(std::vector<GeometryGenerator::Verte
 		vertices[i].Pos = source[i].position;
 		vertices[i].Normal = source[i].normal;
 	}
-
 }
 
 void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& meshData)

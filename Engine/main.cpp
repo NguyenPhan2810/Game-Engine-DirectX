@@ -1,5 +1,7 @@
+#include "stdafx.h"
 #include "DemoSkull.h"
 #include "DemoWave.h"
+
 
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,

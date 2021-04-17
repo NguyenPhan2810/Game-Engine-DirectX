@@ -1,16 +1,14 @@
+#include "stdafx.h"
 
 #include "NPGameEngine.h"
 #include "d3dx11effect.h"
 #include "MathHelper.h"
 #include "GeometryGenerator.h"
 #include "GlobalDefinitions.h"
+#include "Effects.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
-, mFX(nullptr)
-, mTech(nullptr)
-, mfxWorldViewProj(nullptr)
-, mInputLayout(nullptr)
 , mWireframeRS(nullptr)
 , mSolidRS(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
@@ -34,10 +32,11 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 
 NPGameEngine::~NPGameEngine()
 {
-	ReleaseCOM(mFX);
-	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mWireframeRS);
 	ReleaseCOM(mSolidRS);
+
+	InputLayouts::DestroyAll();
+	Effects::DestroyAll();
 }
 
 bool NPGameEngine::Init()
@@ -45,10 +44,11 @@ bool NPGameEngine::Init()
 	if (!D3DApp::Init())
 		return false;
 
+	Effects::InitAll(mDevice);
+	InputLayouts::InitAll(mDevice);
+
 	InitRasterizerState();
 	BuildGeometryBuffers();
-	BuildShaders();
-	BuildVertexlayout();
 
 	return true;
 }
@@ -75,37 +75,6 @@ void NPGameEngine::InitRasterizerState()
 void NPGameEngine::BuildGeometryBuffers()
 {
 	
-}
-
-void NPGameEngine::BuildShaders()
-{
-	
-
-	if (mFX)
-	{
-		mTech = mFX->GetTechniqueByName("ColorTech");
-		mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
-		mfxWorld = mFX->GetVariableByName("gWorld")->AsMatrix();
-		mfxWorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
-		mfxEyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
-		mfxDirLight = mFX->GetVariableByName("gDirLight");
-		mfxPointLight = mFX->GetVariableByName("gPointLight");
-		mfxMaterial = mFX->GetVariableByName("gMaterial");
-	}
-}
-
-void NPGameEngine::BuildVertexlayout()
-{
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
-
-	D3DX11_PASS_DESC passDesc;
-	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
-	HR(mDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize, &mInputLayout));
 }
 
 void NPGameEngine::OnResize()
@@ -190,26 +159,26 @@ void NPGameEngine::DrawScene()
 	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set up
-	mImmediateContext->IASetInputLayout(mInputLayout);
+	mImmediateContext->IASetInputLayout(InputLayouts::PosNormal);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//mImmediateContext->RSSetState(mWireframeRS);
 
 	// Set constants
 
-	XMMATRIX view = XMLoadFloat4x4(&mView);
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = XMLoadFloat4x4(&mView);
 	XMMATRIX viewProj = view * proj;
 	auto allObjects = BaseObject::GetAllObjects();
 
 
 	// Set per frame constants.
-	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
-	mfxPointLight->SetRawValue(&mPointLight, 0, sizeof(mPointLight));
+	Effects::BasicFX->SetDirLight(mDirLight);
+	Effects::BasicFX->SetPointLight(mPointLight);
 	//mfxSpotLight->SetRawValue(&mSpotLight, 0, sizeof(mSpotLight));
-	mfxEyePosW->SetRawValue(&mEyePosW, 0, sizeof(mEyePosW));
+	Effects::BasicFX->SetEyePosW(mEyePosW);
 
 	D3DX11_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
+	Effects::BasicFX->Tech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
 		for (auto obj : allObjects)
@@ -220,12 +189,12 @@ void NPGameEngine::DrawScene()
 			XMMATRIX worldViewProj = world * viewProj;
 			const Material& material = obj->GetMaterial();
 
-			mfxWorld->SetMatrix(reinterpret_cast<float*>(&world));
-			mfxWorldInvTranspose->SetMatrix(reinterpret_cast<float*>(&worldInvTranspose));
-			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-			mfxMaterial->SetRawValue(&material, 0, sizeof(material));
+			Effects::BasicFX->SetWorld(world);
+			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::BasicFX->SetWorldViewProj(worldViewProj);
+			Effects::BasicFX->SetMaterial(material);
 
-			mTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+			Effects::BasicFX->Tech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 
 			// Set state and draw
 			if (obj->renderWireframe)

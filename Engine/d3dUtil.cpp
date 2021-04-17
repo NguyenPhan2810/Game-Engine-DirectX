@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "d3dUtil.h"
 
 HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "DemoWave.h"
 
 #define X 400
@@ -8,7 +9,7 @@ float GetHillHeight(float x, float z)
 	return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
 }
 
-void GetHillVertex(const GeometryGenerator::Vertex& vert, GLOBDEF::Vertex& newVertex)
+void GetHillVertex(const GeometryGenerator::Vertex& vert, Vertex::PosNormal& newVertex)
 {
 	auto x = vert.position.x;
 	auto z = vert.position.z;
@@ -89,7 +90,7 @@ void DemoWave::UpdateScene(float dt)
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	HR(mImmediateContext->Map(waveVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
 
-	GLOBDEF::Vertex* v = reinterpret_cast<GLOBDEF::Vertex*>(mappedData.pData);
+	Vertex::PosNormal* v = reinterpret_cast<Vertex::PosNormal*>(mappedData.pData);
 	for (UINT i = 0; i < mWaves.VertexCount(); ++i)
 	{
 		v[i].Pos = mWaves[i];
@@ -166,8 +167,8 @@ void DemoWave::BuildGeometryBuffers()
 	geoGen.CreateGeoSphere(1, 3, geoSphere);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
-	GLOBDEF::Vertex newVert;
-	std::vector<GLOBDEF::Vertex> vertices;
+	Vertex::PosNormal newVert;
+	std::vector<Vertex::PosNormal> vertices;
 	for (auto& vert : grid.vertices)
 	{
 		GetHillVertex(vert, newVert);
@@ -178,7 +179,7 @@ void DemoWave::BuildGeometryBuffers()
 	mGridObject = new BaseObject(mDevice, mImmediateContext);
 	mGridObject->LoadGeometry(grid); 
 	D3D11_BUFFER_DESC gridVBD{ 0 };
-	gridVBD.ByteWidth = mGridObject->GetVertexCount() * sizeof(GLOBDEF::Vertex);
+	gridVBD.ByteWidth = mGridObject->GetVertexCount() * sizeof(Vertex::PosNormal);
 	gridVBD.Usage = D3D11_USAGE_IMMUTABLE;
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	mGridObject->CreateVertexBuffer(vertices, gridVBD);
@@ -192,12 +193,12 @@ void DemoWave::BuildGeometryBuffers()
 	mWaveMesh->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };
-	waveVBD.ByteWidth = mWaveMesh->GetVertexCount() * sizeof(GLOBDEF::Vertex);
+	waveVBD.ByteWidth = mWaveMesh->GetVertexCount() * sizeof(Vertex::PosNormal);
 	waveVBD.Usage = D3D11_USAGE_DYNAMIC;
 	waveVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	waveVBD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	GeometryGenerator::ConvertToGlobVertex(wave.vertices, vertices);
+	GeometryGenerator::ConvertToPosNormal(wave.vertices, vertices);
 	mWaveMesh->CreateVertexBuffer(vertices, waveVBD);
 
 	// Build mat

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "d3dUtil.h"
-#include "GlobalDefinitions.h"
+#include "Vertex.h"
 
+using namespace Vertex;
 class GeometryGenerator
 {
 public:
@@ -41,7 +42,7 @@ public:
 	///<summary>
 	/// Copy position from source to vertices
 	///</summary>
-	static void ConvertToGlobVertex(std::vector<GeometryGenerator::Vertex>& source, std::vector<GLOBDEF::Vertex>& vertices);
+	static void ConvertToPosNormal(std::vector<GeometryGenerator::Vertex>& source, std::vector<PosNormal>& vertices);
 
 	///<summary>
 	/// Creates a mesh from simple file

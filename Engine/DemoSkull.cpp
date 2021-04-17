@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "DemoSkull.h"
 
 DemoSkull::DemoSkull(HINSTANCE hInstance)
