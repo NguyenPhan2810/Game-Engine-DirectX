@@ -6,10 +6,24 @@ DemoSkull::DemoSkull(HINSTANCE hInstance)
 {
 	mCamRadius = 10;
 
-	mDirLight.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLight.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mDirLight.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mDirLight.direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+	mDirLight.Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	mDirLight.Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLight.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLight.Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	mPointLight.Ambient = XMFLOAT4(0.1f, 0.1f, 0.17f, 1.0f);
+	mPointLight.Diffuse = XMFLOAT4(0.7f, 0.7f, 0.9f, 1.0f);
+	mPointLight.Specular = XMFLOAT4(0.7f, 0.7f, 0.9f, 1.0f);
+	mPointLight.att = XMFLOAT3(1.0f, 0.1f, 0.5f);
+	mPointLight.range = 30.0f;
+
+	mSpotLight.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mSpotLight.Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mSpotLight.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	mSpotLight.Position = XMFLOAT3(0, 5, 0);
+	mSpotLight.Range = 20;
+	mSpotLight.Direction = XMFLOAT3(0, -1, 0);
+	mSpotLight.Att = XMFLOAT3(0, 1, 1);
 }
 
 DemoSkull::~DemoSkull()
@@ -23,6 +37,15 @@ DemoSkull::~DemoSkull()
 	for (auto p : mSpheres)
 		delete p;
 	mSpheres.clear();
+}
+
+void DemoSkull::UpdateScene(float dt)
+{
+	NPGameEngine::UpdateScene(dt);
+
+	mPointLight.Position.x = 3.0f * cosf(2 * mTimer.TotalTime());
+	mPointLight.Position.z = 3.0f * sinf(2 * mTimer.TotalTime());
+	mPointLight.Position.y = 2;
 }
 
 void DemoSkull::BuildGeometryBuffers()
@@ -46,7 +69,7 @@ void DemoSkull::BuildGeometryBuffers()
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
 	mCenterObject->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->Scale(XMFLOAT3(0.7, 0.7, 0.7));
+	mCenterObject->Scale(XMFLOAT3(0.3, 0.3, 0.3));
 	mCenterObject->LoadGeometry(skull);
 
 	mCenterBox = new BaseObject(mDevice, mImmediateContext);
@@ -81,10 +104,10 @@ void DemoSkull::BuildGeometryBuffers()
 	auto& landMat = mGridObject->GetMaterial();
 	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	landMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
 	auto& cubeMat = mCenterObject->GetMaterial();
 	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	cubeMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
+	cubeMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 }

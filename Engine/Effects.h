@@ -33,6 +33,7 @@ public:
 	void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
 	void SetDirLight(const DirectionalLight& light) { DirLight->SetRawValue(&light, 0, sizeof(DirectionalLight)); }
 	void SetPointLight(const PointLight& light) { PntLight->SetRawValue(&light, 0, sizeof(PointLight)); }
+	void SetSpotLight(const SpotLight& light) { SptLight->SetRawValue(&light, 0, sizeof(SpotLight)); }
 	void SetMaterial(const Material& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 
 	ID3DX11EffectTechnique* Tech;
@@ -43,6 +44,7 @@ public:
 	ID3DX11EffectVectorVariable* EyePosW;
 	ID3DX11EffectVariable* DirLight;
 	ID3DX11EffectVariable* PntLight;
+	ID3DX11EffectVariable* SptLight;
 	ID3DX11EffectVariable* Mat;
 };
 #pragma endregion

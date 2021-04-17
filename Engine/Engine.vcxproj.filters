@@ -124,7 +124,7 @@
     <FxCompile Include="FX\LightHelper.fx">
       <Filter>Resource Files\FX</Filter>
     </FxCompile>
-    <FxCompile Include="FX\Lighting.fx">
+    <FxCompile Include="FX\Basic.fx">
       <Filter>Resource Files\FX</Filter>
     </FxCompile>
   </ItemGroup>

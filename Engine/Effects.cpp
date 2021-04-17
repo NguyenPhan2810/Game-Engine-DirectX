@@ -50,6 +50,7 @@ BasicEffect::BasicEffect(ID3D11Device* device, const std::wstring& filename)
 	EyePosW				= mFX->GetVariableByName("gEyePosW")->AsVector();
 	DirLight			= mFX->GetVariableByName("gDirLight");
 	PntLight			= mFX->GetVariableByName("gPointLight");
+	SptLight			= mFX->GetVariableByName("gSpotLight");
 
 	World				= mFX->GetVariableByName("gWorld")->AsMatrix();
 	WorldInvTranspose	= mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
@@ -68,7 +69,7 @@ BasicEffect*  Effects::BasicFX = 0;
 
 void Effects::InitAll(ID3D11Device* device)
 {
-	BasicFX = new BasicEffect(device, L"FX/Lighting.fx");
+	BasicFX = new BasicEffect(device, L"FX/Basic.fx");
 }
 
 void Effects::DestroyAll()

@@ -6,6 +6,7 @@ public:
 	DemoSkull(HINSTANCE hInstance);
 	~DemoSkull();
 
+	virtual void UpdateScene(float dt = 0) override;
 protected:
 	virtual void BuildGeometryBuffers() override;
 

@@ -4,6 +4,7 @@ cbuffer cbPerFrame
 {
     DirectionalLight gDirLight;
     PointLight gPointLight;
+    SpotLight gSpotLight;
     float3 gEyePosW;
 };
 
@@ -73,11 +74,16 @@ float4 PS(VertexOut pin) : SV_Target
     ambient += A;
     diffuse += D;
     spec += S;
+    
+    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
+    ambient += A;
+    diffuse += D;
+    spec += S;
 
     float4 litColor = ambient + diffuse + spec;
 	
 	// Common to take alpha from diffuse material.
-    litColor.a = gMaterial.diffuse.a;
+    litColor.a = gMaterial.Diffuse.a;
 
     return litColor;
 }

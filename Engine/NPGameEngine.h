@@ -30,6 +30,7 @@ protected:
 protected:
 	DirectionalLight mDirLight;
 	PointLight mPointLight;
+	SpotLight mSpotLight;
 
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;

@@ -174,7 +174,7 @@ void NPGameEngine::DrawScene()
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLight(mDirLight);
 	Effects::BasicFX->SetPointLight(mPointLight);
-	//mfxSpotLight->SetRawValue(&mSpotLight, 0, sizeof(mSpotLight));
+	Effects::BasicFX->SetSpotLight(mSpotLight);
 	Effects::BasicFX->SetEyePosW(mEyePosW);
 
 	D3DX11_TECHNIQUE_DESC techDesc;

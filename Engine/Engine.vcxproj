@@ -210,7 +210,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FX\LightHelper.fx" />
-    <FxCompile Include="FX\Lighting.fx" />
+    <FxCompile Include="FX\Basic.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
