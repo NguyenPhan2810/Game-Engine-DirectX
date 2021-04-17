@@ -18,6 +18,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mCamNear(1.0f)
 , mCamFar(1000.0f)
 , mMouseSensitivity(0.25f)
+, mEnableWireframe(false)
 {
 	mClientWidth = 1080;
 	mClientHeight = 720;
@@ -143,10 +144,14 @@ void NPGameEngine::UpdateViewMatrix()
 
 void NPGameEngine::UpdateScene(float dt)
 {
+	// Input
+	if (GetAsyncKeyState('L') & 0x8000)
+		mEnableWireframe = !mEnableWireframe;
+
+	//===
 	float x = mCamRadius * sinf(mCamPhi) * cosf(mCamTheta);
 	float z = mCamRadius * sinf(mCamPhi) * sinf(mCamTheta);
 	float y = mCamRadius * cosf(mCamPhi);
-
 
 	mEyePosW = XMFLOAT3(x, y, z);
 	UpdateViewMatrix();
@@ -161,7 +166,10 @@ void NPGameEngine::DrawScene()
 	// Set up
 	mImmediateContext->IASetInputLayout(InputLayouts::PosNormal);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//mImmediateContext->RSSetState(mWireframeRS);
+	if (mEnableWireframe)
+		mImmediateContext->RSSetState(mWireframeRS);
+	else
+		mImmediateContext->RSSetState(mSolidRS);
 
 	// Set constants
 
@@ -195,12 +203,6 @@ void NPGameEngine::DrawScene()
 			Effects::BasicFX->SetMaterial(material);
 
 			Effects::BasicFX->Tech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-
-			// Set state and draw
-			if (obj->renderWireframe)
-				mImmediateContext->RSSetState(mWireframeRS);
-			else
-				mImmediateContext->RSSetState(mSolidRS);
 
 			obj->Draw();
 		}

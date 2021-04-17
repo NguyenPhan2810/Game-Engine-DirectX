@@ -48,6 +48,8 @@ protected:
 
 	float mMouseSensitivity;
 
+	bool mEnableWireframe;
+
 private:
 	POINT mLastMousePos;
 };
