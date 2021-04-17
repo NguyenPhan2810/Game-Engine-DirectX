@@ -148,13 +148,35 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 	float dPhi = XM_PI / stackCount;
 	float phi = dPhi;
 
+	bool faceUp = true;
 	// stackCount -2 because 2 of the stack connects to poles
 	for (UINT iRing = 0; iRing <= stackCount - 2; ++iRing)
 	{
 		float x = radius * sinf(phi);
 		float y = radius * cosf(phi);
+		float r = x;
 
-		CreateRingVertex(x, y, sliceCount, meshData, true);
+		// Theta step to rotate around
+		float dTheta = 2.0f * XM_PI / sliceCount;
+		if (faceUp)
+			dTheta *= -1;
+
+		// The start end the end vertices is overlapped because texCoord is different
+		float theta = 0;
+		for (UINT i = 0; i <= sliceCount; ++i)
+		{
+			Vertex vert;
+
+			float x = r * cosf(theta);
+			float z = r * sinf(theta);
+
+			vert.position = XMFLOAT3(x, y, z);
+			XMStoreFloat3(&vert.normal, XMVector3Normalize(XMLoadFloat3(&vert.position)));
+
+			meshData.vertices.push_back(vert);
+
+			theta += dTheta;
+		}
 
 		phi += dPhi;
 	}
@@ -177,12 +199,10 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 
 	// Create poles
 	Vertex northPole, southPole;
-	northPole.position.x = 0;
-	northPole.position.y = radius;
-	northPole.position.z = 0;
-	southPole.position.x = 0;
-	southPole.position.y = -radius;
-	southPole.position.z = 0;
+	northPole.position = XMFLOAT3(0, radius, 0);
+	northPole.normal = XMFLOAT3(0, 1, 0);
+	southPole.position = XMFLOAT3(0, -radius, 0);
+	southPole.normal = XMFLOAT3(0, -1, 0);
 	meshData.vertices.push_back(northPole);
 	meshData.vertices.push_back(southPole);
 
@@ -410,13 +430,33 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 	float ringRadiusStep = (topRadius - bottomRadius) / stackCount;
 
 	// Compute vertices
+	bool faceUp = false;
 	UINT ringCount = stackCount + 1;
 	for (UINT ir = 0; ir < ringCount; ++ir)
 	{
 		float y = bottomHeight + ir * stackHeight;
 		float r = bottomRadius + ir * ringRadiusStep;
 
-		CreateRingVertex(r, y, sliceCount, meshData, false);
+		// Theta step to rotate around
+		float dTheta = 2.0f * XM_PI / sliceCount;
+		if (faceUp)
+			dTheta *= -1;
+
+		// The start end the end vertices is overlapped because texCoord is different
+		float theta = 0;
+		for (UINT i = 0; i <= sliceCount; ++i)
+		{
+			Vertex vert;
+
+			float x = r * cosf(theta);
+			float z = r * sinf(theta);
+
+			vert.position = XMFLOAT3(x, y, z);
+
+			meshData.vertices.push_back(vert);
+
+			theta += dTheta;
+		}
 	}
 
 	// Compute indices
@@ -449,26 +489,6 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 	// Reserve index before concatnating vertices
 	UINT baseIndex = meshData.vertices.size();
 
-	CreateRingVertex(radius, y, sliceCount, meshData, faceUp);
-
-	// Create center vertex
-	Vertex centerVert;
-	centerVert.position = XMFLOAT3(0, y, 0);
-	meshData.vertices.push_back(centerVert);
-	
-	UINT centerIndex = meshData.vertices.size() - 1;
-
-	// Calculate index
-	for (UINT i = 0; i < sliceCount; ++i)
-	{
-		meshData.indices.push_back(centerIndex);
-		meshData.indices.push_back(baseIndex + i);
-		meshData.indices.push_back(baseIndex + i + 1);
-	}
-}
-
-void GeometryGenerator::CreateRingVertex(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp)
-{
 	// Theta step to rotate around
 	float dTheta = 2.0f * XM_PI / sliceCount;
 	if (faceUp)
@@ -488,5 +508,20 @@ void GeometryGenerator::CreateRingVertex(float radius, float y, UINT sliceCount,
 		meshData.vertices.push_back(vert);
 
 		theta += dTheta;
+	}
+
+	// Create center vertex
+	Vertex centerVert;
+	centerVert.position = XMFLOAT3(0, y, 0);
+	meshData.vertices.push_back(centerVert);
+	
+	UINT centerIndex = meshData.vertices.size() - 1;
+
+	// Calculate index
+	for (UINT i = 0; i < sliceCount; ++i)
+	{
+		meshData.indices.push_back(centerIndex);
+		meshData.indices.push_back(baseIndex + i);
+		meshData.indices.push_back(baseIndex + i + 1);
 	}
 }

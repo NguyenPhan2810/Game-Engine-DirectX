@@ -5,6 +5,7 @@ DemoSkull::DemoSkull(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 {
 	mCamRadius = 10;
+
 	mDirLight.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	mDirLight.diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -70,9 +71,20 @@ void DemoSkull::BuildGeometryBuffers()
 		sphere1->LoadGeometry(sphere);
 		auto sphere2 = new BaseObject(mDevice, mImmediateContext);
 		sphere2->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
-		sphere2->LoadGeometry(sphere);
+		sphere2->LoadGeometry(geoSphere);
 
 		mSpheres.push_back(sphere1);
 		mSpheres.push_back(sphere2);
-	}
+	}	
+	
+	// Build mat
+	auto& landMat = mGridObject->GetMaterial();
+	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	auto& cubeMat = mCenterObject->GetMaterial();
+	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	cubeMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 }

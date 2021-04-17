@@ -23,6 +23,11 @@ BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateConte
 	mAllObjectsMap[mId] = this;
 
 	mWorldMatrix = XMMatrixIdentity();
+
+	// Default material
+	mMaterial.ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
+	mMaterial.diffuse = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
+	mMaterial.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 }
 
 BaseObject::~BaseObject()

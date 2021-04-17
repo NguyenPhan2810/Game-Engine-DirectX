@@ -98,11 +98,5 @@ private:
 	/// </summary>
 	void CreateCylinderCap(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp);
 
-	/// <summary>
-	/// Create a ring of vertices not contains any faces only edges.
-	/// A ring is centered about the origin and lies in the XZ plane
-	/// faceUp set to true will create triangle be seen from top culling bottom
-	/// </summary>
-	void CreateRingVertex(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp = true);
 };
 
