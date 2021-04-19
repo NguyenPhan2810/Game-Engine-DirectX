@@ -20,7 +20,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mCamFar(1000.0f)
 , mMouseSensitivity(0.25f)
 , mEnableWireframe(false)
-, mLightCount(0)
+, mLightCount(3)
 , mUseTexture(true)
 {
 	mClientWidth = 1080;
@@ -75,7 +75,6 @@ bool NPGameEngine::Init()
 	InputLayouts::InitAll(mDevice);
 
 	InitRasterizerState();
-	BuildGeometryBuffers();
 
 	for (auto obj : BaseObject::GetAllObjects())
 		obj->Init();
@@ -87,7 +86,8 @@ void NPGameEngine::UpdateScene()
 {
 	// Input
 	mEnableWireframe = GetAsyncKeyState('L') & 0x8000;
-	mUseTexture = GetAsyncKeyState('T') & 0x8000;
+	if (GetAsyncKeyState('T') & 0x8000)
+		mUseTexture = !mUseTexture;
 	if (GetAsyncKeyState('0') & 0x8000)
 		mLightCount = 0;
 	if (GetAsyncKeyState('1') & 0x8000)
@@ -213,11 +213,6 @@ void NPGameEngine::InitRasterizerState()
 
 	HR(mDevice->CreateRasterizerState(&wireframeRD, &mWireframeRS));
 	HR(mDevice->CreateRasterizerState(&solidRD, &mSolidRS));
-}
-
-void NPGameEngine::BuildGeometryBuffers()
-{
-	
 }
 
 void NPGameEngine::OnMouseDown(WPARAM btnState, int x, int y)

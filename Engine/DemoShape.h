@@ -12,7 +12,7 @@ public:
 	virtual bool Init() override;
 	virtual void UpdateScene() override;
 protected:
-	virtual void BuildGeometryBuffers() override;
+	void BuildGeometryBuffers();
 
 protected:
 	std::shared_ptr<Texture> mCrateTex;

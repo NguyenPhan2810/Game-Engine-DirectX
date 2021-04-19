@@ -25,8 +25,7 @@ private:
 	void UpdateViewMatrix();
 
 protected:
-	virtual void InitRasterizerState();
-	virtual void BuildGeometryBuffers();
+	void InitRasterizerState();
 
 protected:
 	DirectionalLight mDirLights[3];

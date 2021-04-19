@@ -15,7 +15,7 @@ public:
 	//virtual void DrawScene() override;
 
 protected:
-	virtual void BuildGeometryBuffers() override;
+	void BuildGeometryBuffers();
 
 protected:
 	Waves mWaves;

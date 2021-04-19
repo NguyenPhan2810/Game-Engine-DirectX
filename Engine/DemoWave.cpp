@@ -46,6 +46,7 @@ bool DemoWave::Init()
 	if (!NPGameEngine::Init())
 		return false;
 
+	BuildGeometryBuffers();
 	mWaves.Init(X, Z, 1.0f, 0.06f, 10.25f, 0.2f);
 
 

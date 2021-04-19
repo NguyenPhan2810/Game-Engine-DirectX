@@ -18,7 +18,7 @@ Texture::Texture(const std::wstring& filename)
 
 Texture::~Texture()
 {
-	//ReleaseCOM(mDiffuseMapSRV);
+	ReleaseCOM(mDiffuseMapSRV);
 }
 
 ID3D11ShaderResourceView* Texture::GetDiffuseMapSRV()

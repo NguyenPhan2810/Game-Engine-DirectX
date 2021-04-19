@@ -31,9 +31,7 @@ bool DemoShape::Init()
 	if (!NPGameEngine::Init())
 		return false;
 
-
-	mCrateTex = std::make_shared<Texture>(Texture(L"Textures/WoodCrate01.dds"));
-	RENDERER(mCenterObject)->Texture = mCrateTex;
+	BuildGeometryBuffers();
 
 	return true;
 }
@@ -43,8 +41,12 @@ void DemoShape::UpdateScene()
 	NPGameEngine::UpdateScene();
 
 	mCenterObject->transform->Rorate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
-	
 	mCenterObject->transform->Translate(XMFLOAT3(0, 0.0004 * sin(3 * GameTimer::TotalTime()), 0));
+
+	for (auto& sphere : mSpheres)
+	{
+		sphere->transform->Translate(XMFLOAT3(0, 0.01 * sin(100 * GameTimer::TotalTime()), 0));
+	}
 }
 
 void DemoShape::BuildGeometryBuffers()
@@ -55,9 +57,9 @@ void DemoShape::BuildGeometryBuffers()
 	GeometryGenerator::MeshData skull;
 
 	GeometryGenerator geoGen;
-	geoGen.CreateGeoSphere(0.5, 3, geoSphere);
-	geoGen.CreateSphere(0.5f, 20, 20, sphere);
-	geoGen.CreateCylinder(1, 0.3f, 3.0f, 20, 20, cylinder);
+	geoGen.CreateGeoSphere(0.8, 3, geoSphere);
+	geoGen.CreateSphere(0.8f, 20, 20, sphere);
+	geoGen.CreateCylinder(0.7, 0.3f, 3.0f, 20, 20, cylinder);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
 	mGridObject = new Cube();
@@ -66,6 +68,8 @@ void DemoShape::BuildGeometryBuffers()
 	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
 	mCenterObject->transform->Scale(XMFLOAT3(3, 3, 3));
+	mCrateTex = std::make_shared<Texture>(Texture(L"Textures/WoodCrate01.dds"));
+	RENDERER(mCenterObject)->Texture = mCrateTex;
 	//RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	for (int i = 0; i < 5; ++i)
