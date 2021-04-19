@@ -515,6 +515,7 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 		float z = radius * sinf(theta);
 
 		vert.Position = XMFLOAT3(x, y, z);
+		vert.Normal.y = faceUp ? 1 : -1;
 
 		meshData.vertices.push_back(vert);
 
@@ -524,6 +525,7 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 	// Create center vertex
 	Vertex centerVert;
 	centerVert.Position = XMFLOAT3(0, y, 0);
+	centerVert.Normal = XMFLOAT3(0, faceUp ? 1 : -1, 0);
 	meshData.vertices.push_back(centerVert);
 	
 	UINT centerIndex = meshData.vertices.size() - 1;

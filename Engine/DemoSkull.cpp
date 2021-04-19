@@ -30,20 +30,19 @@ void DemoSkull::UpdateScene(float dt)
 
 void DemoSkull::BuildGeometryBuffers()
 {
-	GeometryGenerator::MeshData grid;
 	GeometryGenerator::MeshData sphere;
 	GeometryGenerator::MeshData geoSphere;
 	GeometryGenerator::MeshData cylinder;
 	GeometryGenerator::MeshData skull;
 
 	GeometryGenerator geoGen;
-	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
 	geoGen.CreateGeoSphere(0.5, 3, geoSphere);
 	geoGen.CreateSphere(0.5f, 20, 20, sphere);
 	geoGen.CreateCylinder(1, 0.3f, 3.0f, 20, 20, cylinder);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
+
 	mGridObject = new Cube();
-	RENDERER(mGridObject)->LoadGeometry(grid);
+	mGridObject->transform->Scale(XMFLOAT3(50, 0.1, 50));
 
 	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 1, 0));

@@ -31,6 +31,21 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
+
+	mDirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLights[0].Diffuse = XMFLOAT4(0.4f, 0.6f, 0.4f, 1.0f);
+	mDirLights[0].Specular = XMFLOAT4(0.4f, 0.6f, 0.4f, 1.0f);
+	mDirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	mDirLights[1].Ambient = XMFLOAT4(0.1f, 0.05f, 0.05f, 1.0f);
+	mDirLights[1].Diffuse = XMFLOAT4(0.4f, 0.2f, 0.2f, 1.0f);
+	mDirLights[1].Specular = XMFLOAT4(0.45f, 0.25f, 0.25f, 1.0f);
+	mDirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
+
+	mDirLights[2].Ambient = XMFLOAT4(0.05f, 0.05f, 0.1f, 1.0f);
+	mDirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.4f, 1.0f);
+	mDirLights[2].Specular = XMFLOAT4(0.05f, 0.05f, 0.1f, 1.0f);
+	mDirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
 }
 
 NPGameEngine::~NPGameEngine()
@@ -48,21 +63,6 @@ void NPGameEngine::OnResize()
 
 	// The window resized, so update the aspect ratio and recompute the projection matrix.
 	UpdateProjMatrix();
-
-	mDirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLights[0].Diffuse = XMFLOAT4(0.4f, 0.6f, 0.4f, 1.0f);
-	mDirLights[0].Specular = XMFLOAT4(0.4f, 0.6f, 0.4f, 1.0f);
-	mDirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-
-	mDirLights[1].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mDirLights[1].Diffuse = XMFLOAT4(0.40f, 0.20f, 0.20f, 1.0f);
-	mDirLights[1].Specular = XMFLOAT4(0.45f, 0.25f, 0.25f, 1.0f);
-	mDirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
-
-	mDirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mDirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.4f, 1.0f);
-	mDirLights[2].Specular = XMFLOAT4(0.05f, 0.05f, 0.1f, 1.0f);
-	mDirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
 }
 
 bool NPGameEngine::Init()
