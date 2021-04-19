@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DemoSkull.h"
 #include "Renderer.h"
+#include "Cube.h"
 
 DemoSkull::DemoSkull(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
@@ -51,7 +52,6 @@ void DemoSkull::UpdateScene(float dt)
 
 void DemoSkull::BuildGeometryBuffers()
 {
-	GeometryGenerator::MeshData box;
 	GeometryGenerator::MeshData grid;
 	GeometryGenerator::MeshData sphere;
 	GeometryGenerator::MeshData geoSphere;
@@ -59,41 +59,39 @@ void DemoSkull::BuildGeometryBuffers()
 	GeometryGenerator::MeshData skull;
 
 	GeometryGenerator geoGen;
-	geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
 	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
 	geoGen.CreateGeoSphere(0.5, 2, geoSphere);
 	geoGen.CreateSphere(0.5f, 10, 10, sphere);
 	geoGen.CreateCylinder(1, 0.3f, 3.0f, 20, 20, cylinder);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
-	mGridObject = new BaseObject();
+	mGridObject = new Cube();
 	RENDERER(mGridObject)->LoadGeometry(grid);
 
-	mCenterObject = new BaseObject();
+	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 1, 0));
 	mCenterObject->transform->Scale(XMFLOAT3(0.3, 0.3, 0.3));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
 
-	mCenterBox = new BaseObject();
+	mCenterBox = new Cube();
 	mCenterBox->transform->Translate(XMFLOAT3(0, 0.5, 0));
 	mCenterBox->transform->Scale(XMFLOAT3(2, 1, 2));
-	RENDERER(mCenterBox)->LoadGeometry(box);
 
 	for (int i = 0; i < 5; ++i)
 	{
-		auto cylinder1 = new BaseObject();
+		auto cylinder1 = new Cube();
 		cylinder1->transform->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
 		RENDERER(cylinder1)->LoadGeometry(cylinder);
-		auto cylinder2 = new BaseObject();
+		auto cylinder2 = new Cube();
 		cylinder2->transform->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
 		RENDERER(cylinder2)->LoadGeometry(cylinder);
 
 		mCylinders.push_back(cylinder1);
 		mCylinders.push_back(cylinder2);
 
-		auto sphere1 = new BaseObject();
+		auto sphere1 = new Cube();
 		sphere1->transform->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
 		RENDERER(sphere1)->LoadGeometry(sphere);
-		auto sphere2 = new BaseObject();
+		auto sphere2 = new Cube();
 		sphere2->transform->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
 		RENDERER(sphere2)->LoadGeometry(geoSphere);
 

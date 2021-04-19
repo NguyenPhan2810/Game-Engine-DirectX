@@ -16,7 +16,6 @@ BaseObject::BaseObject()
 	mIdBase++;
 	mAllObjectsMap[mId] = this;
 
-	AddComponent(new Renderer());
 	transform = new Transform();
 	AddComponent(transform);
 }

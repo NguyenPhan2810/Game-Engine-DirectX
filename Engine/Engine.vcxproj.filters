@@ -94,7 +94,7 @@
       <Filter>Source Files\NPEffects</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NPObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +153,7 @@
       <Filter>Source Files\NPEffects</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\NPObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

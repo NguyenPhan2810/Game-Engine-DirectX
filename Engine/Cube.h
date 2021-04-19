@@ -4,6 +4,6 @@
 
 class Cube : public BaseObject
 {
-
+public:
+	Cube();
 };
-
