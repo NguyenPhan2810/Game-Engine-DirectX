@@ -142,25 +142,13 @@ void NPGameEngine::DrawScene()
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(mEyePosW);
 
-	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3TexTech;
-	if (mUseTexture)
+	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3Tech;
+	switch (mLightCount)
 	{
-		switch (mLightCount)
-		{
-		case 0: activeTech = Effects::BasicFX->Light0TexTech; break;
-		case 1: activeTech = Effects::BasicFX->Light1TexTech; break;
-		case 2: activeTech = Effects::BasicFX->Light2TexTech; break;
-		case 3: activeTech = Effects::BasicFX->Light3TexTech; break;
-		}
-	}
-	else
-	{
-		switch (mLightCount)
-		{
-		case 1: activeTech = Effects::BasicFX->Light1Tech; break;
-		case 2: activeTech = Effects::BasicFX->Light2Tech; break;
-		case 3: activeTech = Effects::BasicFX->Light3Tech; break;
-		}
+	case 0: activeTech = Effects::BasicFX->Light0Tech; break;
+	case 1: activeTech = Effects::BasicFX->Light1Tech; break;
+	case 2: activeTech = Effects::BasicFX->Light2Tech; break;
+	case 3: activeTech = Effects::BasicFX->Light3Tech; break;
 	}
 
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -188,11 +176,13 @@ void NPGameEngine::DrawScene()
 				{
 					Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
 					Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
+					Effects::BasicFX->SetUseTexture(mUseTexture);
 				}
 				else
 				{
 					Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
 					Effects::BasicFX->SetDiffuseMap(0);
+					Effects::BasicFX->SetUseTexture(0);
 				}
 
 				activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
