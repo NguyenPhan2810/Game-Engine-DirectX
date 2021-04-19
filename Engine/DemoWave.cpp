@@ -11,7 +11,7 @@ float GetHillHeight(float x, float z)
 	return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
 }
 
-void GetHillVertex(const GeometryGenerator::Vertex& vert, Vertex::PosNormal& newVertex)
+void GetHillVertex(const GeometryGenerator::Vertex& vert, Vertex::Basic32& newVertex)
 {
 	auto x = vert.Position.x;
 	auto z = vert.Position.z;
@@ -81,7 +81,7 @@ void DemoWave::UpdateScene()
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	HR(mImmediateContext->Map(waveVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
 
-	Vertex::PosNormal* v = reinterpret_cast<Vertex::PosNormal*>(mappedData.pData);
+	Vertex::Basic32* v = reinterpret_cast<Vertex::Basic32*>(mappedData.pData);
 	for (UINT i = 0; i < mWaves.VertexCount(); ++i)
 	{
 		v[i].Pos = mWaves[i];
@@ -112,8 +112,8 @@ void DemoWave::BuildGeometryBuffers()
 	geoGen.CreateGeoSphere(1, 3, geoSphere);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
-	Vertex::PosNormal newVert;
-	std::vector<Vertex::PosNormal> vertices;
+	Vertex::Basic32 newVert;
+	std::vector<Vertex::Basic32> vertices;
 	for (auto& vert : grid.vertices)
 	{
 		GetHillVertex(vert, newVert);
@@ -124,7 +124,7 @@ void DemoWave::BuildGeometryBuffers()
 	mGridObject = new Cube();
 	RENDERER(mGridObject)->LoadGeometry(grid); 
 	D3D11_BUFFER_DESC gridVBD{ 0 };
-	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::PosNormal);
+	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::Basic32);
 	gridVBD.Usage = D3D11_USAGE_IMMUTABLE;
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
@@ -138,7 +138,7 @@ void DemoWave::BuildGeometryBuffers()
 	RENDERER(mWaveMesh)->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };
-	waveVBD.ByteWidth = RENDERER(mWaveMesh)->GetVertexCount() * sizeof(Vertex::PosNormal);
+	waveVBD.ByteWidth = RENDERER(mWaveMesh)->GetVertexCount() * sizeof(Vertex::Basic32);
 	waveVBD.Usage = D3D11_USAGE_DYNAMIC;
 	waveVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	waveVBD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;

@@ -21,6 +21,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mMouseSensitivity(0.25f)
 , mEnableWireframe(false)
 , mLightCount(0)
+, mUseTexture(true)
 {
 	mClientWidth = 1080;
 	mClientHeight = 720;
@@ -86,14 +87,16 @@ void NPGameEngine::UpdateScene()
 {
 	// Input
 	mEnableWireframe = GetAsyncKeyState('L') & 0x8000;
+	mUseTexture = GetAsyncKeyState('T') & 0x8000;
 	if (GetAsyncKeyState('0') & 0x8000)
 		mLightCount = 0;
-	else if (GetAsyncKeyState('1') & 0x8000)
+	if (GetAsyncKeyState('1') & 0x8000)
 		mLightCount = 1;
-	else if (GetAsyncKeyState('2') & 0x8000)
+	if (GetAsyncKeyState('2') & 0x8000)
 		mLightCount = 2;
-	else if (GetAsyncKeyState('3') & 0x8000)
+	if (GetAsyncKeyState('3') & 0x8000)
 		mLightCount = 3;
+		
 
 	//===
 	float x = mCamRadius * sinf(mCamPhi) * cosf(mCamTheta);
@@ -120,7 +123,7 @@ void NPGameEngine::DrawScene()
 	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set up
-	mImmediateContext->IASetInputLayout(InputLayouts::PosNormal);
+	mImmediateContext->IASetInputLayout(InputLayouts::Basic32);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	if (mEnableWireframe)
 		mImmediateContext->RSSetState(mWireframeRS);
@@ -139,12 +142,25 @@ void NPGameEngine::DrawScene()
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(mEyePosW);
 
-	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3Tech;
-	switch (mLightCount)
+	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3TexTech;
+	if (mUseTexture)
 	{
-	case 1: activeTech = Effects::BasicFX->Light1Tech; break;
-	case 2: activeTech = Effects::BasicFX->Light2Tech; break;
-	case 3: activeTech = Effects::BasicFX->Light3Tech; break;
+		switch (mLightCount)
+		{
+		case 0: activeTech = Effects::BasicFX->Light0TexTech; break;
+		case 1: activeTech = Effects::BasicFX->Light1TexTech; break;
+		case 2: activeTech = Effects::BasicFX->Light2TexTech; break;
+		case 3: activeTech = Effects::BasicFX->Light3TexTech; break;
+		}
+	}
+	else
+	{
+		switch (mLightCount)
+		{
+		case 1: activeTech = Effects::BasicFX->Light1Tech; break;
+		case 2: activeTech = Effects::BasicFX->Light2Tech; break;
+		case 3: activeTech = Effects::BasicFX->Light3Tech; break;
+		}
 	}
 
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -166,6 +182,18 @@ void NPGameEngine::DrawScene()
 				Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
 				Effects::BasicFX->SetWorldViewProj(worldViewProj);
 				Effects::BasicFX->SetMaterial(material);
+
+				auto& texture = renderer->Texture;
+				if (texture)
+				{
+					Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
+					Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
+				}
+				else
+				{
+					Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+					Effects::BasicFX->SetDiffuseMap(0);
+				}
 
 				activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 

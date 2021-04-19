@@ -1,15 +1,19 @@
 #include "stdafx.h"
-#include "DemoSkull.h"
+#include "DemoShape.h"
 #include "Renderer.h"
 #include "Cube.h"
 
-DemoSkull::DemoSkull(HINSTANCE hInstance)
+DemoShape::DemoShape(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
+, mCenterBox(nullptr)
+, mCenterObject(nullptr)
+, mGridObject(nullptr)
+, mCrateTex()
 {
 	mCamRadius = 10;
 }
 
-DemoSkull::~DemoSkull()
+DemoShape::~DemoShape()
 {
 	delete mCenterObject;
 	delete mGridObject;
@@ -22,13 +26,28 @@ DemoSkull::~DemoSkull()
 	mSpheres.clear();
 }
 
-void DemoSkull::UpdateScene()
+bool DemoShape::Init()
+{
+	if (!NPGameEngine::Init())
+		return false;
+
+
+	mCrateTex = std::make_shared<Texture>(Texture(L"Textures/WoodCrate01.dds"));
+	RENDERER(mCenterObject)->Texture = mCrateTex;
+
+	return true;
+}
+
+void DemoShape::UpdateScene()
 {
 	NPGameEngine::UpdateScene();
 
+	mCenterObject->transform->Rorate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
+	
+	mCenterObject->transform->Translate(XMFLOAT3(0, 0.0004 * sin(3 * GameTimer::TotalTime()), 0));
 }
 
-void DemoSkull::BuildGeometryBuffers()
+void DemoShape::BuildGeometryBuffers()
 {
 	GeometryGenerator::MeshData sphere;
 	GeometryGenerator::MeshData geoSphere;
@@ -45,9 +64,9 @@ void DemoSkull::BuildGeometryBuffers()
 	mGridObject->transform->Scale(XMFLOAT3(50, 0.1, 50));
 
 	mCenterObject = new Cube();
-	mCenterObject->transform->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->transform->Scale(XMFLOAT3(0.5, 0.5, 0.5));
-	RENDERER(mCenterObject)->LoadGeometry(skull);
+	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
+	mCenterObject->transform->Scale(XMFLOAT3(3, 3, 3));
+	//RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	for (int i = 0; i < 5; ++i)
 	{
@@ -94,9 +113,4 @@ void DemoSkull::BuildGeometryBuffers()
 		mat.Diffuse = XMFLOAT4(0.2f, 0.4f, 0.6f, 1.0f);
 		mat.Specular = XMFLOAT4(0.9f, 0.9f, 0.9f, 16.0f);
 	}
-
-	auto& skullMat = RENDERER(mCenterObject)->GetMaterial();
-	skullMat.Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	skullMat.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	skullMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 }

@@ -179,7 +179,7 @@
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
-    <ClCompile Include="DemoSkull.cpp" />
+    <ClCompile Include="DemoShape.cpp" />
     <ClCompile Include="DemoWave.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -192,6 +192,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Waves.cpp" />
@@ -202,7 +203,7 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
-    <ClInclude Include="DemoSkull.h" />
+    <ClInclude Include="DemoShape.h" />
     <ClInclude Include="DemoWave.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="GameTimer.h" />
@@ -213,6 +214,7 @@
     <ClInclude Include="NPInterfaces.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Waves.h" />

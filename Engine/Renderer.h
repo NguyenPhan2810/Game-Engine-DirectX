@@ -4,6 +4,8 @@
 #include "d3dUtil.h"
 #include "GeometryGenerator.h"
 #include "LightHelper.h"
+#include "Texture.h"
+#include <memory>
 
 /// <summary>
 /// Convinent macro for get this component
@@ -25,8 +27,8 @@ private:
 	void operator=(const Renderer& renderer) {}
 
 public:
-	void LoadGeometry(const GeometryGenerator::MeshData meshData);
-	void CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexData, D3D11_BUFFER_DESC vbd);
+	void LoadGeometry(const GeometryGenerator::MeshData& meshData);
+	void CreateVertexBuffer(const std::vector<Vertex::Basic32>& vertexData, D3D11_BUFFER_DESC vbd);
 	void CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd);
 
 	ID3D11Buffer* GetVertexBuffer();
@@ -35,6 +37,8 @@ public:
 	UINT GetIndexCount() const;
 
 	Material& GetMaterial();
+
+	std::shared_ptr<Texture> Texture;
 
 protected:
 	ID3D11Buffer* mVertexBuffer;

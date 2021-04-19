@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "DemoSkull.h"
+#include "DemoShape.h"
 #include "DemoWave.h"
 
 
@@ -12,7 +12,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	DemoWave theApp(hInstance);
+	DemoShape theApp(hInstance);
 
 	if (!theApp.Init())
 		return -1;

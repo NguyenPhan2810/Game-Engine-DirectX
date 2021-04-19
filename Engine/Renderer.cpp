@@ -8,6 +8,7 @@ Renderer::Renderer()
 , mIndexBuffer(nullptr)
 , mIndexCount(0)
 , mVertexCount(0)
+, Texture(nullptr)
 {
 	name = "Renderer";
 	// Default material
@@ -33,26 +34,31 @@ void Renderer::Update()
 void Renderer::Draw()
 {
 	auto context = D3DApp::GetImmediateContext();
-	UINT stride = sizeof(Vertex::PosNormal);
+	UINT stride = sizeof(Vertex::Basic32);
 	UINT offset = 0;
 	context->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
 	context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	context->DrawIndexed(mIndexCount, 0, 0);
 }
 
-void Renderer::LoadGeometry(const GeometryGenerator::MeshData meshData)
+void Renderer::LoadGeometry(const GeometryGenerator::MeshData& meshData)
 {
 	mVertexCount = meshData.vertices.size();
 
-	std::vector<Vertex::PosNormal> vertices;
+	std::vector<Vertex::Basic32> vertices;
 	for (UINT i = 0; i < mVertexCount; ++i)
 	{
-		vertices.push_back(Vertex::PosNormal{ meshData.vertices[i].Position, meshData.vertices[i].Normal });
+		vertices.push_back(Vertex::Basic32
+			{
+				meshData.vertices[i].Position,
+				meshData.vertices[i].Normal,
+				meshData.vertices[i].TexC
+			});
 	}
 
 	// Create vertex buffer
 	D3D11_BUFFER_DESC vbd{ 0 };
-	vbd.ByteWidth = mVertexCount * sizeof(Vertex::PosNormal);
+	vbd.ByteWidth = mVertexCount * sizeof(Vertex::Basic32);
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
@@ -69,7 +75,7 @@ void Renderer::LoadGeometry(const GeometryGenerator::MeshData meshData)
 	CreateIndexBuffer(meshData.indices, ibd);
 }
 
-void Renderer::CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexData, D3D11_BUFFER_DESC vbd)
+void Renderer::CreateVertexBuffer(const std::vector<Vertex::Basic32>& vertexData, D3D11_BUFFER_DESC vbd)
 {
 	ReleaseCOM(mVertexBuffer);
 

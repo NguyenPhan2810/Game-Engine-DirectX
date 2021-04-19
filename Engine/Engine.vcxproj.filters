@@ -18,9 +18,6 @@
     <Filter Include="Demos\Waves">
       <UniqueIdentifier>{d9c89271-5c38-43aa-aa84-9aa57de38c2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demos\Skull">
-      <UniqueIdentifier>{5ab398af-c0d5-465d-b73e-a3896c7fd4cb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Precompiled Header">
       <UniqueIdentifier>{c1720695-23eb-45d5-bfc9-58e4f13eb71e}</UniqueIdentifier>
     </Filter>
@@ -35,6 +32,12 @@
     </Filter>
     <Filter Include="Source Files\NPEffects\FX">
       <UniqueIdentifier>{b7ed2174-bf46-4fc7-b637-32d21fd341a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demos\Shapes">
+      <UniqueIdentifier>{5ab398af-c0d5-465d-b73e-a3896c7fd4cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NPEffects\NPTextures">
+      <UniqueIdentifier>{f9578a8c-2018-4421-a5db-9c98988fdbf1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,8 +65,8 @@
     <ClCompile Include="Waves.cpp">
       <Filter>Demos\Waves</Filter>
     </ClCompile>
-    <ClCompile Include="DemoSkull.cpp">
-      <Filter>Demos\Skull</Filter>
+    <ClCompile Include="DemoShape.cpp">
+      <Filter>Demos\Shapes</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Precompiled Header</Filter>
@@ -92,6 +95,9 @@
     <ClCompile Include="DemoWave.cpp">
       <Filter>Demos\Waves</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\NPEffects\NPTextures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -118,8 +124,8 @@
     <ClInclude Include="DemoWave.h">
       <Filter>Demos\Waves</Filter>
     </ClInclude>
-    <ClInclude Include="DemoSkull.h">
-      <Filter>Demos\Skull</Filter>
+    <ClInclude Include="DemoShape.h">
+      <Filter>Demos\Shapes</Filter>
     </ClInclude>
     <ClInclude Include="LightHelper.h">
       <Filter>Helper Files</Filter>
@@ -150,6 +156,9 @@
     </ClInclude>
     <ClInclude Include="Cube.h">
       <Filter>Source Files\NPObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Source Files\NPEffects\NPTextures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

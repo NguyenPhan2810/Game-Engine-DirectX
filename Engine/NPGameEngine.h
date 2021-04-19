@@ -31,6 +31,7 @@ protected:
 protected:
 	DirectionalLight mDirLights[3];
 	int mLightCount;
+	bool mUseTexture;
 
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;
