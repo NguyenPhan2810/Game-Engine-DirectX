@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <vector>
 #include <cassert>
-#include <string>
 
 Waves::Waves()
 : mNumRows(0), mNumCols(0), mVertexCount(0), mTriangleCount(0), 
@@ -101,7 +100,6 @@ void Waves::Update(float dt)
 	// Only update the simulation at the specified time step.
 	if( t >= mTimeStep )
 	{
-		OutputDebugString((std::to_wstring(t) + L"\n").c_str());
 		// Only update interior points; we use zero boundary conditions.
 		for(DWORD i = 1; i < mNumRows-1; ++i)
 		{
