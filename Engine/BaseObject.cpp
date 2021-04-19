@@ -10,6 +10,7 @@ std::vector<BaseObject*> BaseObject::mAllObjectsVec;
 BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext)
 : mDevice(device)
 , mImmediateContext(immediateContext)
+, transform(nullptr)
 {
 	mAllObjectsChanged = true;
 
@@ -17,9 +18,9 @@ BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateConte
 	mIdBase++;
 	mAllObjectsMap[mId] = this;
 
-	mWorldMatrix = XMMatrixIdentity();
-
 	AddComponent(new Renderer());
+	transform = new Transform();
+	AddComponent(transform);
 }
 
 BaseObject::~BaseObject()
@@ -85,27 +86,4 @@ BaseComponent* BaseObject::GetComponentByName(const std::string& name)
 			return comp;
 
 	return nullptr;
-}
-
-void BaseObject::Translate(const XMFLOAT3& displacement)
-{
-	XMMATRIX translateMatrix = XMMatrixTranslation(displacement.x, displacement.y, displacement.z);
-	mWorldMatrix = XMMatrixMultiply(translateMatrix, mWorldMatrix);
-}
-
-void BaseObject::Rorate(const XMFLOAT3& rotationOrigin, float radian)
-{
-	XMMATRIX rotateMatrix = XMMatrixRotationAxis(XMLoadFloat3(&rotationOrigin), radian);
-	mWorldMatrix = XMMatrixMultiply(rotateMatrix, mWorldMatrix);
-}
-
-void BaseObject::Scale(const XMFLOAT3& scaleElements)
-{
-	XMMATRIX scaleMatrix = XMMatrixScaling(scaleElements.x, scaleElements.y, scaleElements.z);
-	mWorldMatrix = XMMatrixMultiply(scaleMatrix, mWorldMatrix);
-}
-
-XMMATRIX BaseObject::LocalToWorldMatrix() const
-{
-	return mWorldMatrix;
 }

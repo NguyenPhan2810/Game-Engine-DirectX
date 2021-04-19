@@ -69,32 +69,32 @@ void DemoSkull::BuildGeometryBuffers()
 	RENDERER(mGridObject)->LoadGeometry(grid);
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
-	mCenterObject->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->Scale(XMFLOAT3(0.3, 0.3, 0.3));
+	mCenterObject->transform->Translate(XMFLOAT3(0, 1, 0));
+	mCenterObject->transform->Scale(XMFLOAT3(0.3, 0.3, 0.3));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	mCenterBox = new BaseObject(mDevice, mImmediateContext);
-	mCenterBox->Translate(XMFLOAT3(0, 0.5, 0));
-	mCenterBox->Scale(XMFLOAT3(2, 1, 2));
+	mCenterBox->transform->Translate(XMFLOAT3(0, 0.5, 0));
+	mCenterBox->transform->Scale(XMFLOAT3(2, 1, 2));
 	RENDERER(mCenterBox)->LoadGeometry(box);
 
 	for (int i = 0; i < 5; ++i)
 	{
 		auto cylinder1 = new BaseObject(mDevice, mImmediateContext);
-		cylinder1->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
+		cylinder1->transform->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
 		RENDERER(cylinder1)->LoadGeometry(cylinder);
 		auto cylinder2 = new BaseObject(mDevice, mImmediateContext);
-		cylinder2->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
+		cylinder2->transform->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
 		RENDERER(cylinder2)->LoadGeometry(cylinder);
 
 		mCylinders.push_back(cylinder1);
 		mCylinders.push_back(cylinder2);
 
 		auto sphere1 = new BaseObject(mDevice, mImmediateContext);
-		sphere1->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
+		sphere1->transform->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
 		RENDERER(sphere1)->LoadGeometry(sphere);
 		auto sphere2 = new BaseObject(mDevice, mImmediateContext);
-		sphere2->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
+		sphere2->transform->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
 		RENDERER(sphere2)->LoadGeometry(geoSphere);
 
 		mSpheres.push_back(sphere1);

@@ -4,6 +4,7 @@
 
 BaseComponent::BaseComponent()
 : name("BaseComponent")
+, attachedObject(nullptr)
 {
 
 }

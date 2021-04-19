@@ -199,7 +199,7 @@ void NPGameEngine::DrawScene()
 			if (renderer)
 			{
 				// Update constants
-				XMMATRIX world = obj->LocalToWorldMatrix();
+				XMMATRIX world = obj->transform->LocalToWorldMatrix();
 				XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
 				XMMATRIX worldViewProj = world * viewProj;
 				const Material& material = renderer->GetMaterial();

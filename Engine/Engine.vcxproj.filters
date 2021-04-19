@@ -34,6 +34,9 @@
     <Filter Include="Source Files\NPComponents">
       <UniqueIdentifier>{3be45c90-d455-491f-b13d-5ed17ee8cd10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NPObjects">
+      <UniqueIdentifier>{4b71536b-5eb3-4b9a-b302-80c57d956645}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -56,9 +59,6 @@
     </ClCompile>
     <ClCompile Include="MathHelper.cpp">
       <Filter>Helper Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseObject.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Waves.cpp">
       <Filter>Demos\Waves</Filter>
@@ -84,6 +84,12 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files\NPComponents</Filter>
     </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\NPComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>Source Files\NPObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -103,9 +109,6 @@
     </ClInclude>
     <ClInclude Include="GeometryGenerator.h">
       <Filter>Helper Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseObject.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Waves.h">
       <Filter>Demos\Waves</Filter>
@@ -136,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Source Files\NPComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Source Files\NPComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
+      <Filter>Source Files\NPObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

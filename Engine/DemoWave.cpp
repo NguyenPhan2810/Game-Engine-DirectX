@@ -139,8 +139,8 @@ void DemoWave::BuildGeometryBuffers()
 	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
-	mCenterObject->Translate(XMFLOAT3(0, 10, 0));
-	mCenterObject->Scale(XMFLOAT3(3.5, 3.5, 3.5));
+	mCenterObject->transform->Translate(XMFLOAT3(0, 10, 0));
+	mCenterObject->transform->Scale(XMFLOAT3(3.5, 3.5, 3.5));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	mWaveMesh = new BaseObject(mDevice, mImmediateContext);

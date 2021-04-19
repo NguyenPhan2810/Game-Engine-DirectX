@@ -5,7 +5,7 @@
 #include "GlobalDefinitions.h"
 #include "LightHelper.h"
 #include "BaseComponent.h"
-
+#include "Transform.h"
 
 class BaseObject : public ILifeCycle
 {
@@ -29,20 +29,17 @@ public:
 	_Ty* GetComponent(const std::string& name);
 
 public:
-	void Translate(const XMFLOAT3& displacement);
-	void Rorate(const XMFLOAT3& rotationOrigin, float radian);
-	void Scale(const XMFLOAT3& scaleElements);
-
-	XMMATRIX LocalToWorldMatrix() const;
-
 	ID3D11Device* GetDevice() { return mDevice; }
 	ID3D11DeviceContext* GetImmediateContext() { return mImmediateContext; }
+
+public:
+	// Because every object must have a transform component
+	// So this comp deserves its own place
+	Transform* transform;
 
 protected:
 	ID3D11Device* mDevice;
 	ID3D11DeviceContext* mImmediateContext;
-
-	XMMATRIX mWorldMatrix;
 
 private:
 	UINT mId;
@@ -52,7 +49,7 @@ private:
 	static bool mAllObjectsChanged;
 	static std::vector<BaseObject*> mAllObjectsVec; // Convience way to get all objects outside the class
 
-	std::vector<BaseComponent*> mComponents;
+	std::vector< BaseComponent*> mComponents;
 };
 
 template <class _Ty>
