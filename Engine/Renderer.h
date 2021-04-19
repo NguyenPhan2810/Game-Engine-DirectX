@@ -17,7 +17,7 @@ public:
 	~Renderer() override;
 
 	virtual void Init() override;
-	virtual void Update(float dt = 0) override;
+	virtual void Update() override;
 	virtual void Draw() override;
 
 private:

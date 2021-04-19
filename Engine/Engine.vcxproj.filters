@@ -89,6 +89,9 @@
     <ClCompile Include="Cube.cpp">
       <Filter>Source Files\NPObjects</Filter>
     </ClCompile>
+    <ClCompile Include="DemoWave.cpp">
+      <Filter>Demos\Waves</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">

@@ -48,10 +48,16 @@ void BaseObject::Init()
 		comp->Init();
 }
 
-void BaseObject::Update(float dt)
+void BaseObject::Update()
 {
 	for (auto comp : mComponents)
-		comp->Update(dt);
+		comp->Update();
+}
+
+void BaseObject::FixedUpdate()
+{
+	for (auto comp : mComponents)
+		comp->FixedUpdate();
 }
 
 void BaseObject::Draw()

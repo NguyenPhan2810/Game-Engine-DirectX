@@ -36,7 +36,6 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 , mAppMinimized(false)
 , mAppMaximized(false)
 , mAppResizing(false)
-, mTimer()
 {
 	ZeroMemory(&mScreenViewport, sizeof(D3D11_VIEWPORT));
 
@@ -82,10 +81,10 @@ int D3DApp::Run()
 {
 	MSG msg{ 0 };
 
-	mTimer.Reset();
+	GameTimer::Reset();
 
 	float timeSinceLastUpdate = 0;
-	float timePerFrame = 1.0f / mClientRefreshRate;
+	float timePerUpdate = 0;
 	float deltaTime = 0;
 
 	while (!mAppQuit)
@@ -113,17 +112,18 @@ int D3DApp::Run()
 		}
 
 		// Time control
-		mTimer.Tick();
-		deltaTime = mTimer.DeltaTime();
+		GameTimer::Tick();
+		deltaTime = GameTimer::DeltaTime();
 		timeSinceLastUpdate += deltaTime;
 
+		UpdateScene();
 
-		// Update scene as fast as client refresh rate
-		// So that the dt is fixed for physic or something require fixed step time
-		if (timeSinceLastUpdate >= timePerFrame)
+		// fixed for physic or something require fixed step time
+		timePerUpdate = GameTimer::FixedDeltaTime();
+		if (timeSinceLastUpdate >= timePerUpdate)
 		{
-			UpdateScene(timePerFrame);
-			timeSinceLastUpdate -= timePerFrame;
+			FixedUpdateScene();
+			timeSinceLastUpdate -= timePerUpdate;
 		}
 		
 		// Draw scene as fast as possible
@@ -140,7 +140,7 @@ void D3DApp::Pause()
 	if (!mAppPaused)
 	{
 		mAppPaused = true;
-		mTimer.Stop();
+		GameTimer::Stop();
 	}
 }
 
@@ -149,7 +149,7 @@ void D3DApp::Unpause()
 	if (mAppPaused)
 	{
 		mAppPaused = false;
-		mTimer.Start();
+		GameTimer::Start();
 	}
 }
 

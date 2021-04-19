@@ -11,7 +11,7 @@ public:
 	~DemoWave();
 
 	virtual bool Init() override;
-	virtual void UpdateScene(float dt = 0) override;
+	virtual void UpdateScene() override;
 	//virtual void DrawScene() override;
 
 protected:

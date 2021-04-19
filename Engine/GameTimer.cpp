@@ -1,17 +1,19 @@
 #include "stdafx.h"
 #include "GameTimer.h"
 
+double GameTimer::mTotalTime = 0;
+double GameTimer::mDeltaTime = -1;
+double GameTimer::mFixedDeltaTime = 1 / 60.0f;
+double GameTimer::mPausedTime = 0;
+bool GameTimer::mStopped = false;
+std::chrono::system_clock::time_point GameTimer::mCurrentTime;
+std::chrono::system_clock::time_point GameTimer::mBaseTime;
+std::chrono::system_clock::time_point GameTimer::mStopTime;
+std::chrono::system_clock::time_point GameTimer::mPrevTime;
 
-GameTimer::GameTimer()
-: mTotalTime(0.0)
-, mDeltaTime(-1.0)
-, mPausedTime(0.0)
-, mBaseTime()
-, mStopTime()
-, mPrevTime()
-, mCurrentTime()
-, mStopped(false)
+void GameTimer::SetFixedDeltaTime(float dt)
 {
+    mFixedDeltaTime = dt;
 }
 
 float GameTimer::TotalTime()
@@ -29,9 +31,14 @@ float GameTimer::TotalTime()
     return mTotalTime;
 }
 
-float GameTimer::DeltaTime() const
+float GameTimer::DeltaTime()
 {
     return mDeltaTime;
+}
+
+float GameTimer::FixedDeltaTime()
+{
+    return mFixedDeltaTime;
 }
 
 void GameTimer::Reset()

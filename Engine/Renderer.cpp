@@ -26,7 +26,7 @@ void Renderer::Init()
 {
 }
 
-void Renderer::Update(float dt)
+void Renderer::Update()
 {
 }
 

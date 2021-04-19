@@ -17,7 +17,11 @@ void BaseComponent::Init()
 {
 }
 
-void BaseComponent::Update(float dt)
+void BaseComponent::Update()
+{
+}
+
+void BaseComponent::FixedUpdate()
 {
 }
 

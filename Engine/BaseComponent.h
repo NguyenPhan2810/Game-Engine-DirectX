@@ -12,7 +12,8 @@ public:
 	virtual ~BaseComponent();
 
 	virtual void Init() override;
-	virtual void Update(float dt = 0) override;
+	virtual void Update() override;
+	virtual void FixedUpdate() override;
 	virtual void Draw() override;
 
 	std::string name;

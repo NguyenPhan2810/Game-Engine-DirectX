@@ -12,7 +12,8 @@ public:
 
 	virtual bool Init() override;
 	virtual void OnResize() override;
-	virtual void UpdateScene(float dt = 0) override;
+	virtual void UpdateScene() override;
+	virtual void FixedUpdateScene() override;
 	virtual void DrawScene() override;
 
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;

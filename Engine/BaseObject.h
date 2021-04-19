@@ -16,7 +16,8 @@ public:
 	static std::vector<BaseObject*> GetAllObjects();
 
 	virtual void Init() override;
-	virtual void Update(float dt = 0) override;
+	virtual void Update() override;
+	virtual void FixedUpdate() override;
 	virtual void Draw() override;
 
 public:

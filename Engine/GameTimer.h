@@ -8,37 +8,41 @@ class GameTimer
 public:
 	GameTimer();
 
-	float TotalTime();
-	float DeltaTime() const;
+	static void SetFixedDeltaTime(float dt);
 
-	void Reset(); // Call before main loop
-	void Start(); // Call when unpaused
-	void Stop(); // Call when paused
-	void Tick(); // Call every frame
+	static float TotalTime();
+	static float DeltaTime();
+	static float FixedDeltaTime();
+
+	static void Reset(); // Call before main loop
+	static void Start(); // Call when unpaused
+	static void Stop(); // Call when paused
+	static void Tick(); // Call every frame
 
 protected:
-	std::chrono::system_clock::time_point now();
+	static std::chrono::system_clock::time_point now();
 
 	// Return time differences in second
 	static double TimeDiff(std::chrono::system_clock::time_point before,
 		std::chrono::system_clock::time_point after);
 
 protected:
-	double mDeltaTime; // Time since last frame/tick
-	double mPausedTime; // Total time stopped since mBaseTime
+	static double mFixedDeltaTime; // fixed dt for needs
+	static double mDeltaTime; // Time since last frame/tick
+	static double mPausedTime; // Total time stopped since mBaseTime
 
 	//					<--mPausedTime-->
 	// -----*-----------*---------------*---------------*---------
 	// mBaseTime	mStopTime		mStartTime		mCurrentTime
-	std::chrono::system_clock::time_point mBaseTime;
-	std::chrono::system_clock::time_point mStopTime;
-	std::chrono::system_clock::time_point mPrevTime;
-	std::chrono::system_clock::time_point mCurrentTime;
+	static std::chrono::system_clock::time_point mBaseTime;
+	static std::chrono::system_clock::time_point mStopTime;
+	static std::chrono::system_clock::time_point mPrevTime;
+	static std::chrono::system_clock::time_point mCurrentTime;
 
-	bool mStopped;
+	static bool mStopped;
 
 private:
 	// Store total time so method TotalTime doesnt have to recalculate
 	// everytime it's called during a frame
-	double mTotalTime;
+	static double mTotalTime;
 };

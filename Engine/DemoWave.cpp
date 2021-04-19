@@ -13,8 +13,8 @@ float GetHillHeight(float x, float z)
 
 void GetHillVertex(const GeometryGenerator::Vertex& vert, Vertex::PosNormal& newVertex)
 {
-	auto x = vert.position.x;
-	auto z = vert.position.z;
+	auto x = vert.Position.x;
+	auto z = vert.Position.z;
 	auto y = GetHillHeight(x, z);
 
 	newVertex.Pos.x = x;
@@ -34,16 +34,6 @@ DemoWave::DemoWave(HINSTANCE hInstance)
 {
 	mCamRadius = 70;
 
-	mDirLight.Ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f);
-	mDirLight.Diffuse = XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
-	mDirLight.Specular = XMFLOAT4(0.03f, 0.03f, 0.03f, 1.0f);
-	mDirLight.Direction = XMFLOAT3(0.4f, -0.8f, 0.57735f);
-
-	mPointLight.Ambient = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
-	mPointLight.Diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-	mPointLight.Specular = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-	mPointLight.att = XMFLOAT3(1.0f, 0.1f, 0.0f);
-	mPointLight.range = 2500.0f;
 }
 
 DemoWave::~DemoWave()
@@ -56,15 +46,15 @@ bool DemoWave::Init()
 	if (!NPGameEngine::Init())
 		return false;
 
-	mWaves.Init(X, Z, 1.0f, 0.03f, 10.25f, 0.2f);
+	mWaves.Init(X, Z, 1.0f, 0.06f, 10.25f, 0.2f);
 
 
 	return true;
 }
 
-void DemoWave::UpdateScene(float dt)
+void DemoWave::UpdateScene()
 {
-	NPGameEngine::UpdateScene(dt);
+	NPGameEngine::UpdateScene();
 
 	//
 	// Update the wave vertex buffer with the new solution.
@@ -74,7 +64,7 @@ void DemoWave::UpdateScene(float dt)
 	// Every quarter second, generate a random wave.
 	//
 	static float t_base = 0.0f;
-	if ((mTimer.TotalTime() - t_base) >= 0.01f)
+	if ((GameTimer::TotalTime() - t_base) >= 0.01f)
 	{
 		t_base += 0.25f;
 
@@ -85,7 +75,7 @@ void DemoWave::UpdateScene(float dt)
 		mWaves.Disturb(i, j, r);
 	}
 
-	mWaves.Update(dt);
+	mWaves.Update(GameTimer::DeltaTime());
 
 	auto waveVertexBuffer = RENDERER(mWaveMesh)->GetVertexBuffer();
 	D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -101,9 +91,9 @@ void DemoWave::UpdateScene(float dt)
 	mImmediateContext->Unmap(waveVertexBuffer, 0);
 
 
-	mPointLight.Position.x = 40.0f * cosf(0.8f * mTimer.TotalTime());
-	mPointLight.Position.z = 40.0f * sinf(0.8f * mTimer.TotalTime());
-	mPointLight.Position.y = 20;
+	//mPointLight.Position.x = 40.0f * cosf(0.8f * mTimer.TotalTime());
+	//mPointLight.Position.z = 40.0f * sinf(0.8f * mTimer.TotalTime());
+	//mPointLight.Position.y = 20;
 }
 
 void DemoWave::BuildGeometryBuffers()

@@ -22,9 +22,9 @@ DemoSkull::~DemoSkull()
 	mSpheres.clear();
 }
 
-void DemoSkull::UpdateScene(float dt)
+void DemoSkull::UpdateScene()
 {
-	NPGameEngine::UpdateScene(dt);
+	NPGameEngine::UpdateScene();
 
 }
 

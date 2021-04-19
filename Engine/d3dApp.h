@@ -20,7 +20,8 @@ public:
 	
 	virtual bool Init();
 	virtual void OnResize();
-	virtual void UpdateScene(float dt = 0) = 0;
+	virtual void UpdateScene() = 0;
+	virtual void FixedUpdateScene() = 0;
 	virtual void DrawScene() = 0;
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -53,8 +54,6 @@ protected:
 	bool mAppMaximized;
 	bool mAppResizing;
 	bool mAppQuit;
-
-	GameTimer mTimer;
 
 	ID3D11Device* mDevice;
 	IDXGISwapChain* mSwapChain;

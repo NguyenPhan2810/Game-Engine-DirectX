@@ -76,10 +76,13 @@ bool NPGameEngine::Init()
 	InitRasterizerState();
 	BuildGeometryBuffers();
 
+	for (auto obj : BaseObject::GetAllObjects())
+		obj->Init();
+
 	return true;
 }
 
-void NPGameEngine::UpdateScene(float dt)
+void NPGameEngine::UpdateScene()
 {
 	// Input
 	mEnableWireframe = GetAsyncKeyState('L') & 0x8000;
@@ -101,7 +104,13 @@ void NPGameEngine::UpdateScene(float dt)
 	UpdateViewMatrix();
 
 	for (auto obj : BaseObject::GetAllObjects())
-		obj->Update(dt);
+		obj->Update();
+}
+
+void NPGameEngine::FixedUpdateScene()
+{
+	for (auto obj : BaseObject::GetAllObjects())
+		obj->FixedUpdate();
 }
 
 void NPGameEngine::DrawScene()
@@ -142,7 +151,7 @@ void NPGameEngine::DrawScene()
 	activeTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		for (auto obj : allObjects)
+		for (auto& obj : allObjects)
 		{
 			auto renderer = (Renderer*)(obj->GetComponentByName("Renderer"));
 			if (renderer)
