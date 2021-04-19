@@ -4,8 +4,10 @@
 #include "GeometryGenerator.h"
 #include "GlobalDefinitions.h"
 #include "LightHelper.h"
+#include "BaseComponent.h"
 
-class BaseObject
+
+class BaseObject : public ILifeCycle
 {
 public:
 	BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext);
@@ -13,43 +15,34 @@ public:
 
 	static std::vector<BaseObject*> GetAllObjects();
 
-	virtual void Update(float dt);
-	virtual void Draw();
-	
+	virtual void Init() override;
+	virtual void Update(float dt = 0) override;
+	virtual void Draw() override;
+
+
 public:
-	void LoadGeometry(const GeometryGenerator::MeshData meshData);
-	void CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexData, D3D11_BUFFER_DESC vbd);
-	void CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd);
+	void AddComponent(BaseComponent* comp);
+	void RemoveComponent(const std::string& name);
+	BaseComponent* GetComponentByName(const std::string& name);
 
-	ID3D11Buffer* GetVertexBuffer();
-	UINT GetVertexCount() const;
-	ID3D11Buffer* GetIndexBuffer();
-	UINT GetIndexCount() const;
+	template <class _Ty>
+	_Ty* GetComponent(const std::string& name);
 
+public:
 	void Translate(const XMFLOAT3& displacement);
 	void Rorate(const XMFLOAT3& rotationOrigin, float radian);
 	void Scale(const XMFLOAT3& scaleElements);
 
 	XMMATRIX LocalToWorldMatrix() const;
-	
-	Material& GetMaterial();
 
-public:
-	bool renderWireframe;
+	ID3D11Device* GetDevice() { return mDevice; }
+	ID3D11DeviceContext* GetImmediateContext() { return mImmediateContext; }
 
 protected:
 	ID3D11Device* mDevice;
 	ID3D11DeviceContext* mImmediateContext;
 
-	ID3D11Buffer* mVertexBuffer;
-	ID3D11Buffer* mIndexBuffer;
-
-	UINT mVertexCount;
-	UINT mIndexCount;
-
 	XMMATRIX mWorldMatrix;
-
-	Material mMaterial;
 
 private:
 	UINT mId;
@@ -58,5 +51,12 @@ private:
 
 	static bool mAllObjectsChanged;
 	static std::vector<BaseObject*> mAllObjectsVec; // Convience way to get all objects outside the class
+
+	std::vector<BaseComponent*> mComponents;
 };
 
+template <class _Ty>
+inline _Ty* BaseObject::GetComponent(const std::string& name)
+{
+	return reinterpret_cast<_Ty*>(GetComponentByName(name));
+}

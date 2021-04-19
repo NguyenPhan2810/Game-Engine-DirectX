@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BaseObject.h"
-
+#include "Renderer.h"
 
 UINT BaseObject::mIdBase = 0;
 bool BaseObject::mAllObjectsChanged = false;
@@ -8,13 +8,8 @@ std::map<UINT, BaseObject*> BaseObject::mAllObjectsMap;
 std::vector<BaseObject*> BaseObject::mAllObjectsVec;
 
 BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext)
-: mVertexBuffer(nullptr)
-, mIndexBuffer(nullptr)
-, mIndexCount(0)
-, mVertexCount(0)
-, mDevice(device)
+: mDevice(device)
 , mImmediateContext(immediateContext)
-, renderWireframe(false)
 {
 	mAllObjectsChanged = true;
 
@@ -24,19 +19,16 @@ BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateConte
 
 	mWorldMatrix = XMMatrixIdentity();
 
-	// Default material
-	mMaterial.ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
-	mMaterial.diffuse = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
-	mMaterial.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+	AddComponent(new Renderer());
 }
 
 BaseObject::~BaseObject()
 {
+	for (auto& comp : mComponents)
+		SafeDelete(comp);
+
 	mAllObjectsChanged = true;
 	mAllObjectsMap.erase(mId);
-
-	ReleaseCOM(mVertexBuffer);
-	ReleaseCOM(mIndexBuffer);
 }
 
 std::vector<BaseObject*>  BaseObject::GetAllObjects()
@@ -52,87 +44,47 @@ std::vector<BaseObject*>  BaseObject::GetAllObjects()
 	return mAllObjectsVec;
 }
 
+void BaseObject::Init()
+{
+	for (auto comp : mComponents)
+		comp->Init();
+}
+
 void BaseObject::Update(float dt)
 {
-
+	for (auto comp : mComponents)
+		comp->Update(dt);
 }
 
 void BaseObject::Draw()
 {
-	UINT stride = sizeof(Vertex::PosNormal);
-	UINT offset = 0;
-	mImmediateContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
-	mImmediateContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	mImmediateContext->DrawIndexed(mIndexCount, 0, 0);
+	for (auto comp : mComponents)
+		comp->Draw();
 }
 
-void BaseObject::LoadGeometry(const GeometryGenerator::MeshData meshData)
+void BaseObject::AddComponent(BaseComponent* comp)
 {
-	mVertexCount = meshData.vertices.size();
-
-	std::vector<Vertex::PosNormal> vertices;
-	for (UINT i = 0; i < mVertexCount; ++i)
-	{
-		vertices.push_back(Vertex::PosNormal{ meshData.vertices[i].position, meshData.vertices[i].normal });
-	}
-
-	// Create vertex buffer
-	D3D11_BUFFER_DESC vbd{ 0 };
-	vbd.ByteWidth = mVertexCount * sizeof(Vertex::PosNormal);
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-	CreateVertexBuffer(vertices, vbd);
-
-	// Create index buffer
-	mIndexCount = meshData.indices.size();
-
-	D3D11_BUFFER_DESC ibd{ 0 };
-	ibd.ByteWidth = mIndexCount * sizeof(UINT);
-	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-	CreateIndexBuffer(meshData.indices, ibd);
+	comp->attach(this);
+	mComponents.push_back(comp);
 }
 
-void BaseObject::CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexData, D3D11_BUFFER_DESC vbd)
+void BaseObject::RemoveComponent(const std::string& name)
 {
-	ReleaseCOM(mVertexBuffer);
-	
-	D3D11_SUBRESOURCE_DATA vertexInitData;
-	vertexInitData.pSysMem = vertexData.data();
-
-	HR(mDevice->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
+	for (auto it = mComponents.begin(); it != mComponents.end(); ++it)
+		if ((*it)->name == name)
+		{
+			mComponents.erase(it);
+			break;
+		}
 }
 
-void BaseObject::CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd)
+BaseComponent* BaseObject::GetComponentByName(const std::string& name)
 {
-	ReleaseCOM(mIndexBuffer);
+	for (auto comp : mComponents)
+		if (comp->name == name)
+			return comp;
 
-	D3D11_SUBRESOURCE_DATA indexInitData;
-	indexInitData.pSysMem = indexData.data();
-
-	HR(mDevice->CreateBuffer(&ibd, &indexInitData, &mIndexBuffer));
-}
-
-ID3D11Buffer* BaseObject::GetVertexBuffer()
-{
-	return mVertexBuffer;
-}
-
-UINT BaseObject::GetVertexCount() const
-{
-	return mVertexCount;
-}
-
-ID3D11Buffer* BaseObject::GetIndexBuffer()
-{
-	return mIndexBuffer;
-}
-
-UINT BaseObject::GetIndexCount() const
-{
-	return mIndexCount;
+	return nullptr;
 }
 
 void BaseObject::Translate(const XMFLOAT3& displacement)
@@ -156,9 +108,4 @@ void BaseObject::Scale(const XMFLOAT3& scaleElements)
 XMMATRIX BaseObject::LocalToWorldMatrix() const
 {
 	return mWorldMatrix;
-}
-
-Material& BaseObject::GetMaterial()
-{
-	return mMaterial;
 }

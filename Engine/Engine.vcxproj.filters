@@ -31,6 +31,9 @@
     <Filter Include="Precompiled Header">
       <UniqueIdentifier>{c1720695-23eb-45d5-bfc9-58e4f13eb71e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NPComponents">
+      <UniqueIdentifier>{3be45c90-d455-491f-b13d-5ed17ee8cd10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,6 +78,12 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Precompiled Header</Filter>
     </ClCompile>
+    <ClCompile Include="BaseComponent.cpp">
+      <Filter>Source Files\NPComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\NPComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h">
@@ -118,6 +127,15 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Precompiled Header</Filter>
+    </ClInclude>
+    <ClInclude Include="NPInterfaces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseComponent.h">
+      <Filter>Source Files\NPComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Source Files\NPComponents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

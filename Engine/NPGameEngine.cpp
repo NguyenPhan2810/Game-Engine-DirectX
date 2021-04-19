@@ -6,6 +6,7 @@
 #include "GeometryGenerator.h"
 #include "GlobalDefinitions.h"
 #include "Effects.h"
+#include "Renderer.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
@@ -155,6 +156,9 @@ void NPGameEngine::UpdateScene(float dt)
 
 	mEyePosW = XMFLOAT3(x, y, z);
 	UpdateViewMatrix();
+
+	for (auto obj : BaseObject::GetAllObjects())
+		obj->Update(dt);
 }
 
 void NPGameEngine::DrawScene()
@@ -191,20 +195,24 @@ void NPGameEngine::DrawScene()
 	{
 		for (auto obj : allObjects)
 		{
-			// Update constants
-			XMMATRIX world = obj->LocalToWorldMatrix();
-			XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-			XMMATRIX worldViewProj = world * viewProj;
-			const Material& material = obj->GetMaterial();
+			auto renderer = (Renderer*)(obj->GetComponentByName("Renderer"));
+			if (renderer)
+			{
+				// Update constants
+				XMMATRIX world = obj->LocalToWorldMatrix();
+				XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+				XMMATRIX worldViewProj = world * viewProj;
+				const Material& material = renderer->GetMaterial();
 
-			Effects::BasicFX->SetWorld(world);
-			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::BasicFX->SetWorldViewProj(worldViewProj);
-			Effects::BasicFX->SetMaterial(material);
+				Effects::BasicFX->SetWorld(world);
+				Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+				Effects::BasicFX->SetWorldViewProj(worldViewProj);
+				Effects::BasicFX->SetMaterial(material);
 
-			Effects::BasicFX->Tech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+				Effects::BasicFX->Tech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 
-			obj->Draw();
+				obj->Draw();
+			}
 		}
 	}
 

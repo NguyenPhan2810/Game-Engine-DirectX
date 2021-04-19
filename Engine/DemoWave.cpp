@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "DemoWave.h"
+#include "Renderer.h"
 
 #define X 400
 #define Z 400
@@ -85,7 +86,7 @@ void DemoWave::UpdateScene(float dt)
 
 	mWaves.Update(dt);
 
-	auto waveVertexBuffer = mWaveMesh->GetVertexBuffer();
+	auto waveVertexBuffer = RENDERER(mWaveMesh)->GetVertexBuffer();
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	HR(mImmediateContext->Map(waveVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
 
@@ -130,42 +131,42 @@ void DemoWave::BuildGeometryBuffers()
 
 
 	mGridObject = new BaseObject(mDevice, mImmediateContext);
-	mGridObject->LoadGeometry(grid); 
+	RENDERER(mGridObject)->LoadGeometry(grid); 
 	D3D11_BUFFER_DESC gridVBD{ 0 };
-	gridVBD.ByteWidth = mGridObject->GetVertexCount() * sizeof(Vertex::PosNormal);
+	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::PosNormal);
 	gridVBD.Usage = D3D11_USAGE_IMMUTABLE;
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	mGridObject->CreateVertexBuffer(vertices, gridVBD);
+	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
 	mCenterObject->Translate(XMFLOAT3(0, 10, 0));
 	mCenterObject->Scale(XMFLOAT3(3.5, 3.5, 3.5));
-	mCenterObject->LoadGeometry(skull);
+	RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	mWaveMesh = new BaseObject(mDevice, mImmediateContext);
-	mWaveMesh->LoadGeometry(wave);
+	RENDERER(mWaveMesh)->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };
-	waveVBD.ByteWidth = mWaveMesh->GetVertexCount() * sizeof(Vertex::PosNormal);
+	waveVBD.ByteWidth = RENDERER(mWaveMesh)->GetVertexCount() * sizeof(Vertex::PosNormal);
 	waveVBD.Usage = D3D11_USAGE_DYNAMIC;
 	waveVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	waveVBD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	GeometryGenerator::ConvertToPosNormal(wave.vertices, vertices);
-	mWaveMesh->CreateVertexBuffer(vertices, waveVBD);
+	RENDERER(mWaveMesh)->CreateVertexBuffer(vertices, waveVBD);
 
 	// Build mat
-	auto& landMat = mGridObject->GetMaterial();
+	auto& landMat = RENDERER(mGridObject)->GetMaterial();
 	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
-	auto& waveMat = mWaveMesh->GetMaterial();
+	auto& waveMat = RENDERER(mWaveMesh)->GetMaterial();
 	waveMat.ambient = XMFLOAT4(0.1f, 0.3f, 0.4f, 1.0f);
 	waveMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
 	waveMat.Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 60.0f);
 
-	auto& cubeMat = mCenterObject->GetMaterial();
+	auto& cubeMat = RENDERER(mCenterObject)->GetMaterial();
 	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	cubeMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);

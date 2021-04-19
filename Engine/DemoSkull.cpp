@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "DemoSkull.h"
+#include "Renderer.h"
 
 DemoSkull::DemoSkull(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
@@ -65,48 +66,48 @@ void DemoSkull::BuildGeometryBuffers()
 	geoGen.CreateCylinder(1, 0.3f, 3.0f, 20, 20, cylinder);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 	mGridObject = new BaseObject(mDevice, mImmediateContext);
-	mGridObject->LoadGeometry(grid);
+	RENDERER(mGridObject)->LoadGeometry(grid);
 
 	mCenterObject = new BaseObject(mDevice, mImmediateContext);
 	mCenterObject->Translate(XMFLOAT3(0, 1, 0));
 	mCenterObject->Scale(XMFLOAT3(0.3, 0.3, 0.3));
-	mCenterObject->LoadGeometry(skull);
+	RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	mCenterBox = new BaseObject(mDevice, mImmediateContext);
 	mCenterBox->Translate(XMFLOAT3(0, 0.5, 0));
 	mCenterBox->Scale(XMFLOAT3(2, 1, 2));
-	mCenterBox->LoadGeometry(box);
+	RENDERER(mCenterBox)->LoadGeometry(box);
 
 	for (int i = 0; i < 5; ++i)
 	{
 		auto cylinder1 = new BaseObject(mDevice, mImmediateContext);
 		cylinder1->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
-		cylinder1->LoadGeometry(cylinder);
+		RENDERER(cylinder1)->LoadGeometry(cylinder);
 		auto cylinder2 = new BaseObject(mDevice, mImmediateContext);
 		cylinder2->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
-		cylinder2->LoadGeometry(cylinder);
+		RENDERER(cylinder2)->LoadGeometry(cylinder);
 
 		mCylinders.push_back(cylinder1);
 		mCylinders.push_back(cylinder2);
 
 		auto sphere1 = new BaseObject(mDevice, mImmediateContext);
 		sphere1->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
-		sphere1->LoadGeometry(sphere);
+		RENDERER(sphere1)->LoadGeometry(sphere);
 		auto sphere2 = new BaseObject(mDevice, mImmediateContext);
 		sphere2->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
-		sphere2->LoadGeometry(geoSphere);
+		RENDERER(sphere2)->LoadGeometry(geoSphere);
 
 		mSpheres.push_back(sphere1);
 		mSpheres.push_back(sphere2);
 	}	
 	
 	// Build mat
-	auto& landMat = mGridObject->GetMaterial();
+	auto& landMat = RENDERER(mGridObject)->GetMaterial();
 	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
-	auto& cubeMat = mCenterObject->GetMaterial();
+	auto& cubeMat = RENDERER(mCenterObject)->GetMaterial();
 	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	cubeMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
