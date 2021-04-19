@@ -47,12 +47,8 @@ void DemoSkull::BuildGeometryBuffers()
 
 	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->transform->Scale(XMFLOAT3(0.6, 0.6, 0.6));
+	mCenterObject->transform->Scale(XMFLOAT3(0.5, 0.5, 0.5));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
-
-	mCenterBox = new Cube();
-	mCenterBox->transform->Translate(XMFLOAT3(0, 0.5, 0));
-	mCenterBox->transform->Scale(XMFLOAT3(2, 1, 2));
 
 	for (int i = 0; i < 5; ++i)
 	{

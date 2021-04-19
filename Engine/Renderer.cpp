@@ -47,7 +47,7 @@ void Renderer::LoadGeometry(const GeometryGenerator::MeshData meshData)
 	std::vector<Vertex::PosNormal> vertices;
 	for (UINT i = 0; i < mVertexCount; ++i)
 	{
-		vertices.push_back(Vertex::PosNormal{ meshData.vertices[i].position, meshData.vertices[i].normal });
+		vertices.push_back(Vertex::PosNormal{ meshData.vertices[i].Position, meshData.vertices[i].Normal });
 	}
 
 	// Create vertex buffer

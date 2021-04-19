@@ -9,8 +9,8 @@ void GeometryGenerator::ConvertToPosNormal(std::vector<GeometryGenerator::Vertex
 	vertices.resize(n);
 	for (UINT i = 0; i < n; ++i)
 	{
-		vertices[i].Pos = source[i].position;
-		vertices[i].Normal = source[i].normal;
+		vertices[i].Pos = source[i].Position;
+		vertices[i].Normal = source[i].Normal;
 	}
 }
 
@@ -38,8 +38,8 @@ void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& m
 	vertices.resize(vcount);
 	for (UINT i = 0; i < vcount; ++i)
 	{
-		fin >> vertices[i].position.x >> vertices[i].position.y >> vertices[i].position.z;
-		fin >> vertices[i].normal.x >> vertices[i].normal.y >> vertices[i].normal.z;
+		fin >> vertices[i].Position.x >> vertices[i].Position.y >> vertices[i].Position.z;
+		fin >> vertices[i].Normal.x >> vertices[i].Normal.y >> vertices[i].Normal.z;
 	}
 
 	fin >> ignore;
@@ -170,8 +170,8 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 			float x = r * cosf(theta);
 			float z = r * sinf(theta);
 
-			vert.position = XMFLOAT3(x, y, z);
-			XMStoreFloat3(&vert.normal, XMVector3Normalize(XMLoadFloat3(&vert.position)));
+			vert.Position = XMFLOAT3(x, y, z);
+			XMStoreFloat3(&vert.Normal, XMVector3Normalize(XMLoadFloat3(&vert.Position)));
 
 			meshData.vertices.push_back(vert);
 
@@ -199,10 +199,10 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 
 	// Create poles
 	Vertex northPole, southPole;
-	northPole.position = XMFLOAT3(0, radius, 0);
-	northPole.normal = XMFLOAT3(0, 1, 0);
-	southPole.position = XMFLOAT3(0, -radius, 0);
-	southPole.normal = XMFLOAT3(0, -1, 0);
+	northPole.Position = XMFLOAT3(0, radius, 0);
+	northPole.Normal = XMFLOAT3(0, 1, 0);
+	southPole.Position = XMFLOAT3(0, -radius, 0);
+	southPole.Normal = XMFLOAT3(0, -1, 0);
 	meshData.vertices.push_back(northPole);
 	meshData.vertices.push_back(southPole);
 
@@ -259,7 +259,7 @@ void GeometryGenerator::CreateGeoSphere(float radius, UINT nSubdivisions, MeshDa
 	meshData.indices.resize(60);
 
 	for (UINT i = 0; i < 12; ++i)
-		meshData.vertices[i].position = pos[i];
+		meshData.vertices[i].Position = pos[i];
 
 	for (UINT i = 0; i < 60; ++i)
 		meshData.indices[i] = k[i];
@@ -272,8 +272,8 @@ void GeometryGenerator::CreateGeoSphere(float radius, UINT nSubdivisions, MeshDa
 	size_t nVertices = meshData.vertices.size();
 	for (UINT i = 0; i < nVertices; ++i)
 	{
-		auto& pos = meshData.vertices[i].position;
-		auto& normal = meshData.vertices[i].normal;
+		auto& pos = meshData.vertices[i].Position;
+		auto& normal = meshData.vertices[i].Normal;
 
 		// Normalize vector
 		XMVECTOR n = XMVector3Normalize(XMLoadFloat3(&pos));
@@ -311,9 +311,9 @@ void GeometryGenerator::Subdivide(MeshData& meshData)
 	// Lambda to get new middle vertex based on indices
 	auto GetNewVertex = [&](UINT i1, UINT i2, Vertex& newVert)->void
 	{
-		XMVECTOR p1 = XMLoadFloat3(&GetIndexedVertex(i1).position);
-		XMVECTOR p2 = XMLoadFloat3(&GetIndexedVertex(i2).position);
-		XMStoreFloat3(&newVert.position, 0.5f * (p1 + p2));
+		XMVECTOR p1 = XMLoadFloat3(&GetIndexedVertex(i1).Position);
+		XMVECTOR p2 = XMLoadFloat3(&GetIndexedVertex(i2).Position);
+		XMStoreFloat3(&newVert.Position, 0.5f * (p1 + p2));
 	};
 
 	Vertex m0, m1, m2;
@@ -374,8 +374,8 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 		{
 			auto& vert = meshData.vertices[iv];
 
-			vert.position = XMFLOAT3(x, 0.0, z);
-			vert.normal = normal;
+			vert.Position = XMFLOAT3(x, 0.0, z);
+			vert.Normal = normal;
 
 			iv++;
 			x += dx;
@@ -448,10 +448,21 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 		{
 			Vertex vert;
 
-			float x = r * cosf(theta);
-			float z = r * sinf(theta);
+			float c = cosf(theta);
+			float s = sinf(theta);
 
-			vert.position = XMFLOAT3(x, y, z);
+			vert.Position = XMFLOAT3(r * c, y, r * s);
+
+			// This is unit length.
+			vert.TangentU = XMFLOAT3(-s, 0.0f, c);
+
+			float dr = bottomRadius - topRadius;
+			XMFLOAT3 bitangent(dr * c, -height, dr * s);
+
+			XMVECTOR T = XMLoadFloat3(&vert.TangentU);
+			XMVECTOR B = XMLoadFloat3(&bitangent);
+			XMVECTOR N = XMVector3Normalize(XMVector3Cross(T, B));
+			XMStoreFloat3(&vert.Normal, N);
 
 			meshData.vertices.push_back(vert);
 
@@ -503,7 +514,7 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 		float x = radius * cosf(theta);
 		float z = radius * sinf(theta);
 
-		vert.position = XMFLOAT3(x, y, z);
+		vert.Position = XMFLOAT3(x, y, z);
 
 		meshData.vertices.push_back(vert);
 
@@ -512,7 +523,7 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 
 	// Create center vertex
 	Vertex centerVert;
-	centerVert.position = XMFLOAT3(0, y, 0);
+	centerVert.Position = XMFLOAT3(0, y, 0);
 	meshData.vertices.push_back(centerVert);
 	
 	UINT centerIndex = meshData.vertices.size() - 1;
