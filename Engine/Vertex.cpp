@@ -23,7 +23,7 @@ void InputLayouts::InitAll(ID3D11Device* device)
 	//
 
 	D3DX11_PASS_DESC passDesc;
-	Effects::BasicFX->Tech->GetPassByIndex(0)->GetDesc(&passDesc);
+	Effects::BasicFX->Light1Tech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(device->CreateInputLayout(InputLayoutDesc::PosNormal, 2, passDesc.pIAInputSignature,
 		passDesc.IAInputSignatureSize, &PosNormal));
 }

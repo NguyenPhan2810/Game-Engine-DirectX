@@ -61,8 +61,8 @@ struct Material
 	// Set all values to 0	
 	Material() { ZeroMemory(this, sizeof(this)); }
 
-	XMFLOAT4 ambient;
-	XMFLOAT4 diffuse;
+	XMFLOAT4 Ambient;
+	XMFLOAT4 Diffuse;
 	XMFLOAT4 Specular; // w = SpecPower
 	//XMFLOAT4 reflect; // Ignore for now
 };

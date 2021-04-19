@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DemoWave.h"
 #include "Renderer.h"
+#include "Cube.h"
 
 #define X 400
 #define Z 400
@@ -130,7 +131,7 @@ void DemoWave::BuildGeometryBuffers()
 	}
 
 
-	mGridObject = new BaseObject();
+	mGridObject = new Cube();
 	RENDERER(mGridObject)->LoadGeometry(grid); 
 	D3D11_BUFFER_DESC gridVBD{ 0 };
 	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::PosNormal);
@@ -138,12 +139,12 @@ void DemoWave::BuildGeometryBuffers()
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
 
-	mCenterObject = new BaseObject();
+	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 10, 0));
 	mCenterObject->transform->Scale(XMFLOAT3(3.5, 3.5, 3.5));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
 
-	mWaveMesh = new BaseObject();
+	mWaveMesh = new Cube();
 	RENDERER(mWaveMesh)->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };
@@ -157,17 +158,17 @@ void DemoWave::BuildGeometryBuffers()
 
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();
-	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.Ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.Diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
 	auto& waveMat = RENDERER(mWaveMesh)->GetMaterial();
-	waveMat.ambient = XMFLOAT4(0.1f, 0.3f, 0.4f, 1.0f);
-	waveMat.diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	waveMat.Ambient = XMFLOAT4(0.1f, 0.3f, 0.4f, 1.0f);
+	waveMat.Diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
 	waveMat.Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 60.0f);
 
 	auto& cubeMat = RENDERER(mCenterObject)->GetMaterial();
-	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	cubeMat.Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	cubeMat.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	cubeMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 }

@@ -9,15 +9,8 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Helper Files">
       <UniqueIdentifier>{c5b4d46e-2528-4d21-8fcc-c1c4e2621798}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\FX">
-      <UniqueIdentifier>{b7ed2174-bf46-4fc7-b637-32d21fd341a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Demos">
       <UniqueIdentifier>{a71e3064-5ae1-4918-91bc-19289d949630}</UniqueIdentifier>
@@ -39,6 +32,9 @@
     </Filter>
     <Filter Include="Source Files\NPEffects">
       <UniqueIdentifier>{91a1403b-93ba-458b-bc7a-5295a8bc2d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NPEffects\FX">
+      <UniqueIdentifier>{b7ed2174-bf46-4fc7-b637-32d21fd341a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -64,9 +60,6 @@
       <Filter>Helper Files</Filter>
     </ClCompile>
     <ClCompile Include="Waves.cpp">
-      <Filter>Demos\Waves</Filter>
-    </ClCompile>
-    <ClCompile Include="DemoWave.cpp">
       <Filter>Demos\Waves</Filter>
     </ClCompile>
     <ClCompile Include="DemoSkull.cpp">
@@ -158,10 +151,10 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FX\LightHelper.fx">
-      <Filter>Resource Files\FX</Filter>
+      <Filter>Source Files\NPEffects\FX</Filter>
     </FxCompile>
     <FxCompile Include="FX\Basic.fx">
-      <Filter>Resource Files\FX</Filter>
+      <Filter>Source Files\NPEffects\FX</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

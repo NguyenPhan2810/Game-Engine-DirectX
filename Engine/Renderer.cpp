@@ -11,8 +11,8 @@ Renderer::Renderer()
 {
 	name = "Renderer";
 	// Default material
-	mMaterial.ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
-	mMaterial.diffuse = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
+	mMaterial.Ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
+	mMaterial.Diffuse = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
 	mMaterial.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 }
 

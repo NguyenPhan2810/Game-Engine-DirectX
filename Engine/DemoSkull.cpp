@@ -7,25 +7,6 @@ DemoSkull::DemoSkull(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 {
 	mCamRadius = 10;
-
-	mDirLight.Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	mDirLight.Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLight.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLight.Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-
-	mPointLight.Ambient = XMFLOAT4(0.1f, 0.1f, 0.17f, 1.0f);
-	mPointLight.Diffuse = XMFLOAT4(0.7f, 0.7f, 0.9f, 1.0f);
-	mPointLight.Specular = XMFLOAT4(0.7f, 0.7f, 0.9f, 1.0f);
-	mPointLight.att = XMFLOAT3(1.0f, 0.1f, 0.5f);
-	mPointLight.range = 30.0f;
-
-	mSpotLight.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mSpotLight.Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mSpotLight.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	mSpotLight.Position = XMFLOAT3(0, 5, 0);
-	mSpotLight.Range = 20;
-	mSpotLight.Direction = XMFLOAT3(0, -1, 0);
-	mSpotLight.Att = XMFLOAT3(0, 1, 1);
 }
 
 DemoSkull::~DemoSkull()
@@ -45,9 +26,6 @@ void DemoSkull::UpdateScene(float dt)
 {
 	NPGameEngine::UpdateScene(dt);
 
-	mPointLight.Position.x = 3.0f * cosf(2 * mTimer.TotalTime());
-	mPointLight.Position.z = 3.0f * sinf(2 * mTimer.TotalTime());
-	mPointLight.Position.y = 2;
 }
 
 void DemoSkull::BuildGeometryBuffers()
@@ -60,8 +38,8 @@ void DemoSkull::BuildGeometryBuffers()
 
 	GeometryGenerator geoGen;
 	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
-	geoGen.CreateGeoSphere(0.5, 2, geoSphere);
-	geoGen.CreateSphere(0.5f, 10, 10, sphere);
+	geoGen.CreateGeoSphere(0.5, 3, geoSphere);
+	geoGen.CreateSphere(0.5f, 20, 20, sphere);
 	geoGen.CreateCylinder(1, 0.3f, 3.0f, 20, 20, cylinder);
 	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 	mGridObject = new Cube();
@@ -69,7 +47,7 @@ void DemoSkull::BuildGeometryBuffers()
 
 	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 1, 0));
-	mCenterObject->transform->Scale(XMFLOAT3(0.3, 0.3, 0.3));
+	mCenterObject->transform->Scale(XMFLOAT3(0.6, 0.6, 0.6));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	mCenterBox = new Cube();
@@ -101,12 +79,29 @@ void DemoSkull::BuildGeometryBuffers()
 	
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();
-	landMat.ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	landMat.diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.Ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	landMat.Diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
-	auto& cubeMat = RENDERER(mCenterObject)->GetMaterial();
-	cubeMat.ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	cubeMat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	cubeMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
+
+	for (auto& cyl : mCylinders)
+	{
+		auto& mat = RENDERER(cyl)->GetMaterial();
+		mat.Ambient = XMFLOAT4(0.7f, 0.85f, 0.7f, 1.0f);
+		mat.Diffuse = XMFLOAT4(0.7f, 0.85f, 0.7f, 1.0f);
+		mat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
+	}
+
+	for (auto& sphere : mSpheres)
+	{
+		auto& mat = RENDERER(sphere)->GetMaterial();
+		mat.Ambient = XMFLOAT4(0.1f, 0.2f, 0.3f, 1.0f);
+		mat.Diffuse = XMFLOAT4(0.2f, 0.4f, 0.6f, 1.0f);
+		mat.Specular = XMFLOAT4(0.9f, 0.9f, 0.9f, 16.0f);
+	}
+
+	auto& skullMat = RENDERER(mCenterObject)->GetMaterial();
+	skullMat.Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	skullMat.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	skullMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 }

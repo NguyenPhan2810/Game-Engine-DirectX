@@ -2,9 +2,7 @@
 
 cbuffer cbPerFrame
 {
-    DirectionalLight gDirLight;
-    PointLight gPointLight;
-    SpotLight gSpotLight;
+    DirectionalLight gDirLights[3];
     float3 gEyePosW;
 };
 
@@ -18,15 +16,15 @@ cbuffer cbPerObject
 
 struct VertexIn
 {
-	float3 PosL : POSITION;
-	float3 NormalL : NORMAL;
+	float3 PosL     : POSITION;
+	float3 NormalL  : NORMAL;
 };
 
 struct VertexOut
 {
-    float4 PosH : SV_POSITION;
-    float3 PosW : POSITION;
-    float3 NormalW : NORMAL;
+    float4 PosH     : SV_POSITION;
+    float3 PosW     : POSITION;
+    float3 NormalW  : NORMAL;
 };
 
 // Vertex shader
@@ -50,7 +48,7 @@ VertexOut VS(VertexIn vin)
 }
 
 // Pixel shader
-float4 PS(VertexOut pin) : SV_Target
+float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
 { 
 	// Interpolated normal can be unnormalized so here normalize it
     pin.NormalW = normalize(pin.NormalW);
@@ -60,25 +58,19 @@ float4 PS(VertexOut pin) : SV_Target
 	// Start with a sum of zero. 
     float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Sum the light contribution from each light source.
     float4 A, D, S;
 	
-    ComputeDirectionalLight(gMaterial, gDirLight, pin.NormalW, toEyeW, A, D, S);
-    ambient += A;
-    diffuse += D;
-    spec += S;
-	
-    ComputePointLight(gMaterial, gPointLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
-    ambient += A;
-    diffuse += D;
-    spec += S;
-    
-    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEyeW, A, D, S);
-    ambient += A;
-    diffuse += D;
-    spec += S;
+	[unroll]
+    for (int i = 0; i < gLightCount; ++i)
+    {
+        ComputeDirectionalLight(gMaterial, gDirLights[i], pin.NormalW, toEyeW, A, D, S);
+        ambient += A;
+        diffuse += D;
+        spec += S;
+    }
 
     float4 litColor = ambient + diffuse + spec;
 	
@@ -88,12 +80,32 @@ float4 PS(VertexOut pin) : SV_Target
     return litColor;
 }
 
-technique11 LightingTech
+technique11 Light1
 {
-	pass P0
-	{
-		SetVertexShader(CompileShader(vs_5_0, VS()));
-		SetGeometryShader(NULL);
-		SetPixelShader(CompileShader(ps_5_0, PS()));
-	}
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0, VS()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS(1)));
+    }
+}
+
+technique11 Light2
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0, VS()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS(2)));
+    }
+}
+
+technique11 Light3
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0, VS()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS(3)));
+    }
 }

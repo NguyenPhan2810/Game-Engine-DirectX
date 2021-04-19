@@ -45,13 +45,12 @@ Effect::~Effect()
 BasicEffect::BasicEffect(ID3D11Device* device, const std::wstring& filename)
 : Effect(device, filename)
 {
-	Tech = mFX->GetTechniqueByName("LightingTech");
+	Light1Tech = mFX->GetTechniqueByName("Light1");
+	Light2Tech = mFX->GetTechniqueByName("Light2");
+	Light3Tech = mFX->GetTechniqueByName("Light3");
 
 	EyePosW				= mFX->GetVariableByName("gEyePosW")->AsVector();
-	DirLight			= mFX->GetVariableByName("gDirLight");
-	PntLight			= mFX->GetVariableByName("gPointLight");
-	SptLight			= mFX->GetVariableByName("gSpotLight");
-
+	DirLights			= mFX->GetVariableByName("gDirLights");
 	World				= mFX->GetVariableByName("gWorld")->AsMatrix();
 	WorldInvTranspose	= mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
 	WorldViewProj		= mFX->GetVariableByName("gWorldViewProj")->AsMatrix();

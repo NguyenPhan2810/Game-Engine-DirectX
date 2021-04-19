@@ -20,6 +20,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mCamFar(1000.0f)
 , mMouseSensitivity(0.25f)
 , mEnableWireframe(false)
+, mLightCount(0)
 {
 	mClientWidth = 1080;
 	mClientHeight = 720;
@@ -41,6 +42,29 @@ NPGameEngine::~NPGameEngine()
 	Effects::DestroyAll();
 }
 
+void NPGameEngine::OnResize()
+{
+	D3DApp::OnResize();
+
+	// The window resized, so update the aspect ratio and recompute the projection matrix.
+	UpdateProjMatrix();
+
+	mDirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLights[0].Diffuse = XMFLOAT4(0.4f, 0.6f, 0.4f, 1.0f);
+	mDirLights[0].Specular = XMFLOAT4(0.4f, 0.6f, 0.4f, 1.0f);
+	mDirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	mDirLights[1].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mDirLights[1].Diffuse = XMFLOAT4(0.40f, 0.20f, 0.20f, 1.0f);
+	mDirLights[1].Specular = XMFLOAT4(0.45f, 0.25f, 0.25f, 1.0f);
+	mDirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
+
+	mDirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mDirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.4f, 1.0f);
+	mDirLights[2].Specular = XMFLOAT4(0.05f, 0.05f, 0.1f, 1.0f);
+	mDirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
+}
+
 bool NPGameEngine::Init()
 {
 	if (!D3DApp::Init())
@@ -53,6 +77,96 @@ bool NPGameEngine::Init()
 	BuildGeometryBuffers();
 
 	return true;
+}
+
+void NPGameEngine::UpdateScene(float dt)
+{
+	// Input
+	mEnableWireframe = GetAsyncKeyState('L') & 0x8000;
+	if (GetAsyncKeyState('0') & 0x8000)
+		mLightCount = 0;
+	else if (GetAsyncKeyState('1') & 0x8000)
+		mLightCount = 1;
+	else if (GetAsyncKeyState('2') & 0x8000)
+		mLightCount = 2;
+	else if (GetAsyncKeyState('3') & 0x8000)
+		mLightCount = 3;
+
+	//===
+	float x = mCamRadius * sinf(mCamPhi) * cosf(mCamTheta);
+	float z = mCamRadius * sinf(mCamPhi) * sinf(mCamTheta);
+	float y = mCamRadius * cosf(mCamPhi);
+
+	mEyePosW = XMFLOAT3(x, y, z);
+	UpdateViewMatrix();
+
+	for (auto obj : BaseObject::GetAllObjects())
+		obj->Update(dt);
+}
+
+void NPGameEngine::DrawScene()
+{
+	// Clear buffer
+	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Black));
+	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Set up
+	mImmediateContext->IASetInputLayout(InputLayouts::PosNormal);
+	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	if (mEnableWireframe)
+		mImmediateContext->RSSetState(mWireframeRS);
+	else
+		mImmediateContext->RSSetState(mSolidRS);
+
+	// Set constants
+
+	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = XMLoadFloat4x4(&mView);
+	XMMATRIX viewProj = view * proj;
+	auto allObjects = BaseObject::GetAllObjects();
+
+
+	// Set per frame constants.
+	Effects::BasicFX->SetDirLights(mDirLights);
+	Effects::BasicFX->SetEyePosW(mEyePosW);
+
+	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3Tech;
+	switch (mLightCount)
+	{
+	case 1: activeTech = Effects::BasicFX->Light1Tech; break;
+	case 2: activeTech = Effects::BasicFX->Light2Tech; break;
+	case 3: activeTech = Effects::BasicFX->Light3Tech; break;
+	}
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	activeTech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		for (auto obj : allObjects)
+		{
+			auto renderer = (Renderer*)(obj->GetComponentByName("Renderer"));
+			if (renderer)
+			{
+				// Update constants
+				XMMATRIX world = obj->transform->LocalToWorldMatrix();
+				XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+				XMMATRIX worldViewProj = world * viewProj;
+				const Material& material = renderer->GetMaterial();
+
+				Effects::BasicFX->SetWorld(world);
+				Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+				Effects::BasicFX->SetWorldViewProj(worldViewProj);
+				Effects::BasicFX->SetMaterial(material);
+
+				activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+				obj->Draw();
+			}
+		}
+	}
+
+	// Present buffer
+	HR(mSwapChain->Present(0, 0));
 }
 
 void NPGameEngine::InitRasterizerState()
@@ -77,14 +191,6 @@ void NPGameEngine::InitRasterizerState()
 void NPGameEngine::BuildGeometryBuffers()
 {
 	
-}
-
-void NPGameEngine::OnResize()
-{
-	D3DApp::OnResize();
-
-	// The window resized, so update the aspect ratio and recompute the projection matrix.
-	UpdateProjMatrix();
 }
 
 void NPGameEngine::OnMouseDown(WPARAM btnState, int x, int y)
@@ -141,81 +247,4 @@ void NPGameEngine::UpdateViewMatrix()
 
 	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&mView, V);
-}
-
-void NPGameEngine::UpdateScene(float dt)
-{
-	// Input
-	if (GetAsyncKeyState('L') & 0x8000)
-		mEnableWireframe = !mEnableWireframe;
-
-	//===
-	float x = mCamRadius * sinf(mCamPhi) * cosf(mCamTheta);
-	float z = mCamRadius * sinf(mCamPhi) * sinf(mCamTheta);
-	float y = mCamRadius * cosf(mCamPhi);
-
-	mEyePosW = XMFLOAT3(x, y, z);
-	UpdateViewMatrix();
-
-	for (auto obj : BaseObject::GetAllObjects())
-		obj->Update(dt);
-}
-
-void NPGameEngine::DrawScene()
-{
-	// Clear buffer
-	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Cyan));
-	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Set up
-	mImmediateContext->IASetInputLayout(InputLayouts::PosNormal);
-	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	if (mEnableWireframe)
-		mImmediateContext->RSSetState(mWireframeRS);
-	else
-		mImmediateContext->RSSetState(mSolidRS);
-
-	// Set constants
-
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX viewProj = view * proj;
-	auto allObjects = BaseObject::GetAllObjects();
-
-
-	// Set per frame constants.
-	Effects::BasicFX->SetDirLight(mDirLight);
-	Effects::BasicFX->SetPointLight(mPointLight);
-	Effects::BasicFX->SetSpotLight(mSpotLight);
-	Effects::BasicFX->SetEyePosW(mEyePosW);
-
-	D3DX11_TECHNIQUE_DESC techDesc;
-	Effects::BasicFX->Tech->GetDesc(&techDesc);
-	for (UINT p = 0; p < techDesc.Passes; ++p)
-	{
-		for (auto obj : allObjects)
-		{
-			auto renderer = (Renderer*)(obj->GetComponentByName("Renderer"));
-			if (renderer)
-			{
-				// Update constants
-				XMMATRIX world = obj->transform->LocalToWorldMatrix();
-				XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-				XMMATRIX worldViewProj = world * viewProj;
-				const Material& material = renderer->GetMaterial();
-
-				Effects::BasicFX->SetWorld(world);
-				Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-				Effects::BasicFX->SetWorldViewProj(worldViewProj);
-				Effects::BasicFX->SetMaterial(material);
-
-				Effects::BasicFX->Tech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-
-				obj->Draw();
-			}
-		}
-	}
-
-	// Present buffer
-	HR(mSwapChain->Present(0, 0));
 }

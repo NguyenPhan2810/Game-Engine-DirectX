@@ -31,20 +31,18 @@ public:
 	void SetWorld(CXMMATRIX M) { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetWorldInvTranspose(CXMMATRIX M) { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetEyePosW(const XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetDirLight(const DirectionalLight& light) { DirLight->SetRawValue(&light, 0, sizeof(DirectionalLight)); }
-	void SetPointLight(const PointLight& light) { PntLight->SetRawValue(&light, 0, sizeof(PointLight)); }
-	void SetSpotLight(const SpotLight& light) { SptLight->SetRawValue(&light, 0, sizeof(SpotLight)); }
+	void SetDirLights(const DirectionalLight lights[]) { DirLights->SetRawValue(lights, 0, 3 * sizeof(DirectionalLight)); }
 	void SetMaterial(const Material& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 
-	ID3DX11EffectTechnique* Tech;
+	ID3DX11EffectTechnique* Light1Tech;
+	ID3DX11EffectTechnique* Light2Tech;
+	ID3DX11EffectTechnique* Light3Tech;
 
 	ID3DX11EffectMatrixVariable* WorldViewProj;
 	ID3DX11EffectMatrixVariable* World;
 	ID3DX11EffectMatrixVariable* WorldInvTranspose;
 	ID3DX11EffectVectorVariable* EyePosW;
-	ID3DX11EffectVariable* DirLight;
-	ID3DX11EffectVariable* PntLight;
-	ID3DX11EffectVariable* SptLight;
+	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
 };
 #pragma endregion

@@ -28,9 +28,8 @@ protected:
 	virtual void BuildGeometryBuffers();
 
 protected:
-	DirectionalLight mDirLight;
-	PointLight mPointLight;
-	SpotLight mSpotLight;
+	DirectionalLight mDirLights[3];
+	int mLightCount;
 
 	ID3D11RasterizerState* mWireframeRS;
 	ID3D11RasterizerState* mSolidRS;

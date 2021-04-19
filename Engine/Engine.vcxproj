@@ -180,7 +180,6 @@
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="DemoSkull.cpp" />
-    <ClCompile Include="DemoWave.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
