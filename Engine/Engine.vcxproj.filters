@@ -37,6 +37,9 @@
     <Filter Include="Source Files\NPObjects">
       <UniqueIdentifier>{4b71536b-5eb3-4b9a-b302-80c57d956645}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NPEffects">
+      <UniqueIdentifier>{91a1403b-93ba-458b-bc7a-5295a8bc2d4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -69,12 +72,6 @@
     <ClCompile Include="DemoSkull.cpp">
       <Filter>Demos\Skull</Filter>
     </ClCompile>
-    <ClCompile Include="Effects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vertex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Precompiled Header</Filter>
     </ClCompile>
@@ -89,6 +86,15 @@
     </ClCompile>
     <ClCompile Include="BaseObject.cpp">
       <Filter>Source Files\NPObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Source Files\NPEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Effects.cpp">
+      <Filter>Source Files\NPEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,12 +128,6 @@
     <ClInclude Include="LightHelper.h">
       <Filter>Helper Files</Filter>
     </ClInclude>
-    <ClInclude Include="Effects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Precompiled Header</Filter>
     </ClInclude>
@@ -145,6 +145,15 @@
     </ClInclude>
     <ClInclude Include="BaseObject.h">
       <Filter>Source Files\NPObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Effects.h">
+      <Filter>Source Files\NPEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Source Files\NPEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -130,7 +130,7 @@ void DemoWave::BuildGeometryBuffers()
 	}
 
 
-	mGridObject = new BaseObject(mDevice, mImmediateContext);
+	mGridObject = new BaseObject();
 	RENDERER(mGridObject)->LoadGeometry(grid); 
 	D3D11_BUFFER_DESC gridVBD{ 0 };
 	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::PosNormal);
@@ -138,12 +138,12 @@ void DemoWave::BuildGeometryBuffers()
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
 
-	mCenterObject = new BaseObject(mDevice, mImmediateContext);
+	mCenterObject = new BaseObject();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 10, 0));
 	mCenterObject->transform->Scale(XMFLOAT3(3.5, 3.5, 3.5));
 	RENDERER(mCenterObject)->LoadGeometry(skull);
 
-	mWaveMesh = new BaseObject(mDevice, mImmediateContext);
+	mWaveMesh = new BaseObject();
 	RENDERER(mWaveMesh)->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };

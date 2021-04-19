@@ -10,7 +10,7 @@
 class BaseObject : public ILifeCycle
 {
 public:
-	BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext);
+	BaseObject();
 	~BaseObject();
 
 	static std::vector<BaseObject*> GetAllObjects();
@@ -18,7 +18,6 @@ public:
 	virtual void Init() override;
 	virtual void Update(float dt = 0) override;
 	virtual void Draw() override;
-
 
 public:
 	void AddComponent(BaseComponent* comp);
@@ -29,17 +28,9 @@ public:
 	_Ty* GetComponent(const std::string& name);
 
 public:
-	ID3D11Device* GetDevice() { return mDevice; }
-	ID3D11DeviceContext* GetImmediateContext() { return mImmediateContext; }
-
-public:
 	// Because every object must have a transform component
 	// So this comp deserves its own place
 	Transform* transform;
-
-protected:
-	ID3D11Device* mDevice;
-	ID3D11DeviceContext* mImmediateContext;
 
 private:
 	UINT mId;

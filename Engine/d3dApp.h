@@ -39,6 +39,10 @@ public:
 	// It works like cout but to output debug window each cycle
 	std::wstringstream Output;
 
+
+	static ID3D11Device* GetDevice();
+	static ID3D11DeviceContext* GetImmediateContext();
+
 protected:
 	HINSTANCE mhAppInstance;
 	HWND mhMainWnd;

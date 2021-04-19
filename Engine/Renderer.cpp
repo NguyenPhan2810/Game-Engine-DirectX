@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include "BaseObject.h"
+#include "d3dApp.h"
 
 Renderer::Renderer()
 : mVertexBuffer(nullptr)
@@ -31,7 +32,7 @@ void Renderer::Update(float dt)
 
 void Renderer::Draw()
 {
-	auto context = attachedObject->GetImmediateContext();
+	auto context = D3DApp::GetImmediateContext();
 	UINT stride = sizeof(Vertex::PosNormal);
 	UINT offset = 0;
 	context->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
@@ -75,7 +76,7 @@ void Renderer::CreateVertexBuffer(const std::vector<Vertex::PosNormal>& vertexDa
 	D3D11_SUBRESOURCE_DATA vertexInitData;
 	vertexInitData.pSysMem = vertexData.data();
 
-	HR(attachedObject->GetDevice()->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
+	HR(D3DApp::GetDevice()->CreateBuffer(&vbd, &vertexInitData, &mVertexBuffer));
 }
 
 void Renderer::CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFER_DESC ibd)
@@ -85,7 +86,7 @@ void Renderer::CreateIndexBuffer(const std::vector<UINT>& indexData, D3D11_BUFFE
 	D3D11_SUBRESOURCE_DATA indexInitData;
 	indexInitData.pSysMem = indexData.data();
 
-	HR(attachedObject->GetDevice()->CreateBuffer(&ibd, &indexInitData, &mIndexBuffer));
+	HR(D3DApp::GetDevice()->CreateBuffer(&ibd, &indexInitData, &mIndexBuffer));
 }
 
 ID3D11Buffer* Renderer::GetVertexBuffer()

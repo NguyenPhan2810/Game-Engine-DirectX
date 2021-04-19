@@ -7,10 +7,8 @@ bool BaseObject::mAllObjectsChanged = false;
 std::map<UINT, BaseObject*> BaseObject::mAllObjectsMap;
 std::vector<BaseObject*> BaseObject::mAllObjectsVec;
 
-BaseObject::BaseObject(ID3D11Device* device, ID3D11DeviceContext* immediateContext)
-: mDevice(device)
-, mImmediateContext(immediateContext)
-, transform(nullptr)
+BaseObject::BaseObject()
+: transform(nullptr)
 {
 	mAllObjectsChanged = true;
 

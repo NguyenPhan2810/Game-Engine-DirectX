@@ -13,7 +13,6 @@ LRESULT MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 D3DApp::D3DApp(HINSTANCE hInstance)
 : mhAppInstance(hInstance)
 , mhMainWnd(NULL)
-
 , mDevice(nullptr)
 , mImmediateContext(nullptr)
 , mSwapChain(nullptr)
@@ -416,6 +415,16 @@ void D3DApp::EventWindowResize(WPARAM wParam)
 			OnResize();
 		}
 	}
+}
+
+ID3D11Device* D3DApp::GetDevice()
+{
+	return gd3dApp->mDevice;
+}
+
+ID3D11DeviceContext* D3DApp::GetImmediateContext()
+{
+	return gd3dApp->mImmediateContext;
 }
 
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
