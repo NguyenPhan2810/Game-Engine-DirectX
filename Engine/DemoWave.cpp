@@ -128,11 +128,11 @@ void DemoWave::BuildGeometryBuffers()
 //	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
 	Vertex::Basic32 newVert;
-	std::vector<Vertex::Basic32> vertices;
-	for (auto& vert : grid.vertices)
+	std::vector<Vertex::Basic32> Vertices;
+	for (auto& vert : grid.Vertices)
 	{
 		GetHillVertex(vert, newVert);
-		vertices.push_back(newVert);
+		Vertices.push_back(newVert);
 	}
 
 
@@ -144,7 +144,7 @@ void DemoWave::BuildGeometryBuffers()
 	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::Basic32);
 	gridVBD.Usage = D3D11_USAGE_IMMUTABLE;
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
+	RENDERER(mGridObject)->CreateVertexBuffer(Vertices, gridVBD);
 
 	// Load texture
 	mLandTex = std::make_shared<Texture>(L"Textures/grass.dds");
@@ -163,8 +163,8 @@ void DemoWave::BuildGeometryBuffers()
 	waveVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	waveVBD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	GeometryGenerator::ConvertToBasic32(wave.vertices, vertices);
-	RENDERER(mWaveMesh)->CreateVertexBuffer(vertices, waveVBD);
+	GeometryGenerator::ConvertToBasic32(wave.Vertices, Vertices);
+	RENDERER(mWaveMesh)->CreateVertexBuffer(Vertices, waveVBD);
 
 	// Load texture
 	mWaveTex = std::make_shared<Texture>(L"Textures/water2.dds");

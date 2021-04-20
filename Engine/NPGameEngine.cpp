@@ -33,7 +33,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
 
-	mDirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLights[0].Ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
 	mDirLights[0].Diffuse = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	mDirLights[0].Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	mDirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
@@ -44,7 +44,7 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 	mDirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
 
 	mDirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mDirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLights[2].Diffuse = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	mDirLights[2].Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mDirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
 }

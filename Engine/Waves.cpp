@@ -81,7 +81,7 @@ void Waves::Init(UINT m, UINT n, float dx, float dt, float speed, float damping)
 	mNormals = new XMFLOAT3[m * n];
 	mTangentX = new XMFLOAT3[m * n];
 
-	// Generate grid vertices in system memory.
+	// Generate grid Vertices in system memory.
 
 	float halfWidth = (n - 1) * dx * 0.5f;
 	float halfDepth = (m - 1) * dx * 0.5f;
@@ -122,7 +122,7 @@ void Waves::Update(float dt)
 
 				// Note j indexes x and i indexes z: h(x_j, z_i, t_k)
 				// Moreover, our +z axis goes "down"; this is just to 
-				// keep consistent with our row indices going down.
+				// keep consistent with our row Indices going down.
 
 				mPrevSolution[i*mNumCols+j].y = 
 

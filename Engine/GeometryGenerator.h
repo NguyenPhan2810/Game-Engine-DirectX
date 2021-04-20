@@ -35,14 +35,14 @@ public:
 
 	struct MeshData
 	{
-		std::vector<Vertex> vertices;
-		std::vector<UINT> indices;
+		std::vector<Vertex> Vertices;
+		std::vector<UINT> Indices;
 	};
 
 	///<summary>
-	/// Copy position from source to vertices
+	/// Copy position from source to Vertices
 	///</summary>
-	static void ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& vertices);
+	static void ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& Vertices);
 
 	///<summary>
 	/// Creates a mesh from simple file
@@ -93,7 +93,7 @@ private:
 	void Subdivide(MeshData& meshData);
 
 	/// <summary>
-	/// Create a seperate cylinder cap vertices that doesnt connect toe the cylinder it self
+	/// Create a seperate cylinder cap Vertices that doesnt connect toe the cylinder it self
 	/// faceUp set to true will create triangle be seen from top culling bottom
 	/// </summary>
 	void CreateCylinderCap(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp);

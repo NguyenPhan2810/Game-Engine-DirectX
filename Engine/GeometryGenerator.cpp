@@ -1,17 +1,18 @@
 #include "stdafx.h"
 #include "GeometryGenerator.h"
+#include "MathHelper.h"
 #include <map>
 #include <fstream>
 
-void GeometryGenerator::ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& vertices)
+void GeometryGenerator::ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& Vertices)
 {
 	size_t n = source.size();
-	vertices.resize(n);
+	Vertices.resize(n);
 	for (UINT i = 0; i < n; ++i)
 	{
-		vertices[i].Pos = source[i].Position;
-		vertices[i].Normal = source[i].Normal;
-		vertices[i].Tex = source[i].TexC;
+		Vertices[i].Pos = source[i].Position;
+		Vertices[i].Normal = source[i].Normal;
+		Vertices[i].Tex = source[i].TexC;
 	}
 }
 
@@ -35,12 +36,12 @@ void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& m
 
 	float nx, ny, nz;
 
-	std::vector<Vertex>& vertices = meshData.vertices;
-	vertices.resize(vcount);
+	std::vector<Vertex>& Vertices = meshData.Vertices;
+	Vertices.resize(vcount);
 	for (UINT i = 0; i < vcount; ++i)
 	{
-		fin >> vertices[i].Position.x >> vertices[i].Position.y >> vertices[i].Position.z;
-		fin >> vertices[i].Normal.x >> vertices[i].Normal.y >> vertices[i].Normal.z;
+		fin >> Vertices[i].Position.x >> Vertices[i].Position.y >> Vertices[i].Position.z;
+		fin >> Vertices[i].Normal.x >> Vertices[i].Normal.y >> Vertices[i].Normal.z;
 	}
 
 	fin >> ignore;
@@ -48,11 +49,11 @@ void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& m
 	fin >> ignore;
 
 	UINT skullIndexCount = 3 * tcount;
-	std::vector<UINT>& indices = meshData.indices;
-	indices.resize(skullIndexCount);
+	std::vector<UINT>& Indices = meshData.Indices;
+	Indices.resize(skullIndexCount);
 	for (UINT i = 0; i < tcount; ++i)
 	{
-		fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
+		fin >> Indices[i * 3 + 0] >> Indices[i * 3 + 1] >> Indices[i * 3 + 2];
 	}
 
 	fin.close();
@@ -61,7 +62,7 @@ void GeometryGenerator::CreateFromFile(const std::wstring& filepath, MeshData& m
 void GeometryGenerator::CreateBox(float width, float height, float depth, MeshData& meshData)
 {
 	//
-	// Create the vertices.
+	// Create the Vertices.
 	//
 
 	Vertex v[24];
@@ -106,10 +107,10 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, MeshDa
 	v[22] = Vertex(+w2, +h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	v[23] = Vertex(+w2, -h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
-	meshData.vertices.assign(&v[0], &v[24]);
+	meshData.Vertices.assign(&v[0], &v[24]);
 
 	//
-	// Create the indices.
+	// Create the Indices.
 	//
 
 	UINT i[36];
@@ -138,7 +139,7 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, MeshDa
 	i[30] = 20; i[31] = 21; i[32] = 22;
 	i[33] = 20; i[34] = 22; i[35] = 23;
 
-	meshData.indices.assign(&i[0], &i[36]);
+	meshData.Indices.assign(&i[0], &i[36]);
 }
 
 void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
@@ -162,7 +163,7 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 		if (faceUp)
 			dTheta *= -1;
 
-		// The start end the end vertices is overlapped because texCoord is different
+		// The start end the end Vertices is overlapped because texCoord is different
 		float theta = 0;
 		for (UINT i = 0; i <= sliceCount; ++i)
 		{
@@ -173,8 +174,8 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 
 			vert.Position = XMFLOAT3(x, y, z);
 			XMStoreFloat3(&vert.Normal, XMVector3Normalize(XMLoadFloat3(&vert.Position)));
-
-			meshData.vertices.push_back(vert);
+			vert.TexC = XMFLOAT2(theta / XM_2PI, phi / XM_PI);
+			meshData.Vertices.push_back(vert);
 
 			theta += dTheta;
 		}
@@ -182,19 +183,19 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 		phi += dPhi;
 	}
 
-	// Create indices
+	// Create Indices
 	UINT ringVertexCount = sliceCount + 1;
 	for (UINT iStack = 0; iStack < stackCount - 2; ++iStack)
 	{
 		for (UINT iSlice = 0; iSlice < sliceCount; ++iSlice)
 		{
-			meshData.indices.push_back(iStack * ringVertexCount + iSlice);
-			meshData.indices.push_back((iStack + 1) * ringVertexCount + iSlice);
-			meshData.indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
+			meshData.Indices.push_back(iStack * ringVertexCount + iSlice);
+			meshData.Indices.push_back((iStack + 1) * ringVertexCount + iSlice);
+			meshData.Indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
 
-			meshData.indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
-			meshData.indices.push_back(iStack * ringVertexCount + iSlice + 1);
-			meshData.indices.push_back(iStack * ringVertexCount + iSlice);
+			meshData.Indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
+			meshData.Indices.push_back(iStack * ringVertexCount + iSlice + 1);
+			meshData.Indices.push_back(iStack * ringVertexCount + iSlice);
 		}
 	}
 
@@ -202,18 +203,20 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 	Vertex northPole, southPole;
 	northPole.Position = XMFLOAT3(0, radius, 0);
 	northPole.Normal = XMFLOAT3(0, 1, 0);
+	northPole.TexC = XMFLOAT2(0, 0);
 	southPole.Position = XMFLOAT3(0, -radius, 0);
 	southPole.Normal = XMFLOAT3(0, -1, 0);
-	meshData.vertices.push_back(northPole);
-	meshData.vertices.push_back(southPole);
+	southPole.TexC = XMFLOAT2(0, 1);
+	meshData.Vertices.push_back(northPole);
+	meshData.Vertices.push_back(southPole);
 
-	size_t nVertices = meshData.vertices.size();
+	size_t nVertices = meshData.Vertices.size();
 	// Index north pole
 	for (UINT iSlice = 0; iSlice < sliceCount; ++iSlice)
 	{
-		meshData.indices.push_back(nVertices - 2); // north pole index
-		meshData.indices.push_back(iSlice);
-		meshData.indices.push_back(iSlice + 1);
+		meshData.Indices.push_back(nVertices - 2); // north pole index
+		meshData.Indices.push_back(iSlice);
+		meshData.Indices.push_back(iSlice + 1);
 	}
 
 	// Index south pole
@@ -222,9 +225,9 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 	UINT baseIndex = nVertices - 1 - 2 - sliceCount;
 	for (UINT iSlice = 0; iSlice < sliceCount; ++iSlice)
 	{
-		meshData.indices.push_back(nVertices - 1); // south pole index
-		meshData.indices.push_back(iSlice + baseIndex + 1);
-		meshData.indices.push_back(iSlice + baseIndex);
+		meshData.Indices.push_back(nVertices - 1); // south pole index
+		meshData.Indices.push_back(iSlice + baseIndex + 1);
+		meshData.Indices.push_back(iSlice + baseIndex);
 	}
 	
 	return;
@@ -256,34 +259,39 @@ void GeometryGenerator::CreateGeoSphere(float radius, UINT nSubdivisions, MeshDa
 		10,1,6, 11,0,9, 2,11,9, 5,2,9,  11,2,7
 	};
 
-	meshData.vertices.resize(12);
-	meshData.indices.resize(60);
+	meshData.Vertices.resize(12);
+	meshData.Indices.resize(60);
 
 	for (UINT i = 0; i < 12; ++i)
-		meshData.vertices[i].Position = pos[i];
+		meshData.Vertices[i].Position = pos[i];
 
 	for (UINT i = 0; i < 60; ++i)
-		meshData.indices[i] = k[i];
+		meshData.Indices[i] = k[i];
 
 	// Subdivide
 	for(int i = 0; i < nSubdivisions; ++i)
 		Subdivide(meshData);
 
 	// Project onto a sphere and scale
-	size_t nVertices = meshData.vertices.size();
+	size_t nVertices = meshData.Vertices.size();
 	for (UINT i = 0; i < nVertices; ++i)
 	{
-		auto& pos = meshData.vertices[i].Position;
-		auto& normal = meshData.vertices[i].Normal;
+		auto& pos = meshData.Vertices[i].Position;
+		auto& normal = meshData.Vertices[i].Normal;
 
 		// Normalize vector
 		XMVECTOR n = XMVector3Normalize(XMLoadFloat3(&pos));
 
 		// Project onto a sphere
 		XMVECTOR p = n * radius;
-		
+
 		XMStoreFloat3(&pos, p);
 		XMStoreFloat3(&normal, n);
+
+		float theta = MathHelper::AngleFromXY(pos.x, pos.z);
+		float phi = acosf(pos.y / radius);
+
+		meshData.Vertices[i].TexC = XMFLOAT2(theta / XM_2PI, phi / XM_PI);
 	}
 }
 
@@ -292,10 +300,10 @@ void GeometryGenerator::Subdivide(MeshData& meshData)
 	// Save a copy of the input data to reoder later
 	MeshData meshDataCopy = meshData;
 
-	meshData.vertices.clear();
-	meshData.indices.clear();
+	meshData.Vertices.clear();
+	meshData.Indices.clear();
 
-	// A visual of how to divide and the indices
+	// A visual of how to divide and the Indices
 	//        v1(1)
 	//        *
 	//       / \
@@ -307,9 +315,9 @@ void GeometryGenerator::Subdivide(MeshData& meshData)
 	// v0(0)  m2(5)  v2(2)
 
 
-#define GetIndexedVertex(index) meshDataCopy.vertices[meshDataCopy.indices[index]]
+#define GetIndexedVertex(index) meshDataCopy.Vertices[meshDataCopy.Indices[index]]
 
-	// Lambda to get new middle vertex based on indices
+	// Lambda to get new middle vertex based on Indices
 	auto GetNewVertex = [&](UINT i1, UINT i2, Vertex& newVert)->void
 	{
 		XMVECTOR p1 = XMLoadFloat3(&GetIndexedVertex(i1).Position);
@@ -319,36 +327,36 @@ void GeometryGenerator::Subdivide(MeshData& meshData)
 
 	Vertex m0, m1, m2;
 
-	UINT nVerts = meshDataCopy.indices.size();
+	UINT nVerts = meshDataCopy.Indices.size();
 	for (int iv = 0; iv < nVerts; iv += 3)
 	{
 		GetNewVertex(iv, iv + 1, m0);
 		GetNewVertex(iv + 1, iv + 2, m1);
 		GetNewVertex(iv + 2, iv, m2);
 
-		// Add new vertices
-		meshData.vertices.push_back(GetIndexedVertex(iv)); // 0
-		meshData.vertices.push_back(GetIndexedVertex(iv + 1)); // 1
-		meshData.vertices.push_back(GetIndexedVertex(iv + 2)); // 2
-		meshData.vertices.push_back(m0); // 3
-		meshData.vertices.push_back(m1); // 4
-		meshData.vertices.push_back(m2); // 5
+		// Add new Vertices
+		meshData.Vertices.push_back(GetIndexedVertex(iv)); // 0
+		meshData.Vertices.push_back(GetIndexedVertex(iv + 1)); // 1
+		meshData.Vertices.push_back(GetIndexedVertex(iv + 2)); // 2
+		meshData.Vertices.push_back(m0); // 3
+		meshData.Vertices.push_back(m1); // 4
+		meshData.Vertices.push_back(m2); // 5
 
-		meshData.indices.push_back(iv * 2 + 0);
-		meshData.indices.push_back(iv * 2 + 3);
-		meshData.indices.push_back(iv * 2 + 5);
+		meshData.Indices.push_back(iv * 2 + 0);
+		meshData.Indices.push_back(iv * 2 + 3);
+		meshData.Indices.push_back(iv * 2 + 5);
 
-		meshData.indices.push_back(iv * 2 + 3);
-		meshData.indices.push_back(iv * 2 + 4);
-		meshData.indices.push_back(iv * 2 + 5);
+		meshData.Indices.push_back(iv * 2 + 3);
+		meshData.Indices.push_back(iv * 2 + 4);
+		meshData.Indices.push_back(iv * 2 + 5);
 
-		meshData.indices.push_back(iv * 2 + 4);
-		meshData.indices.push_back(iv * 2 + 2);
-		meshData.indices.push_back(iv * 2 + 5);
+		meshData.Indices.push_back(iv * 2 + 4);
+		meshData.Indices.push_back(iv * 2 + 2);
+		meshData.Indices.push_back(iv * 2 + 5);
 
-		meshData.indices.push_back(iv * 2 + 3);
-		meshData.indices.push_back(iv * 2 + 1);
-		meshData.indices.push_back(iv * 2 + 4);
+		meshData.Indices.push_back(iv * 2 + 3);
+		meshData.Indices.push_back(iv * 2 + 1);
+		meshData.Indices.push_back(iv * 2 + 4);
 	}
 }
 
@@ -358,7 +366,7 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 	float halfZ = lengthZ * 0.5f;
 	XMFLOAT3 normal = XMFLOAT3(0, 1, 0);
 
-#pragma region Generate vertices
+#pragma region Generate Vertices
 	UINT vertCount = m * n;
 
 	const float dx = lengthX / (n - 1);
@@ -367,16 +375,16 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 	const float du = 1.0f / (n - 1);
 	const float dv = 1.0f / (m - 1);
 
-	meshData.vertices.resize(vertCount);
+	meshData.Vertices.resize(vertCount);
 
-	UINT iv = 0; // vertices index
+	UINT iv = 0; // Vertices index
 	float z = halfZ;
 	for (UINT iz = 0; iz < m; ++iz)
 	{
 		float x = -halfX;
 		for (UINT ix = 0; ix < n; ++ix)
 		{
-			auto& vert = meshData.vertices[iv];
+			auto& vert = meshData.Vertices[iv];
 
 			vert.Position = XMFLOAT3(x, 0.0, z);
 			vert.Normal = normal;
@@ -390,11 +398,11 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 	}
 #pragma endregion
 
-#pragma region indices
+#pragma region Indices
 	// each quad is divided by 2 so multiply by 2
 	UINT faceCount = (m - 1) * (n - 1) * 2;
 
-	meshData.indices.resize(faceCount * 3); // each face has 3 vertices
+	meshData.Indices.resize(faceCount * 3); // each face has 3 Vertices
 
 	UINT q = 0; // iterate through each quad
 	for (UINT iz = 0; iz < m - 1; ++iz)
@@ -405,17 +413,17 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 			//   \ |
 			//     -
 			// first triangle
-			meshData.indices[q++] = iz * n + ix;
-			meshData.indices[q++] = iz * n + ix + 1;
-			meshData.indices[q++] = (iz + 1) * n + ix + 1;
+			meshData.Indices[q++] = iz * n + ix;
+			meshData.Indices[q++] = iz * n + ix + 1;
+			meshData.Indices[q++] = (iz + 1) * n + ix + 1;
 			
 			// -
 			// | \
 			// -----
 			// second triangle
-			meshData.indices[q++] = (iz + 1) * n + ix + 1;
-			meshData.indices[q++] = (iz + 1) * n + ix;
-			meshData.indices[q++] = iz * n + ix;
+			meshData.Indices[q++] = (iz + 1) * n + ix + 1;
+			meshData.Indices[q++] = (iz + 1) * n + ix;
+			meshData.Indices[q++] = iz * n + ix;
 		}
 	}
 	
@@ -425,8 +433,8 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 
 void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, float height, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
-	meshData.vertices.clear();
-	meshData.indices.clear();
+	meshData.Vertices.clear();
+	meshData.Indices.clear();
 
 	float stackHeight = height / stackCount;
 	float bottomHeight = -0.5f * height;
@@ -435,7 +443,7 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 	// Radius change in each ring moving up from bottom
 	float ringRadiusStep = (topRadius - bottomRadius) / stackCount;
 
-	// Compute vertices
+	// Compute Vertices
 	bool faceUp = false;
 	UINT ringCount = stackCount + 1;
 	for (UINT ir = 0; ir < ringCount; ++ir)
@@ -448,7 +456,7 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 		if (faceUp)
 			dTheta *= -1;
 
-		// The start end the end vertices is overlapped because texCoord is different
+		// The start end the end Vertices is overlapped because texCoord is different
 		float theta = 0;
 		for (UINT i = 0; i <= sliceCount; ++i)
 		{
@@ -458,6 +466,9 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 			float s = sinf(theta);
 
 			vert.Position = XMFLOAT3(r * c, y, r * s);
+
+			vert.TexC.x = (float)i / sliceCount;
+			vert.TexC.y = 1.0f - (float)ir / stackCount;
 
 			// This is unit length.
 			vert.TangentU = XMFLOAT3(-s, 0.0f, c);
@@ -470,13 +481,13 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 			XMVECTOR N = XMVector3Normalize(XMVector3Cross(T, B));
 			XMStoreFloat3(&vert.Normal, N);
 
-			meshData.vertices.push_back(vert);
+			meshData.Vertices.push_back(vert);
 
 			theta += dTheta;
 		}
 	}
 
-	// Compute indices
+	// Compute Indices
 	// Add one because we duplicate the first and last vertex per ring
 	// since the texture coordinates are different betwwen the first and the last vertex.
 	UINT ringVertexCount = sliceCount + 1;
@@ -484,13 +495,13 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 	{
 		for (UINT iSlice = 0; iSlice < sliceCount; ++iSlice)
 		{
-			meshData.indices.push_back(iStack * ringVertexCount + iSlice);
-			meshData.indices.push_back((iStack + 1) * ringVertexCount + iSlice);
-			meshData.indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
+			meshData.Indices.push_back(iStack * ringVertexCount + iSlice);
+			meshData.Indices.push_back((iStack + 1) * ringVertexCount + iSlice);
+			meshData.Indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
 
-			meshData.indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
-			meshData.indices.push_back(iStack * ringVertexCount + iSlice + 1);
-			meshData.indices.push_back(iStack * ringVertexCount + iSlice);
+			meshData.Indices.push_back((iStack + 1) * ringVertexCount + iSlice + 1);
+			meshData.Indices.push_back(iStack * ringVertexCount + iSlice + 1);
+			meshData.Indices.push_back(iStack * ringVertexCount + iSlice);
 		}
 	}
 
@@ -503,15 +514,15 @@ void GeometryGenerator::CreateCylinder(float bottomRadius, float topRadius, floa
 
 void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount, MeshData& meshData, bool faceUp)
 {
-	// Reserve index before concatnating vertices
-	UINT baseIndex = meshData.vertices.size();
+	// Reserve index before concatnating Vertices
+	UINT baseIndex = meshData.Vertices.size();
 
 	// Theta step to rotate around
 	float dTheta = 2.0f * XM_PI / sliceCount;
 	if (faceUp)
 		dTheta *= -1;
 
-	// The start end the end vertices is overlapped because texCoord is different
+	// The start end the end Vertices is overlapped because texCoord is different
 	float theta = 0;
 	for (UINT i = 0; i <= sliceCount; ++i)
 	{
@@ -522,8 +533,9 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 
 		vert.Position = XMFLOAT3(x, y, z);
 		vert.Normal.y = faceUp ? 1 : -1;
+		vert.TexC = XMFLOAT2(x / y / 2 + 0.5, z / y / 2 + 0.5);
 
-		meshData.vertices.push_back(vert);
+		meshData.Vertices.push_back(vert);
 
 		theta += dTheta;
 	}
@@ -532,15 +544,16 @@ void GeometryGenerator::CreateCylinderCap(float radius, float y, UINT sliceCount
 	Vertex centerVert;
 	centerVert.Position = XMFLOAT3(0, y, 0);
 	centerVert.Normal = XMFLOAT3(0, faceUp ? 1 : -1, 0);
-	meshData.vertices.push_back(centerVert);
+	centerVert.TexC = XMFLOAT2(0.5, 0.5);
+	meshData.Vertices.push_back(centerVert);
 	
-	UINT centerIndex = meshData.vertices.size() - 1;
+	UINT centerIndex = meshData.Vertices.size() - 1;
 
 	// Calculate index
 	for (UINT i = 0; i < sliceCount; ++i)
 	{
-		meshData.indices.push_back(centerIndex);
-		meshData.indices.push_back(baseIndex + i);
-		meshData.indices.push_back(baseIndex + i + 1);
+		meshData.Indices.push_back(centerIndex);
+		meshData.Indices.push_back(baseIndex + i);
+		meshData.Indices.push_back(baseIndex + i + 1);
 	}
 }

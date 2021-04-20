@@ -43,16 +43,16 @@ void Renderer::Draw()
 
 void Renderer::LoadGeometry(const GeometryGenerator::MeshData& meshData)
 {
-	mVertexCount = meshData.vertices.size();
+	mVertexCount = meshData.Vertices.size();
 
-	std::vector<Vertex::Basic32> vertices;
+	std::vector<Vertex::Basic32> Vertices;
 	for (UINT i = 0; i < mVertexCount; ++i)
 	{
-		vertices.push_back(Vertex::Basic32
+		Vertices.push_back(Vertex::Basic32
 			{
-				meshData.vertices[i].Position,
-				meshData.vertices[i].Normal,
-				meshData.vertices[i].TexC
+				meshData.Vertices[i].Position,
+				meshData.Vertices[i].Normal,
+				meshData.Vertices[i].TexC
 			});
 	}
 
@@ -62,17 +62,17 @@ void Renderer::LoadGeometry(const GeometryGenerator::MeshData& meshData)
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-	CreateVertexBuffer(vertices, vbd);
+	CreateVertexBuffer(Vertices, vbd);
 
 	// Create index buffer
-	mIndexCount = meshData.indices.size();
+	mIndexCount = meshData.Indices.size();
 
 	D3D11_BUFFER_DESC ibd{ 0 };
 	ibd.ByteWidth = mIndexCount * sizeof(UINT);
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
-	CreateIndexBuffer(meshData.indices, ibd);
+	CreateIndexBuffer(meshData.Indices, ibd);
 }
 
 void Renderer::CreateVertexBuffer(const std::vector<Vertex::Basic32>& vertexData, D3D11_BUFFER_DESC vbd)

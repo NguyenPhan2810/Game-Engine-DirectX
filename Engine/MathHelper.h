@@ -64,6 +64,10 @@ public:
 		return XMMatrixTranspose(XMMatrixInverse(&det, A));
 	}
 
+	// Returns the polar angle of the point (x,y) in [0, 2*PI).
+	static float AngleFromXY(float x, float y);
+	
+
 	static const float Infinity;
 	static const float Pi;
 };
