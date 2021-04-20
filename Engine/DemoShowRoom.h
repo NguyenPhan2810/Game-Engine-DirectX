@@ -1,13 +1,14 @@
 #pragma once
+
 #include "NPGameEngine.h"
 #include "Texture.h"
 #include <memory>
 
-class DemoShape : public NPGameEngine
+class DemoShowRoom : public NPGameEngine
 {
 public:
-	DemoShape(HINSTANCE hInstance);
-	~DemoShape();
+	DemoShowRoom(HINSTANCE hInstance);
+	~DemoShowRoom();
 
 	virtual bool Init() override;
 	virtual void UpdateScene() override;
@@ -22,10 +23,9 @@ protected:
 	std::shared_ptr<Texture> mCylTex;
 	std::shared_ptr<Texture> mSphereTex;
 
-	std::shared_ptr<BaseObject> mCrateObject;
-	std::shared_ptr<BaseObject> mGridObject;
+	std::shared_ptr<BaseObject> mCenterObject;
+	std::shared_ptr<BaseObject> mFloorObject;
 	std::shared_ptr<BaseObject> mCenterBox;
 	std::vector<std::shared_ptr<BaseObject>> mCylinders;
 	std::vector<std::shared_ptr<BaseObject>> mSpheres;
 };
-
