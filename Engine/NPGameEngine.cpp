@@ -22,8 +22,8 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 , mLightCount(3)
 , mUseTexture(true)
 {
-	mClientWidth = 1080;
-	mClientHeight = 720;
+	mClientWidth = 1366;
+	mClientHeight = 768;
 	mMainWindowCaption = L"NP Game Engine";
 
 	mLastMousePos = POINT{ 0 };

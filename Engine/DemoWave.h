@@ -22,13 +22,15 @@ protected:
 protected:
 	Waves mWaves;
 
-	std::shared_ptr<BaseObject> mWaveMesh;
-	std::shared_ptr<BaseObject> mCenterObject;
+	std::shared_ptr<BaseObject> mWaveObject;
+	std::shared_ptr<BaseObject> mCrateObject;
+	std::shared_ptr<BaseObject> mFenceCrateObject;
 	std::shared_ptr<BaseObject> mGridObject;
 
 	std::shared_ptr<Texture> mLandTex;
 	std::shared_ptr<Texture> mWaveTex;
 	std::shared_ptr<Texture> mCrateTex;
+	std::shared_ptr<Texture> mFenceCrateTex;
 
 	XMFLOAT2 mWaveTexOffset;
 };

@@ -6,7 +6,7 @@
 DemoShape::DemoShape(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 , mCenterBox(nullptr)
-, mCenterObject(nullptr)
+, mCrateObject(nullptr)
 , mGridObject(nullptr)
 , mCrateTex(nullptr)
 , mFireTexIndex(0)
@@ -56,8 +56,8 @@ void DemoShape::UpdateScene()
 {
 	NPGameEngine::UpdateScene();
 
-	mCenterObject->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
-	mCenterObject->transform->Translate(XMFLOAT3(0, 0.0004 * sin(3 * GameTimer::TotalTime()), 0));
+	mCrateObject->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
+	mCrateObject->transform->Translate(XMFLOAT3(0, 0.0004 * sin(3 * GameTimer::TotalTime()), 0));
 
 	//for (auto& cyl : mCylinders)
 	//{
@@ -73,7 +73,7 @@ void DemoShape::UpdateScene()
 	animTime += GameTimer::DeltaTime();
 	if (animTime > 1.0 / 30)
 	{
-		RENDERER(mCenterObject)->Texture = mFireTex[mFireTexIndex].get();
+		RENDERER(mCrateObject)->Texture = mFireTex[mFireTexIndex].get();
 
 		mFireTexIndex++;
 		if (mFireTexIndex >= mFireTex.size())
@@ -101,11 +101,11 @@ void DemoShape::BuildGeometryBuffers()
 
 	RENDERER(mGridObject)->Texture = mDarkBrickTex.get();
 
-	mCenterObject = std::make_shared<Cube>();
-	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
-	mCenterObject->transform->Scale(XMFLOAT3(3, 3, 3));
-	RENDERER(mCenterObject)->Texture = mCrateTex.get();
-	//RENDERER(mCenterObject)->LoadGeometry(skull);
+	mCrateObject = std::make_shared<Cube>();
+	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
+	mCrateObject->transform->Scale(XMFLOAT3(3, 3, 3));
+	RENDERER(mCrateObject)->Texture = mCrateTex.get();
+	//RENDERER(mCrateObject)->LoadGeometry(skull);
 
 	for (int i = 0; i < 5; ++i)
 	{

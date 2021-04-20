@@ -77,6 +77,11 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
     if (gUseTexture)
     {
         texColor = gDiffuseMap.Sample(samAnisotropic, pin.Tex);
+        
+		// Discard pixel if texture alpha < 0.1.  Note that we do this
+		// test as soon as possible so that we can potentially exit the shader 
+		// early, thereby skipping the rest of the shader code.
+        clip(texColor.a - 0.1f);
     }
 
     float4 litColor = texColor;

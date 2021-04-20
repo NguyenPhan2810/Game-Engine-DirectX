@@ -34,14 +34,14 @@ void GetHillVertex(const GeometryGenerator::Vertex& vert, Vertex::Basic32& newVe
 
 DemoWave::DemoWave(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
-, mCenterObject(nullptr)
-, mWaveMesh(nullptr)
+, mCrateObject(nullptr)
+, mWaveObject(nullptr)
 , mGridObject(nullptr)
 , mWaveTex(nullptr)
 , mLandTex(nullptr)
 {
 
-	mCamRadius = 60;
+	mCamRadius = 40;
 }
 
 DemoWave::~DemoWave()
@@ -54,9 +54,23 @@ bool DemoWave::Init()
 	if (!NPGameEngine::Init())
 		return false;
 
+
 	BuildGeometryBuffers();
 	mWaves.Init(X, Z, 1.0f, 0.03f, 10.25f, 0.2f);
 
+	mLandTex = std::make_shared<Texture>(L"Textures/grass.dds");
+	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate02.dds");
+	mFenceCrateTex = std::make_shared<Texture>(L"Textures/WireFence.dds");
+	mWaveTex = std::make_shared<Texture>(L"Textures/water2.dds");
+
+	RENDERER(mGridObject)->Texture = mLandTex.get();
+	RENDERER(mWaveObject)->Texture = mWaveTex.get();
+	RENDERER(mCrateObject)->Texture = mCrateTex.get();
+	RENDERER(mFenceCrateObject)->Texture = mFenceCrateTex.get();
+
+	// Tile/scale texture
+	XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
+	XMStoreFloat4x4(&RENDERER(mGridObject)->Texture->TexTransform, grassTexScale);
 
 	return true;
 }
@@ -82,7 +96,7 @@ void DemoWave::UpdateScene()
 
 	mWaves.Update(GameTimer::DeltaTime());
 
-	auto waveVertexBuffer = RENDERER(mWaveMesh)->GetVertexBuffer();
+	auto waveVertexBuffer = RENDERER(mWaveObject)->GetVertexBuffer();
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	HR(mImmediateContext->Map(waveVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
 
@@ -98,7 +112,6 @@ void DemoWave::UpdateScene()
 	}
 
 	mImmediateContext->Unmap(waveVertexBuffer, 0);
-
 }
 
 void DemoWave::FixedUpdateScene()
@@ -109,7 +122,7 @@ void DemoWave::FixedUpdateScene()
 
 	XMMATRIX waveTexScale = XMMatrixScaling(10.0f, 10.0f, 0.0f);
 	XMMATRIX waveTexOffset = XMMatrixTranslation(mWaveTexOffset.x, mWaveTexOffset.y, 0.0f);
-	XMStoreFloat4x4(&RENDERER(mWaveMesh)->Texture->TexTransform, waveTexScale * waveTexOffset);
+	XMStoreFloat4x4(&RENDERER(mWaveObject)->Texture->TexTransform, waveTexScale * waveTexOffset);
 }
 
 void DemoWave::BuildGeometryBuffers()
@@ -128,6 +141,9 @@ void DemoWave::BuildGeometryBuffers()
 //	geoGen.CreateGeoSphere(1, 3, geoSphere);
 //	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
+
+	//=======================================
+	// Hill
 	Vertex::Basic32 newVert;
 	std::vector<Vertex::Basic32> Vertices;
 	for (auto& vert : grid.Vertices)
@@ -135,7 +151,6 @@ void DemoWave::BuildGeometryBuffers()
 		GetHillVertex(vert, newVert);
 		Vertices.push_back(newVert);
 	}
-
 
 	mGridObject = std::make_shared<Cube>();
 	RENDERER(mGridObject)->LoadGeometry(grid); 
@@ -147,37 +162,37 @@ void DemoWave::BuildGeometryBuffers()
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	RENDERER(mGridObject)->CreateVertexBuffer(Vertices, gridVBD);
 
-	// Load texture
-	mLandTex = std::make_shared<Texture>(L"Textures/grass.dds");
-	RENDERER(mGridObject)->Texture = mLandTex.get();
-	
-	// Tile/scale texture
-	XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
-	XMStoreFloat4x4(&RENDERER(mGridObject)->Texture->TexTransform, grassTexScale);
 
-	mWaveMesh = std::make_shared<Cube>();
-	RENDERER(mWaveMesh)->LoadGeometry(wave);
+	//=======================================
+	// Waves
+
+	mWaveObject = std::make_shared<Cube>();
+	RENDERER(mWaveObject)->LoadGeometry(wave);
 
 	D3D11_BUFFER_DESC waveVBD{ 0 };
-	waveVBD.ByteWidth = RENDERER(mWaveMesh)->GetVertexCount() * sizeof(Vertex::Basic32);
+	waveVBD.ByteWidth = RENDERER(mWaveObject)->GetVertexCount() * sizeof(Vertex::Basic32);
 	waveVBD.Usage = D3D11_USAGE_DYNAMIC;
 	waveVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	waveVBD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	GeometryGenerator::ConvertToBasic32(wave.Vertices, Vertices);
-	RENDERER(mWaveMesh)->CreateVertexBuffer(Vertices, waveVBD);
+	RENDERER(mWaveObject)->CreateVertexBuffer(Vertices, waveVBD);
 
-	// Load texture
-	mWaveTex = std::make_shared<Texture>(L"Textures/water2.dds");
-	RENDERER(mWaveMesh)->Texture = mWaveTex.get();
+	//=======================================
+	// Crate
+	mCrateObject = std::make_shared<Cube>();
+	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
+	mCrateObject->transform->Scale(XMFLOAT3(10, 10, 10));
+	mCrateObject->transform->Rotate(XMFLOAT3(1, 0, 0), XM_PI / 8);
+	mCrateObject->transform->Rotate(XMFLOAT3(0, 0, 1), XM_PI / 9);
 
-	mCenterObject = std::make_shared<Cube>();
-	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
-	mCenterObject->transform->Scale(XMFLOAT3(10, 10, 10));
-	mCenterObject->transform->Rotate(XMFLOAT3(1, 0, 0), XM_PI / 8);
-	mCenterObject->transform->Rotate(XMFLOAT3(0, 0, 1), XM_PI / 9);
-	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate02.dds");
-	RENDERER(mCenterObject)->Texture = mCrateTex.get();
+	//=======================================
+	// Fence crate
+	mFenceCrateObject = std::make_shared<Cube>();
+	mFenceCrateObject->transform->Translate(XMFLOAT3(-10, 0, 10));
+	mFenceCrateObject->transform->Scale(XMFLOAT3(10, 10, 10));
+	mFenceCrateObject->transform->Rotate(XMFLOAT3(1, 0, 0), XM_PI / 10);
+	mFenceCrateObject->transform->Rotate(XMFLOAT3(0, 0, 1), XM_PI / 10);
 
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();
@@ -185,17 +200,18 @@ void DemoWave::BuildGeometryBuffers()
 	landMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
-	auto& waveMat = RENDERER(mWaveMesh)->GetMaterial();
+	auto& waveMat = RENDERER(mWaveObject)->GetMaterial();
 	waveMat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	waveMat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.4f);
 	waveMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
 
-	auto& crateMat = RENDERER(mCenterObject)->GetMaterial();
+	auto& crateMat = RENDERER(mCrateObject)->GetMaterial();
 	crateMat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	crateMat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	crateMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
 
 	// Build blend
-	RENDERER(mWaveMesh)->BlendState = RenderStates::TransparentBS;
-	RENDERER(mWaveMesh)->RasterizerState = RenderStates::NoCullRS;;
+	RENDERER(mWaveObject)->BlendState = RenderStates::TransparentBS;
+	RENDERER(mWaveObject)->RasterizerState = RenderStates::NoCullRS;;
+	RENDERER(mFenceCrateObject)->RasterizerState = RenderStates::NoCullRS;;
 }
