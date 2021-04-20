@@ -24,16 +24,12 @@ private:
 	void UpdateProjMatrix();
 	void UpdateViewMatrix();
 
-protected:
-	void InitRasterizerState();
 
 protected:
 	DirectionalLight mDirLights[3];
 	int mLightCount;
 	bool mUseTexture;
 
-	ID3D11RasterizerState* mWireframeRS;
-	ID3D11RasterizerState* mSolidRS;
 
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;

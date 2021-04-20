@@ -39,15 +39,12 @@
     <Filter Include="Source Files\NPEffects\NPTextures">
       <UniqueIdentifier>{f9578a8c-2018-4421-a5db-9c98988fdbf1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NPGameEngine">
+      <UniqueIdentifier>{04f1f12d-8513-40f6-a15e-5e0725517c87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NPGameEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="d3dUtil.cpp">
@@ -98,14 +95,17 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\NPEffects\NPTextures</Filter>
     </ClCompile>
+    <ClCompile Include="NPGameEngine.cpp">
+      <Filter>Source Files\NPGameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>Source Files\NPGameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStates.cpp">
+      <Filter>Source Files\NPEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="d3dApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NPGameEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dUtil.h">
       <Filter>Helper Files</Filter>
     </ClInclude>
@@ -159,6 +159,15 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Source Files\NPEffects\NPTextures</Filter>
+    </ClInclude>
+    <ClInclude Include="NPGameEngine.h">
+      <Filter>Source Files\NPGameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dApp.h">
+      <Filter>Source Files\NPGameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderStates.h">
+      <Filter>Source Files\NPEffects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

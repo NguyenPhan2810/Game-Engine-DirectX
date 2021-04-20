@@ -25,8 +25,10 @@ protected:
 	std::shared_ptr<BaseObject> mWaveMesh;
 	std::shared_ptr<BaseObject> mCenterObject;
 	std::shared_ptr<BaseObject> mGridObject;
+
 	std::shared_ptr<Texture> mLandTex;
 	std::shared_ptr<Texture> mWaveTex;
+	std::shared_ptr<Texture> mCrateTex;
 
 	XMFLOAT2 mWaveTexOffset;
 };

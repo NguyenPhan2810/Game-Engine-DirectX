@@ -7,11 +7,10 @@
 #include "GlobalDefinitions.h"
 #include "Effects.h"
 #include "Renderer.h"
+#include "RenderStates.h"
 
 NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 : D3DApp(hInstance)
-, mWireframeRS(nullptr)
-, mSolidRS(nullptr)
 , mCamPhi(0.1f * MathHelper::Pi)
 , mCamTheta(1.5f * MathHelper::Pi)
 , mCamRadius(200.0f)
@@ -51,11 +50,11 @@ NPGameEngine::NPGameEngine(HINSTANCE hInstance)
 
 NPGameEngine::~NPGameEngine()
 {
-	ReleaseCOM(mWireframeRS);
-	ReleaseCOM(mSolidRS);
 
 	InputLayouts::DestroyAll();
+	RenderStates::DestroyAll();
 	Effects::DestroyAll();
+
 }
 
 void NPGameEngine::OnResize()
@@ -73,8 +72,7 @@ bool NPGameEngine::Init()
 
 	Effects::InitAll(mDevice);
 	InputLayouts::InitAll(mDevice);
-
-	InitRasterizerState();
+	RenderStates::InitAll(mDevice);
 
 	for (auto obj : BaseObject::GetAllObjects())
 		obj->Init();
@@ -125,10 +123,6 @@ void NPGameEngine::DrawScene()
 	// Set up
 	mImmediateContext->IASetInputLayout(InputLayouts::Basic32);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	if (mEnableWireframe)
-		mImmediateContext->RSSetState(mWireframeRS);
-	else
-		mImmediateContext->RSSetState(mSolidRS);
 
 	// Set constants
 
@@ -153,66 +147,110 @@ void NPGameEngine::DrawScene()
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	activeTech->GetDesc(&techDesc);
-	for (UINT p = 0; p < techDesc.Passes; ++p)
+
+	// Render blend objects later
+	std::vector<BaseObject*> blendedObjects;
+	std::vector<BaseObject*> nonBlendedObjects;
+	for (auto& obj : allObjects)
 	{
-		for (auto& obj : allObjects)
+		auto renderer = obj->GetComponent<Renderer>("Renderer");
+		if (renderer)
 		{
-			auto renderer = (Renderer*)(obj->GetComponentByName("Renderer"));
-			if (renderer)
-			{
-				// Update constants
-				XMMATRIX world = obj->transform->LocalToWorldMatrix();
-				XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-				XMMATRIX worldViewProj = world * viewProj;
-				const Material& material = renderer->GetMaterial();
-
-				Effects::BasicFX->SetWorld(world);
-				Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-				Effects::BasicFX->SetWorldViewProj(worldViewProj);
-				Effects::BasicFX->SetMaterial(material);
-
-				auto& texture = renderer->Texture;
-				if (texture)
-				{
-					Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
-					Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
-					Effects::BasicFX->SetUseTexture(mUseTexture);
-				}
-				else
-				{
-					Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
-					Effects::BasicFX->SetDiffuseMap(0);
-					Effects::BasicFX->SetUseTexture(0);
-				}
-
-				activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
-
-				obj->Draw();
-			}
+			if (renderer->BlendState)
+				blendedObjects.emplace_back(obj);
+			else
+				nonBlendedObjects.emplace_back(obj);
 		}
 	}
 
+#pragma region Non blended objects
+
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		for (auto& obj : nonBlendedObjects)
+		{
+			auto renderer = RENDERER(obj);
+
+			// Update per object constants
+			XMMATRIX world = obj->transform->LocalToWorldMatrix();
+			XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+			XMMATRIX worldViewProj = world * viewProj;
+			const Material& material = renderer->GetMaterial();
+
+			Effects::BasicFX->SetWorld(world);
+			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::BasicFX->SetWorldViewProj(worldViewProj);
+			Effects::BasicFX->SetMaterial(material);
+
+			auto& texture = renderer->Texture;
+			if (texture)
+			{
+				Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
+				Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
+				Effects::BasicFX->SetUseTexture(mUseTexture);
+			}
+
+			mImmediateContext->RSSetState(renderer->RasterizerState);
+			activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+			obj->Draw();
+
+			// Restore default render state.
+			mImmediateContext->RSSetState(0);
+			Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+			Effects::BasicFX->SetDiffuseMap(0);
+			Effects::BasicFX->SetUseTexture(0);
+		}
+	}
+
+#pragma endregion
+
+#pragma region Blended objects
+
+	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		for (auto& obj : blendedObjects)
+		{
+			auto renderer = RENDERER(obj);
+
+			// Update per object constants
+			XMMATRIX world = obj->transform->LocalToWorldMatrix();
+			XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+			XMMATRIX worldViewProj = world * viewProj;
+			const Material& material = renderer->GetMaterial();
+
+			Effects::BasicFX->SetWorld(world);
+			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::BasicFX->SetWorldViewProj(worldViewProj);
+			Effects::BasicFX->SetMaterial(material);
+
+			auto& texture = renderer->Texture;
+			if (texture)
+			{
+				Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
+				Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
+				Effects::BasicFX->SetUseTexture(mUseTexture);
+			}
+
+			mImmediateContext->RSSetState(renderer->RasterizerState);
+			mImmediateContext->OMSetBlendState(renderer->BlendState, blendFactor, 0xfffffff);
+			activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+			obj->Draw();
+
+			mImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+			mImmediateContext->RSSetState(0);
+			Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+			Effects::BasicFX->SetDiffuseMap(0);
+			Effects::BasicFX->SetUseTexture(0);
+		}
+	}
+
+#pragma endregion
+
 	// Present buffer
 	HR(mSwapChain->Present(0, 0));
-}
-
-void NPGameEngine::InitRasterizerState()
-{
-	D3D11_RASTERIZER_DESC wireframeRD, solidRD;
-
-	ZeroMemory(&wireframeRD, sizeof(D3D11_RASTERIZER_DESC));
-	ZeroMemory(&solidRD, sizeof(D3D11_RASTERIZER_DESC));
-
-	solidRD.DepthClipEnable = TRUE;
-	solidRD.CullMode = D3D11_CULL_BACK;
-	solidRD.FillMode = D3D11_FILL_SOLID;
-
-	wireframeRD.DepthClipEnable = TRUE;
-	wireframeRD.FillMode = D3D11_FILL_WIREFRAME;
-	wireframeRD.CullMode = D3D11_CULL_NONE;
-
-	HR(mDevice->CreateRasterizerState(&wireframeRD, &mWireframeRS));
-	HR(mDevice->CreateRasterizerState(&solidRD, &mSolidRS));
 }
 
 void NPGameEngine::OnMouseDown(WPARAM btnState, int x, int y)

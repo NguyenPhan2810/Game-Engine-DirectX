@@ -38,7 +38,9 @@ public:
 
 	Material& GetMaterial();
 
-	std::shared_ptr<Texture> Texture;
+	Texture* Texture;
+	ID3D11RasterizerState* RasterizerState;
+	ID3D11BlendState* BlendState;
 
 protected:
 	ID3D11Buffer* mVertexBuffer;

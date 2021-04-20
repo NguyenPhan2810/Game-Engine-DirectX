@@ -56,7 +56,7 @@ void DemoShape::UpdateScene()
 {
 	NPGameEngine::UpdateScene();
 
-	mCenterObject->transform->Rorate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
+	mCenterObject->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
 	mCenterObject->transform->Translate(XMFLOAT3(0, 0.0004 * sin(3 * GameTimer::TotalTime()), 0));
 
 	//for (auto& cyl : mCylinders)
@@ -65,7 +65,7 @@ void DemoShape::UpdateScene()
 	//}
 	for (auto& sphere : mSpheres)
 	{
-		sphere->transform->Rorate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
+		sphere->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
 		//sphere->transform->Translate(XMFLOAT3(0, 0.001 * sin(10 * GameTimer::TotalTime()), 0));
 	}
 
@@ -73,7 +73,7 @@ void DemoShape::UpdateScene()
 	animTime += GameTimer::DeltaTime();
 	if (animTime > 1.0 / 30)
 	{
-		RENDERER(mCenterObject)->Texture = mFireTex[mFireTexIndex];
+		RENDERER(mCenterObject)->Texture = mFireTex[mFireTexIndex].get();
 
 		mFireTexIndex++;
 		if (mFireTexIndex >= mFireTex.size())
@@ -99,12 +99,12 @@ void DemoShape::BuildGeometryBuffers()
 	mGridObject = std::make_shared<Cube>();
 	mGridObject->transform->Scale(XMFLOAT3(15, 0.1, 25));
 
-	RENDERER(mGridObject)->Texture = mDarkBrickTex;
+	RENDERER(mGridObject)->Texture = mDarkBrickTex.get();
 
 	mCenterObject = std::make_shared<Cube>();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
 	mCenterObject->transform->Scale(XMFLOAT3(3, 3, 3));
-	RENDERER(mCenterObject)->Texture = mCrateTex;
+	RENDERER(mCenterObject)->Texture = mCrateTex.get();
 	//RENDERER(mCenterObject)->LoadGeometry(skull);
 
 	for (int i = 0; i < 5; ++i)
@@ -112,11 +112,11 @@ void DemoShape::BuildGeometryBuffers()
 		auto cylinder1 = std::make_shared<Cube>();
 		cylinder1->transform->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
 		RENDERER(cylinder1)->LoadGeometry(cylinder);
-		RENDERER(cylinder1)->Texture = mCylTex;
+		RENDERER(cylinder1)->Texture = mCylTex.get();
 		auto cylinder2 = std::make_shared<Cube>();
 		cylinder2->transform->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
 		RENDERER(cylinder2)->LoadGeometry(cylinder);
-		RENDERER(cylinder2)->Texture = mCylTex;
+		RENDERER(cylinder2)->Texture = mCylTex.get();
 
 		mCylinders.push_back(cylinder1);
 		mCylinders.push_back(cylinder2);
@@ -124,11 +124,11 @@ void DemoShape::BuildGeometryBuffers()
 		auto sphere1 = std::make_shared<Cube>();
 		sphere1->transform->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
 		RENDERER(sphere1)->LoadGeometry(sphere);
-		RENDERER(sphere1)->Texture = mSphereTex;
+		RENDERER(sphere1)->Texture = mSphereTex.get();
 		auto sphere2 = std::make_shared<Cube>();
 		sphere2->transform->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
 		RENDERER(sphere2)->LoadGeometry(geoSphere);
-		RENDERER(sphere2)->Texture = mSphereTex;
+		RENDERER(sphere2)->Texture = mSphereTex.get();
 
 		mSpheres.push_back(sphere1);
 		mSpheres.push_back(sphere2);

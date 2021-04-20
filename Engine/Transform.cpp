@@ -31,7 +31,7 @@ void Transform::Translate(const XMFLOAT3& displacement)
 	mWorldMatrix = XMMatrixMultiply(translateMatrix, mWorldMatrix);
 }
 
-void Transform::Rorate(const XMFLOAT3& rotationOrigin, float radian)
+void Transform::Rotate(const XMFLOAT3& rotationOrigin, float radian)
 {
 	XMMATRIX rotateMatrix = XMMatrixRotationAxis(XMLoadFloat3(&rotationOrigin), radian);
 	mWorldMatrix = XMMatrixMultiply(rotateMatrix, mWorldMatrix);

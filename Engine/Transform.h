@@ -19,7 +19,7 @@ private:
 
 public:
 	void Translate(const XMFLOAT3& displacement);
-	void Rorate(const XMFLOAT3& rotationOrigin, float radian);
+	void Rotate(const XMFLOAT3& rotationOrigin, float radian);
 	void Scale(const XMFLOAT3& scaleElements);
 
 	XMMATRIX LocalToWorldMatrix() const;

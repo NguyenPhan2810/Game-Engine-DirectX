@@ -2,6 +2,7 @@
 #include "DemoWave.h"
 #include "Renderer.h"
 #include "Cube.h"
+#include "RenderStates.h"
 
 #define X 160
 #define Z 160
@@ -116,14 +117,14 @@ void DemoWave::BuildGeometryBuffers()
 	GeometryGenerator::MeshData grid;
 	GeometryGenerator::MeshData wave;
 //	GeometryGenerator::MeshData skull;
-//	GeometryGenerator::MeshData box;
+	GeometryGenerator::MeshData box;
 //	GeometryGenerator::MeshData geoSphere;
 
 
 	GeometryGenerator geoGen;
 	geoGen.CreateGrid(X, Z, 50, 50, grid);
 	geoGen.CreateGrid(X, Z, X, Z, wave);
-//	geoGen.CreateBox(1, 1, 1, box);
+	geoGen.CreateBox(1, 1, 1, box);
 //	geoGen.CreateGeoSphere(1, 3, geoSphere);
 //	geoGen.CreateFromFile(L"Models/skull.txt", skull);
 
@@ -148,7 +149,7 @@ void DemoWave::BuildGeometryBuffers()
 
 	// Load texture
 	mLandTex = std::make_shared<Texture>(L"Textures/grass.dds");
-	RENDERER(mGridObject)->Texture = mLandTex;
+	RENDERER(mGridObject)->Texture = mLandTex.get();
 	
 	// Tile/scale texture
 	XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
@@ -168,7 +169,15 @@ void DemoWave::BuildGeometryBuffers()
 
 	// Load texture
 	mWaveTex = std::make_shared<Texture>(L"Textures/water2.dds");
-	RENDERER(mWaveMesh)->Texture = mWaveTex;
+	RENDERER(mWaveMesh)->Texture = mWaveTex.get();
+
+	mCenterObject = std::make_shared<Cube>();
+	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
+	mCenterObject->transform->Scale(XMFLOAT3(10, 10, 10));
+	mCenterObject->transform->Rotate(XMFLOAT3(1, 0, 0), XM_PI / 8);
+	mCenterObject->transform->Rotate(XMFLOAT3(0, 0, 1), XM_PI / 9);
+	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate02.dds");
+	RENDERER(mCenterObject)->Texture = mCrateTex.get();
 
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();
@@ -177,12 +186,16 @@ void DemoWave::BuildGeometryBuffers()
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
 	auto& waveMat = RENDERER(mWaveMesh)->GetMaterial();
-	waveMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	waveMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	waveMat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	waveMat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.4f);
 	waveMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
 
-	//auto& cubeMat = RENDERER(mCenterObject)->GetMaterial();
-	//cubeMat.Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	//cubeMat.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	//cubeMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
+	auto& crateMat = RENDERER(mCenterObject)->GetMaterial();
+	crateMat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	crateMat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	crateMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
+
+	// Build blend
+	RENDERER(mWaveMesh)->BlendState = RenderStates::TransparentBS;
+	RENDERER(mWaveMesh)->RasterizerState = RenderStates::NoCullRS;;
 }
