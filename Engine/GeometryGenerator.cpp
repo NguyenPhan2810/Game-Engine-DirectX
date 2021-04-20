@@ -363,6 +363,9 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 	const float dx = lengthX / (n - 1);
 	const float dz = lengthZ / (m - 1);
 
+	const float du = 1.0f / (n - 1);
+	const float dv = 1.0f / (m - 1);
+
 	meshData.vertices.resize(vertCount);
 
 	UINT iv = 0; // vertices index
@@ -376,6 +379,8 @@ void GeometryGenerator::CreateGrid(float lengthX, float lengthZ, UINT m, UINT n,
 
 			vert.Position = XMFLOAT3(x, 0.0, z);
 			vert.Normal = normal;
+
+			vert.TexC = XMFLOAT2(du * ix, dv * iz);
 
 			iv++;
 			x += dx;

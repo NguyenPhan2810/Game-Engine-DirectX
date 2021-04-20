@@ -3,6 +3,7 @@
 #include "Waves.h"
 #include "MathHelper.h"
 #include "LightHelper.h"
+#include "Texture.h"
 
 class DemoWave : public NPGameEngine
 {
@@ -20,8 +21,9 @@ protected:
 protected:
 	Waves mWaves;
 
-	BaseObject* mWaveMesh;
-	BaseObject* mCenterObject;
-	BaseObject* mGridObject;
+	std::shared_ptr<BaseObject> mWaveMesh;
+	std::shared_ptr<BaseObject> mCenterObject;
+	std::shared_ptr<BaseObject> mGridObject;
+	std::shared_ptr<Texture> mLandTex;
 };
 
