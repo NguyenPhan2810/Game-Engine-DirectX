@@ -70,7 +70,7 @@ bool DemoWave::Init()
 
 	// Tile/scale texture
 	XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
-	XMStoreFloat4x4(&RENDERER(mGridObject)->Texture->TexTransform, grassTexScale);
+	XMStoreFloat4x4(&RENDERER(mGridObject)->TexTransform, grassTexScale);
 
 	return true;
 }
@@ -122,7 +122,7 @@ void DemoWave::FixedUpdateScene()
 
 	XMMATRIX waveTexScale = XMMatrixScaling(10.0f, 10.0f, 0.0f);
 	XMMATRIX waveTexOffset = XMMatrixTranslation(mWaveTexOffset.x, mWaveTexOffset.y, 0.0f);
-	XMStoreFloat4x4(&RENDERER(mWaveObject)->Texture->TexTransform, waveTexScale * waveTexOffset);
+	XMStoreFloat4x4(&RENDERER(mWaveObject)->TexTransform, waveTexScale * waveTexOffset);
 }
 
 void DemoWave::BuildGeometryBuffers()

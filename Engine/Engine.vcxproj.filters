@@ -42,6 +42,9 @@
     <Filter Include="Source Files\NPGameEngine">
       <UniqueIdentifier>{04f1f12d-8513-40f6-a15e-5e0725517c87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demos\ShowRoom">
+      <UniqueIdentifier>{dc4709ce-1856-4ccf-943e-e65b367311cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="RenderStates.cpp">
       <Filter>Source Files\NPEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoShowRoom.cpp">
+      <Filter>Demos\ShowRoom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +174,9 @@
     </ClInclude>
     <ClInclude Include="RenderStates.h">
       <Filter>Source Files\NPEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoShowRoom.h">
+      <Filter>Demos\ShowRoom</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

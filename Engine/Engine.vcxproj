@@ -180,6 +180,7 @@
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="DemoShape.cpp" />
+    <ClCompile Include="DemoShowRoom.cpp" />
     <ClCompile Include="DemoWave.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="DemoShape.h" />
+    <ClInclude Include="DemoShowRoom.h" />
     <ClInclude Include="DemoWave.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="GameTimer.h" />

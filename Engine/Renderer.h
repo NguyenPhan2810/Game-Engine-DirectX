@@ -38,9 +38,11 @@ public:
 
 	Material& GetMaterial();
 
-	Texture* Texture;
 	ID3D11RasterizerState* RasterizerState;
 	ID3D11BlendState* BlendState;
+
+	Texture* Texture;
+	XMFLOAT4X4 TexTransform;
 
 protected:
 	ID3D11Buffer* mVertexBuffer;

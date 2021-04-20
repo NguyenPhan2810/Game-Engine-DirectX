@@ -186,7 +186,7 @@ void NPGameEngine::DrawScene()
 			auto& texture = renderer->Texture;
 			if (texture)
 			{
-				Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
+				Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&renderer->TexTransform));
 				Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
 				Effects::BasicFX->SetUseTexture(mUseTexture);
 			}
@@ -229,7 +229,7 @@ void NPGameEngine::DrawScene()
 			auto& texture = renderer->Texture;
 			if (texture)
 			{
-				Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&texture->TexTransform));
+				Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&renderer->TexTransform));
 				Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
 				Effects::BasicFX->SetUseTexture(mUseTexture);
 			}

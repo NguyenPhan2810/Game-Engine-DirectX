@@ -15,6 +15,10 @@ Renderer::Renderer()
 	mMaterial.Ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
 	mMaterial.Diffuse = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
 	mMaterial.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	// Default texture transform
+	XMMATRIX I = XMMatrixIdentity();
+	XMStoreFloat4x4(&TexTransform, I);
 }
 
 Renderer::~Renderer()

@@ -26,13 +26,10 @@ bool DemoShape::Init()
 
 	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate01.dds");
 	mDarkBrickTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
-	XMStoreFloat4x4(&mDarkBrickTex->TexTransform, XMMatrixScaling(10, 5, 0));
 
 	mCylTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
-	XMStoreFloat4x4(&mCylTex->TexTransform, XMMatrixScaling(2, 2, 0));
 
 	mSphereTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
-	XMStoreFloat4x4(&mSphereTex->TexTransform, XMMatrixScaling(2, 2, 0));
 
 	for (int i = 1; i <= 120; ++i)
 	{
@@ -85,54 +82,48 @@ void DemoShape::UpdateScene()
 
 void DemoShape::BuildGeometryBuffers()
 {
-	GeometryGenerator::MeshData sphere;
-	GeometryGenerator::MeshData geoSphere;
-	GeometryGenerator::MeshData cylinder;
-	GeometryGenerator::MeshData skull;
+	GeometryGenerator::MeshData sphereMesh;
+	GeometryGenerator::MeshData geoSphereMesh;
+	GeometryGenerator::MeshData cylinderMesh;
+	GeometryGenerator::MeshData skullMesh;
 
 	GeometryGenerator geoGen;
-	geoGen.CreateGeoSphere(0.8, 3, geoSphere);
-	geoGen.CreateSphere(0.8f, 20, 20, sphere);
-	geoGen.CreateCylinder(0.7, 0.3f, 3.0f, 20, 20, cylinder);
-	geoGen.CreateFromFile(L"Models/skull.txt", skull);
+	geoGen.CreateGeoSphere(0.8, 3, geoSphereMesh);
+	geoGen.CreateSphere(0.8f, 20, 20, sphereMesh);
+	geoGen.CreateCylinder(0.7, 0.3f, 3.0f, 20, 20, cylinderMesh);
+	geoGen.CreateFromFile(L"Models/skull.txt", skullMesh);
 
 	mGridObject = std::make_shared<Cube>();
 	mGridObject->transform->Scale(XMFLOAT3(15, 0.1, 25));
-
 	RENDERER(mGridObject)->Texture = mDarkBrickTex.get();
+	XMStoreFloat4x4(&RENDERER(mGridObject)->TexTransform, XMMatrixScaling(10, 5, 0));
+	
 
 	mCrateObject = std::make_shared<Cube>();
 	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
 	mCrateObject->transform->Scale(XMFLOAT3(2, 2, 2));
 	RENDERER(mCrateObject)->Texture = mCrateTex.get();
 	//RENDERER(mCrateObject)->LoadGeometry(skull);
+	
+	for(float x = -5; x <= 5; x += 10)
+		for (int i = 0; i < 5; ++i)
+		{
+			auto cylinder = std::make_shared<Cube>();
+			cylinder->transform->Translate(XMFLOAT3(x, 1.5f, -10.0f + i * 5.0f));
+			RENDERER(cylinder)->LoadGeometry(cylinderMesh);
+			RENDERER(cylinder)->Texture = mCylTex.get();
+			XMStoreFloat4x4(&RENDERER(cylinder)->TexTransform, XMMatrixScaling(2, 2, 0));
 
-	for (int i = 0; i < 5; ++i)
-	{
-		auto cylinder1 = std::make_shared<Cube>();
-		cylinder1->transform->Translate(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f));
-		RENDERER(cylinder1)->LoadGeometry(cylinder);
-		RENDERER(cylinder1)->Texture = mCylTex.get();
-		auto cylinder2 = std::make_shared<Cube>();
-		cylinder2->transform->Translate(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f));
-		RENDERER(cylinder2)->LoadGeometry(cylinder);
-		RENDERER(cylinder2)->Texture = mCylTex.get();
+			mCylinders.push_back(cylinder);
 
-		mCylinders.push_back(cylinder1);
-		mCylinders.push_back(cylinder2);
+			auto sphere = std::make_shared<Cube>();
+			sphere->transform->Translate(XMFLOAT3(x, 3.5f, -10.0f + i * 5.0f));
+			RENDERER(sphere)->LoadGeometry(sphereMesh);
+			RENDERER(sphere)->Texture = mSphereTex.get();
+			XMStoreFloat4x4(&RENDERER(sphere)->TexTransform, XMMatrixScaling(2, 2, 0));
 
-		auto sphere1 = std::make_shared<Cube>();
-		sphere1->transform->Translate(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f));
-		RENDERER(sphere1)->LoadGeometry(sphere);
-		RENDERER(sphere1)->Texture = mSphereTex.get();
-		auto sphere2 = std::make_shared<Cube>();
-		sphere2->transform->Translate(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f));
-		RENDERER(sphere2)->LoadGeometry(geoSphere);
-		RENDERER(sphere2)->Texture = mSphereTex.get();
-
-		mSpheres.push_back(sphere1);
-		mSpheres.push_back(sphere2);
-	}	
+			mSpheres.push_back(sphere);
+		}	
 	
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();
