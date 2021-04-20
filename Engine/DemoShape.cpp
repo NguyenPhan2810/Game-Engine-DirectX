@@ -8,7 +8,7 @@ DemoShape::DemoShape(HINSTANCE hInstance)
 , mCenterBox(nullptr)
 , mCenterObject(nullptr)
 , mGridObject(nullptr)
-, mCrateTex()
+, mCrateTex(nullptr)
 {
 	mCamRadius = 10;
 }
@@ -30,6 +30,8 @@ bool DemoShape::Init()
 {
 	if (!NPGameEngine::Init())
 		return false;
+
+	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate01.dds");
 
 	BuildGeometryBuffers();
 
@@ -68,7 +70,6 @@ void DemoShape::BuildGeometryBuffers()
 	mCenterObject = new Cube();
 	mCenterObject->transform->Translate(XMFLOAT3(0, 2, 0));
 	mCenterObject->transform->Scale(XMFLOAT3(3, 3, 3));
-	mCrateTex = std::make_shared<Texture>(Texture(L"Textures/WoodCrate01.dds"));
 	RENDERER(mCenterObject)->Texture = mCrateTex;
 	//RENDERER(mCenterObject)->LoadGeometry(skull);
 
