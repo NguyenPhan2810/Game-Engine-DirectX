@@ -21,6 +21,7 @@ protected:
 protected:
 	std::shared_ptr<Texture> mCrateTex;
 	std::shared_ptr<Texture> mDarkBrickTex;
+	std::shared_ptr<Texture> mCheckBoardTex;
 
 	std::shared_ptr<BaseObject> mCenterObj;
 	std::shared_ptr<BaseObject> mFloorObj;
