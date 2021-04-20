@@ -4,6 +4,12 @@ cbuffer cbPerFrame
 {
     DirectionalLight gDirLights[3];
     float3 gEyePosW;
+
+    // Allow application to change fog parameters once per frame.
+    // For example, we may only use fog for certain times of day.
+    float gFogStart;
+    float gFogRange;
+    float4 gFogColor;
 };
 
 cbuffer cbPerObject
@@ -71,6 +77,7 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
     pin.NormalW = normalize(pin.NormalW);
 	
     float3 toEyeW = normalize(gEyePosW - pin.PosW);
+    float3 distToEye = 
     
     float4 texColor = float4(1, 1, 1, 1);
     [flatten]
@@ -107,7 +114,17 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
         }
 
         litColor = texColor * (ambient + diffuse) + spec;
-    }
+    }	
+    
+    //
+    // Fogging
+    //
+
+    float fogLerp = saturate((distToEye - gFogStart) / gFogRange);
+
+    // Blend the fog color and the lit color.
+    litColor = lerp(litColor, gFogColor, fogLerp);
+   
 	
 	// Common to take alpha from diffuse material and texture.
     litColor.a = gMaterial.Diffuse.a * texColor.a;

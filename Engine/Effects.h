@@ -36,6 +36,10 @@ public:
 	void SetMaterial(const Material& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 	void SetDiffuseMap(ID3D11ShaderResourceView* tex) { DiffuseMap->SetResource(tex); }
 	void SetUseTexture(const bool& value) { UseTexture->SetRawValue(&value, 0, sizeof(value)); }
+
+	void SetFogStart(const float& value) { FogStart->SetFloat(value); }
+	void SetFogRange(const float& value) { FogRange->SetFloat(value); }
+	void SetFogColor(const FXMVECTOR v) { FogColor->SetFloatVector(reinterpret_cast<const float*>(&v)); }
 	
 	ID3DX11EffectTechnique* Light0Tech;
 	ID3DX11EffectTechnique* Light1Tech;
@@ -50,6 +54,10 @@ public:
 	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
 	ID3DX11EffectVariable* UseTexture;
+
+	ID3DX11EffectScalarVariable* FogStart;
+	ID3DX11EffectScalarVariable* FogRange;
+	ID3DX11EffectVectorVariable* FogColor;
 
 	ID3DX11EffectShaderResourceVariable* DiffuseMap;
 };

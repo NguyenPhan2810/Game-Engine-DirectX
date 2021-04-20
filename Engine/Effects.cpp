@@ -59,6 +59,10 @@ BasicEffect::BasicEffect(ID3D11Device* device, const std::wstring& filename)
 	TexTransform		= mFX->GetVariableByName("gTexTransform")->AsMatrix();
 	DiffuseMap			= mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
 	UseTexture			= mFX->GetVariableByName("gUseTexture");
+	
+	FogStart = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange = mFX->GetVariableByName("gFogRange")->AsScalar();
+	FogColor = mFX->GetVariableByName("gFogColor")->AsVector();
 }
 
 BasicEffect::~BasicEffect()
