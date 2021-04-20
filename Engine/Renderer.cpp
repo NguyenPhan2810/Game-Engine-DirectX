@@ -12,8 +12,8 @@ Renderer::Renderer()
 {
 	name = "Renderer";
 	// Default material
-	mMaterial.Ambient = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
-	mMaterial.Diffuse = XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f);
+	mMaterial.Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mMaterial.Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mMaterial.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
 	// Default texture transform

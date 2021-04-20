@@ -28,19 +28,19 @@ void Transform::Draw()
 void Transform::Translate(const XMFLOAT3& displacement)
 {
 	XMMATRIX translateMatrix = XMMatrixTranslation(displacement.x, displacement.y, displacement.z);
-	mWorldMatrix = XMMatrixMultiply(translateMatrix, mWorldMatrix);
+	mWorldMatrix = XMMatrixMultiply(mWorldMatrix, translateMatrix);
 }
 
 void Transform::Rotate(const XMFLOAT3& rotationOrigin, float radian)
 {
 	XMMATRIX rotateMatrix = XMMatrixRotationAxis(XMLoadFloat3(&rotationOrigin), radian);
-	mWorldMatrix = XMMatrixMultiply(rotateMatrix, mWorldMatrix);
+	mWorldMatrix = XMMatrixMultiply(mWorldMatrix, rotateMatrix);
 }
 
 void Transform::Scale(const XMFLOAT3& scaleElements)
 {
 	XMMATRIX scaleMatrix = XMMatrixScaling(scaleElements.x, scaleElements.y, scaleElements.z);
-	mWorldMatrix = XMMatrixMultiply(scaleMatrix, mWorldMatrix);
+	mWorldMatrix = XMMatrixMultiply(mWorldMatrix, scaleMatrix);
 }
 
 XMMATRIX Transform::LocalToWorldMatrix() const

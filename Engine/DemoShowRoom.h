@@ -12,15 +12,15 @@ public:
 
 	virtual bool Init() override;
 	virtual void UpdateScene() override;
+
 protected:
-	void BuildGeometryBuffers();
+	void CreateObjects();
+	void CreateTextures();
+	void CreateMaterials();
 
 protected:
 	std::shared_ptr<Texture> mCrateTex;
-	std::vector<std::shared_ptr<Texture>> mFireTex;
-	UINT mFireTexIndex;
 	std::shared_ptr<Texture> mDarkBrickTex;
-	std::shared_ptr<Texture> mSphereTex;
 
 	std::shared_ptr<BaseObject> mCenterObj;
 	std::shared_ptr<BaseObject> mFloorObj;

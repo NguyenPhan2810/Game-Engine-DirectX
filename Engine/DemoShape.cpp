@@ -26,9 +26,7 @@ bool DemoShape::Init()
 
 	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate01.dds");
 	mDarkBrickTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
-
 	mCylTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
-
 	mSphereTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
 
 	for (int i = 1; i <= 120; ++i)
