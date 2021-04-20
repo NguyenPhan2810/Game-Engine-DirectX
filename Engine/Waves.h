@@ -22,12 +22,15 @@ public:
 	UINT ColumnCount()const;
 	UINT VertexCount()const;
 	UINT TriangleCount()const;
+	float Width() const;
+	float Depth() const;
 
 	// Returns the solution at the ith grid point.
 	const XMFLOAT3& operator[](int i)const { return mCurrSolution[i]; }
 
 	// Returns the solution normal at the ith grid point.
 	const XMFLOAT3& Normal(int i)const { return mNormals[i]; }
+
 
 	void Init(UINT m, UINT n, float dx, float dt, float speed, float damping);
 	void Update(float dt);

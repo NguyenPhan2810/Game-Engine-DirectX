@@ -13,6 +13,7 @@ public:
 
 	virtual bool Init() override;
 	virtual void UpdateScene() override;
+	virtual void FixedUpdateScene() override;
 	//virtual void DrawScene() override;
 
 protected:
@@ -25,5 +26,8 @@ protected:
 	std::shared_ptr<BaseObject> mCenterObject;
 	std::shared_ptr<BaseObject> mGridObject;
 	std::shared_ptr<Texture> mLandTex;
+	std::shared_ptr<Texture> mWaveTex;
+
+	XMFLOAT2 mWaveTexOffset;
 };
 

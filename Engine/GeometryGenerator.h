@@ -42,7 +42,7 @@ public:
 	///<summary>
 	/// Copy position from source to vertices
 	///</summary>
-	static void ConvertToPosNormal(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& vertices);
+	static void ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& vertices);
 
 	///<summary>
 	/// Creates a mesh from simple file

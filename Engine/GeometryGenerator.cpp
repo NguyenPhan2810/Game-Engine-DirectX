@@ -3,7 +3,7 @@
 #include <map>
 #include <fstream>
 
-void GeometryGenerator::ConvertToPosNormal(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& vertices)
+void GeometryGenerator::ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& vertices)
 {
 	size_t n = source.size();
 	vertices.resize(n);
@@ -11,6 +11,7 @@ void GeometryGenerator::ConvertToPosNormal(std::vector<GeometryGenerator::Vertex
 	{
 		vertices[i].Pos = source[i].Position;
 		vertices[i].Normal = source[i].Normal;
+		vertices[i].Tex = source[i].TexC;
 	}
 }
 

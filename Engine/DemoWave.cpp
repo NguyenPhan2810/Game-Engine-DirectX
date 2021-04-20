@@ -3,8 +3,8 @@
 #include "Renderer.h"
 #include "Cube.h"
 
-#define X 200
-#define Z 200
+#define X 160
+#define Z 160
 
 float GetHillHeight(float x, float z)
 {
@@ -36,9 +36,11 @@ DemoWave::DemoWave(HINSTANCE hInstance)
 , mCenterObject(nullptr)
 , mWaveMesh(nullptr)
 , mGridObject(nullptr)
+, mWaveTex(nullptr)
+, mLandTex(nullptr)
 {
 
-	mCamRadius = 70;
+	mCamRadius = 60;
 }
 
 DemoWave::~DemoWave()
@@ -52,7 +54,7 @@ bool DemoWave::Init()
 		return false;
 
 	BuildGeometryBuffers();
-	mWaves.Init(X, Z, 1.0f, 0.03f, 15.25f, 0.2f);
+	mWaves.Init(X, Z, 1.0f, 0.03f, 10.25f, 0.2f);
 
 
 	return true;
@@ -62,10 +64,6 @@ void DemoWave::UpdateScene()
 {
 	NPGameEngine::UpdateScene();
 
-	//
-	// Update the wave vertex buffer with the new solution.
-	//
-	
 	//
 	// Every quarter second, generate a random wave.
 	//
@@ -77,7 +75,7 @@ void DemoWave::UpdateScene()
 		DWORD i = 5 + rand() % (X - 10);
 		DWORD j = 5 + rand() % (X - 10);
 
-		float r = MathHelper::RandF(1.0f, 3);
+		float r = MathHelper::RandF(1.0f, 2);
 		mWaves.Disturb(i, j, r);
 	}
 
@@ -92,14 +90,25 @@ void DemoWave::UpdateScene()
 	{
 		v[i].Pos = mWaves[i];
 		v[i].Normal = mWaves.Normal(i);
+
+		// Derive tex-coords in [0,1] from position.
+		v[i].Tex.x = 0.5f + mWaves[i].x / mWaves.Width();
+		v[i].Tex.y = 0.5f - mWaves[i].z / mWaves.Depth();
 	}
 
 	mImmediateContext->Unmap(waveVertexBuffer, 0);
 
+}
 
-	//mPointLight.Position.x = 40.0f * cosf(0.8f * mTimer.TotalTime());
-	//mPointLight.Position.z = 40.0f * sinf(0.8f * mTimer.TotalTime());
-	//mPointLight.Position.y = 20;
+void DemoWave::FixedUpdateScene()
+{
+	// Scroll water texture
+	mWaveTexOffset.x += 0.05f * GameTimer::FixedDeltaTime();
+	mWaveTexOffset.y += 0.01f * GameTimer::FixedDeltaTime();
+
+	XMMATRIX waveTexScale = XMMatrixScaling(10.0f, 10.0f, 0.0f);
+	XMMATRIX waveTexOffset = XMMatrixTranslation(mWaveTexOffset.x, mWaveTexOffset.y, 0.0f);
+	XMStoreFloat4x4(&RENDERER(mWaveMesh)->Texture->TexTransform, waveTexScale * waveTexOffset);
 }
 
 void DemoWave::BuildGeometryBuffers()
@@ -129,21 +138,21 @@ void DemoWave::BuildGeometryBuffers()
 
 	mGridObject = std::make_shared<Cube>();
 	RENDERER(mGridObject)->LoadGeometry(grid); 
+
+	// Set hills height
 	D3D11_BUFFER_DESC gridVBD{ 0 };
 	gridVBD.ByteWidth = RENDERER(mGridObject)->GetVertexCount() * sizeof(Vertex::Basic32);
 	gridVBD.Usage = D3D11_USAGE_IMMUTABLE;
 	gridVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	RENDERER(mGridObject)->CreateVertexBuffer(vertices, gridVBD);
+
+	// Load texture
 	mLandTex = std::make_shared<Texture>(L"Textures/grass.dds");
 	RENDERER(mGridObject)->Texture = mLandTex;
 	
+	// Tile/scale texture
 	XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
 	XMStoreFloat4x4(&RENDERER(mGridObject)->Texture->TexTransform, grassTexScale);
-
-	/*mCenterObject = std::make_shared<Cube>();
-	mCenterObject->transform->Translate(XMFLOAT3(0, 10, 0));
-	mCenterObject->transform->Scale(XMFLOAT3(3.5, 3.5, 3.5));
-	RENDERER(mCenterObject)->LoadGeometry(skull);*/
 
 	mWaveMesh = std::make_shared<Cube>();
 	RENDERER(mWaveMesh)->LoadGeometry(wave);
@@ -154,19 +163,23 @@ void DemoWave::BuildGeometryBuffers()
 	waveVBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	waveVBD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	GeometryGenerator::ConvertToPosNormal(wave.vertices, vertices);
+	GeometryGenerator::ConvertToBasic32(wave.vertices, vertices);
 	RENDERER(mWaveMesh)->CreateVertexBuffer(vertices, waveVBD);
+
+	// Load texture
+	mWaveTex = std::make_shared<Texture>(L"Textures/water2.dds");
+	RENDERER(mWaveMesh)->Texture = mWaveTex;
 
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();
-	//landMat.Ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	//landMat.Diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	//landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+	landMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	landMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
 	auto& waveMat = RENDERER(mWaveMesh)->GetMaterial();
-	waveMat.Ambient = XMFLOAT4(0.1f, 0.3f, 0.4f, 1.0f);
-	waveMat.Diffuse = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	waveMat.Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 60.0f);
+	waveMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	waveMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	waveMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
 
 	//auto& cubeMat = RENDERER(mCenterObject)->GetMaterial();
 	//cubeMat.Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
