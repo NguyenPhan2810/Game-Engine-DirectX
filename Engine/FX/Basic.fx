@@ -76,8 +76,9 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
 	// Interpolated normal can be unnormalized so here normalize it
     pin.NormalW = normalize(pin.NormalW);
 	
-    float3 toEyeW = normalize(gEyePosW - pin.PosW);
-    float3 distToEye = 
+    float3 toEye = gEyePosW - pin.PosW;
+	float distToEye = length(toEye);
+	toEye /= distToEye;
     
     float4 texColor = float4(1, 1, 1, 1);
     [flatten]
@@ -107,7 +108,7 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
 	    [unroll]
         for (int i = 0; i < gLightCount; ++i)
         {
-            ComputeDirectionalLight(gMaterial, gDirLights[i], pin.NormalW, toEyeW, A, D, S);
+            ComputeDirectionalLight(gMaterial, gDirLights[i], pin.NormalW, toEye, A, D, S);
             ambient += A;
             diffuse += D;
             spec += S;
