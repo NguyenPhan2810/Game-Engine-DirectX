@@ -81,6 +81,7 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
 	toEye /= distToEye;
     
     float4 texColor = float4(1, 1, 1, 1);
+    
     [flatten]
     if (gUseTexture)
     {
@@ -121,16 +122,19 @@ float4 PS(VertexOut pin, uniform int gLightCount) : SV_Target
     // Fogging
     //
 
-    float fogLerp = saturate((distToEye - gFogStart) / gFogRange);
+    [flatten]
+	if (gFogRange != 0)
+	{
+		float fogLerp = saturate((distToEye - gFogStart) / gFogRange);
 
-    // Blend the fog color and the lit color.
-    litColor = lerp(litColor, gFogColor, fogLerp);
-   
-	
+        // Blend the fog color and the lit color.
+		litColor = lerp(litColor, gFogColor, fogLerp);
+	}
+    
 	// Common to take alpha from diffuse material and texture.
-    litColor.a = gMaterial.Diffuse.a * texColor.a;
+	litColor.a = gMaterial.Diffuse.a * texColor.a;
 
-    return litColor;
+	return litColor;
 }
 
 technique11 Light0

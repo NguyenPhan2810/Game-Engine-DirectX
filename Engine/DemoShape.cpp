@@ -57,7 +57,7 @@ void DemoShape::UpdateScene()
 	NPGameEngine::UpdateScene();
 
 	mCrateObject->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
-	mCrateObject->transform->Translate(XMFLOAT3(0, 0.0004 * sin(3 * GameTimer::TotalTime()), 0));
+	mCrateObject->transform->Translate(XMFLOAT3(0, 0.0001 * sin(2 * GameTimer::TotalTime()), 0));
 
 	//for (auto& cyl : mCylinders)
 	//{
@@ -103,7 +103,7 @@ void DemoShape::BuildGeometryBuffers()
 
 	mCrateObject = std::make_shared<Cube>();
 	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
-	mCrateObject->transform->Scale(XMFLOAT3(3, 3, 3));
+	mCrateObject->transform->Scale(XMFLOAT3(2, 2, 2));
 	RENDERER(mCrateObject)->Texture = mCrateTex.get();
 	//RENDERER(mCrateObject)->LoadGeometry(skull);
 
