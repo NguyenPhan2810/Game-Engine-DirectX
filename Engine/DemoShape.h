@@ -12,7 +12,9 @@ public:
 	virtual bool Init() override;
 	virtual void UpdateScene() override;
 protected:
-	void BuildGeometryBuffers();
+	void CreateObjects();
+	void CreateTextures();
+	void CreateMaterials();
 
 protected:
 	std::shared_ptr<Texture> mCrateTex;
@@ -23,7 +25,7 @@ protected:
 	std::shared_ptr<Texture> mSphereTex;
 
 	std::shared_ptr<BaseObject> mCrateObject;
-	std::shared_ptr<BaseObject> mGridObject;
+	std::shared_ptr<BaseObject> mFloorObject;
 	std::shared_ptr<BaseObject> mCenterBox;
 	std::vector<std::shared_ptr<BaseObject>> mCylinders;
 	std::vector<std::shared_ptr<BaseObject>> mSpheres;

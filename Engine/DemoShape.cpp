@@ -7,7 +7,7 @@ DemoShape::DemoShape(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 , mCenterBox(nullptr)
 , mCrateObject(nullptr)
-, mGridObject(nullptr)
+, mFloorObject(nullptr)
 , mCrateTex(nullptr)
 , mFireTexIndex(0)
 {
@@ -24,6 +24,93 @@ bool DemoShape::Init()
 	if (!NPGameEngine::Init())
 		return false;
 
+	CreateObjects();
+	CreateTextures();
+	CreateMaterials();
+
+	
+	return true;
+}
+
+void DemoShape::UpdateScene()
+{
+	NPGameEngine::UpdateScene();
+
+	mCrateObject->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
+	mCrateObject->transform->Translate(XMFLOAT3(0, 0.00005 * sin(2 * GameTimer::TotalTime()), 0));
+
+
+	static float animTime = 0;
+	animTime += GameTimer::DeltaTime();
+	if (animTime > 1.0 / 30)
+	{
+		RENDERER(mCrateObject)->Texture = mFireTex[mFireTexIndex].get();
+
+		mFireTexIndex++;
+		if (mFireTexIndex >= mFireTex.size())
+			mFireTexIndex = 0;
+
+		animTime = 0;
+	}
+}
+
+void DemoShape::CreateObjects()
+{
+	GeometryGenerator::MeshData sphereMesh;
+	GeometryGenerator::MeshData geoSphereMesh;
+	GeometryGenerator::MeshData cylinderMesh;
+	GeometryGenerator::MeshData skullMesh;
+
+	GeometryGenerator geoGen;
+	geoGen.CreateGeoSphere(0.8, 3, geoSphereMesh);
+	geoGen.CreateSphere(0.8f, 20, 20, sphereMesh);
+	geoGen.CreateCylinder(0.7, 0.3f, 3.0f, 20, 20, cylinderMesh);
+	geoGen.CreateFromFile(L"Models/skull.txt", skullMesh);
+
+	//
+	// Center object
+	//
+
+	mCrateObject = std::make_shared<Cube>();
+	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
+	mCrateObject->transform->Scale(XMFLOAT3(2, 2, 2));
+	//RENDERER(mCrateObject)->LoadGeometry(skull);
+	
+	//
+	// Floor
+	//
+
+	mFloorObject = std::make_shared<Cube>();
+	mFloorObject->transform->Scale(XMFLOAT3(15, 0.1, 25));
+	XMStoreFloat4x4(&RENDERER(mFloorObject)->TexTransform, XMMatrixScaling(6, 8, 0));
+
+	//
+	// Build cylinder and sphere
+	//
+	
+	for (float x = -5; x <= 5; x += 10)
+		for (int i = 0; i < 5; ++i)
+		{
+			auto cylinder = std::make_shared<Cube>();
+			cylinder->transform->Translate(XMFLOAT3(x, 1.5f, -10.0f + i * 5.0f));
+			RENDERER(cylinder)->LoadGeometry(cylinderMesh);
+			RENDERER(cylinder)->Texture = mCylTex.get();
+			XMStoreFloat4x4(&RENDERER(cylinder)->TexTransform, XMMatrixScaling(2, 2, 0));
+
+			mCylinders.push_back(cylinder);
+
+			auto sphere = std::make_shared<Cube>();
+			sphere->transform->Translate(XMFLOAT3(x, 3.5f, -10.0f + i * 5.0f));
+			RENDERER(sphere)->LoadGeometry(sphereMesh);
+			RENDERER(sphere)->Texture = mSphereTex.get();
+			XMStoreFloat4x4(&RENDERER(sphere)->TexTransform, XMMatrixScaling(2, 2, 0));
+
+			mSpheres.push_back(sphere);
+		}
+}
+
+void DemoShape::CreateTextures()
+{
 	mCrateTex = std::make_shared<Texture>(L"Textures/WoodCrate01.dds");
 	mDarkBrickTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
 	mCylTex = std::make_shared<Texture>(L"Textures/darkbrickdxt1.dds");
@@ -42,89 +129,19 @@ bool DemoShape::Init()
 		mFireTex.push_back(std::make_shared<Texture>(filename));
 	}
 
-	BuildGeometryBuffers();
 
-	return true;
-}
-
-void DemoShape::UpdateScene()
-{
-	NPGameEngine::UpdateScene();
-
-	mCrateObject->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
-	mCrateObject->transform->Translate(XMFLOAT3(0, 0.0001 * sin(2 * GameTimer::TotalTime()), 0));
-
-	//for (auto& cyl : mCylinders)
-	//{
-	//	cyl->transform->Translate(XMFLOAT3(0, 0.02 * sin(50 * GameTimer::TotalTime()), 0));
-	//}
+	RENDERER(mFloorObject)->Texture = mDarkBrickTex.get();
+	RENDERER(mCrateObject)->Texture = mCrateTex.get();	
+	for (auto& cyl : mCylinders)
+		RENDERER(cyl)->Texture = mCylTex.get();
 	for (auto& sphere : mSpheres)
-	{
-		sphere->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
-		//sphere->transform->Translate(XMFLOAT3(0, 0.001 * sin(10 * GameTimer::TotalTime()), 0));
-	}
-
-	static float animTime = 0;
-	animTime += GameTimer::DeltaTime();
-	if (animTime > 1.0 / 30)
-	{
-		RENDERER(mCrateObject)->Texture = mFireTex[mFireTexIndex].get();
-
-		mFireTexIndex++;
-		if (mFireTexIndex >= mFireTex.size())
-			mFireTexIndex = 0;
-
-		animTime = 0;
-	}
+		RENDERER(sphere)->Texture = mSphereTex.get();
 }
 
-void DemoShape::BuildGeometryBuffers()
+void DemoShape::CreateMaterials()
 {
-	GeometryGenerator::MeshData sphereMesh;
-	GeometryGenerator::MeshData geoSphereMesh;
-	GeometryGenerator::MeshData cylinderMesh;
-	GeometryGenerator::MeshData skullMesh;
-
-	GeometryGenerator geoGen;
-	geoGen.CreateGeoSphere(0.8, 3, geoSphereMesh);
-	geoGen.CreateSphere(0.8f, 20, 20, sphereMesh);
-	geoGen.CreateCylinder(0.7, 0.3f, 3.0f, 20, 20, cylinderMesh);
-	geoGen.CreateFromFile(L"Models/skull.txt", skullMesh);
-
-	mGridObject = std::make_shared<Cube>();
-	mGridObject->transform->Scale(XMFLOAT3(15, 0.1, 25));
-	RENDERER(mGridObject)->Texture = mDarkBrickTex.get();
-	XMStoreFloat4x4(&RENDERER(mGridObject)->TexTransform, XMMatrixScaling(10, 5, 0));
-	
-
-	mCrateObject = std::make_shared<Cube>();
-	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
-	mCrateObject->transform->Scale(XMFLOAT3(2, 2, 2));
-	RENDERER(mCrateObject)->Texture = mCrateTex.get();
-	//RENDERER(mCrateObject)->LoadGeometry(skull);
-	
-	for(float x = -5; x <= 5; x += 10)
-		for (int i = 0; i < 5; ++i)
-		{
-			auto cylinder = std::make_shared<Cube>();
-			cylinder->transform->Translate(XMFLOAT3(x, 1.5f, -10.0f + i * 5.0f));
-			RENDERER(cylinder)->LoadGeometry(cylinderMesh);
-			RENDERER(cylinder)->Texture = mCylTex.get();
-			XMStoreFloat4x4(&RENDERER(cylinder)->TexTransform, XMMatrixScaling(2, 2, 0));
-
-			mCylinders.push_back(cylinder);
-
-			auto sphere = std::make_shared<Cube>();
-			sphere->transform->Translate(XMFLOAT3(x, 3.5f, -10.0f + i * 5.0f));
-			RENDERER(sphere)->LoadGeometry(sphereMesh);
-			RENDERER(sphere)->Texture = mSphereTex.get();
-			XMStoreFloat4x4(&RENDERER(sphere)->TexTransform, XMMatrixScaling(2, 2, 0));
-
-			mSpheres.push_back(sphere);
-		}	
-	
 	// Build mat
-	auto& landMat = RENDERER(mGridObject)->GetMaterial();
+	auto& landMat = RENDERER(mFloorObject)->GetMaterial();
 	landMat.Ambient = XMFLOAT4(0.48f, 0.48f, 0.48f, 1.0f);
 	landMat.Diffuse = XMFLOAT4(0.48f, 0.48f, 0.48f, 1.0f);
 	landMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
