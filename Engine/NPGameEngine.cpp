@@ -122,7 +122,7 @@ void NPGameEngine::DrawScene()
 
 	// Set up
 	mImmediateContext->IASetInputLayout(InputLayouts::Basic32);
-	//mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX view = XMLoadFloat4x4(&mView);
@@ -235,7 +235,7 @@ void NPGameEngine::DrawScene()
 			}
 
 			mImmediateContext->RSSetState(renderer->RasterizerState);
-			mImmediateContext->OMSetBlendState(renderer->BlendState, blendFactor, 0xffffffe);
+			mImmediateContext->OMSetBlendState(renderer->BlendState, blendFactor, 0xfffffff);
 			activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 
 			obj->Draw();

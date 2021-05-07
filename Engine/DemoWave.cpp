@@ -181,18 +181,18 @@ void DemoWave::BuildGeometryBuffers()
 	//=======================================
 	// Crate
 	mCrateObject = std::make_shared<Cube>();
-	mCrateObject->transform->Translate(XMFLOAT3(0, 2, 0));
 	mCrateObject->transform->Scale(XMFLOAT3(10, 10, 10));
 	mCrateObject->transform->Rotate(XMFLOAT3(1, 0, 0), XM_PI / 8);
 	mCrateObject->transform->Rotate(XMFLOAT3(0, 0, 1), XM_PI / 9);
+	mCrateObject->transform->Translate(XMFLOAT3(0, 0.5, 0));
 
 	//=======================================
 	// Fence crate
 	mFenceCrateObject = std::make_shared<Cube>();
-	mFenceCrateObject->transform->Translate(XMFLOAT3(-10, 0, 10));
 	mFenceCrateObject->transform->Scale(XMFLOAT3(10, 10, 10));
 	mFenceCrateObject->transform->Rotate(XMFLOAT3(1, 0, 0), XM_PI / 10);
 	mFenceCrateObject->transform->Rotate(XMFLOAT3(0, 0, 1), XM_PI / 10);
+	mFenceCrateObject->transform->Translate(XMFLOAT3(-10, 0.2, 10));
 
 	// Build mat
 	auto& landMat = RENDERER(mGridObject)->GetMaterial();

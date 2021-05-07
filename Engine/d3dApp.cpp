@@ -216,8 +216,7 @@ bool D3DApp::InitDirect3D()
 #pragma region CreateDevice
 	UINT createDeviceFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)
-	// @TODO: re-enable this
-	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	D3D_FEATURE_LEVEL featureLevel;
