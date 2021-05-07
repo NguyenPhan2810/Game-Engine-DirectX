@@ -43,6 +43,30 @@ void Transform::Scale(const XMFLOAT3& scaleElements)
 	mWorldMatrix = XMMatrixMultiply(mWorldMatrix, scaleMatrix);
 }
 
+XMFLOAT3 Transform::GetWorldPosition() const
+{
+	XMVECTOR O = { 0 };
+	XMFLOAT3 result;
+
+	XMStoreFloat3(&result, XMVector3Transform(O, mWorldMatrix));
+
+	return result;
+}
+
+XMFLOAT3 Transform::GetWorldY() const
+{
+	
+	XMVECTOR Y = XMVectorSet(0, 1, 0, 0);
+	XMFLOAT3 result;
+	
+	XMFLOAT3 posFloat = GetWorldPosition();
+	XMVECTOR pos = XMLoadFloat3(&posFloat);
+
+	XMStoreFloat3(&result, XMVector3Normalize(XMVector3Transform(Y, mWorldMatrix) - pos));
+
+	return result;
+}
+
 XMMATRIX Transform::LocalToWorldMatrix() const
 {
 	return mWorldMatrix;

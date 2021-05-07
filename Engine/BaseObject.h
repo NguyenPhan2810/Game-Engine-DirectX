@@ -33,6 +33,9 @@ public:
 	// So this comp deserves its own place
 	Transform* transform;
 
+	// Set this to false will discard any process on this object
+	bool enabled;
+
 private:
 	UINT mId;
 	static UINT mIdBase;

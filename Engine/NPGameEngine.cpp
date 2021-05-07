@@ -105,13 +105,15 @@ void NPGameEngine::UpdateScene()
 	UpdateViewMatrix();
 
 	for (auto obj : BaseObject::GetAllObjects())
-		obj->Update();
+		if (obj->enabled)
+			obj->Update();
 }
 
 void NPGameEngine::FixedUpdateScene()
 {
 	for (auto obj : BaseObject::GetAllObjects())
-		obj->FixedUpdate();
+		if (obj->enabled)
+			obj->FixedUpdate();
 }
 
 void NPGameEngine::DrawScene()
@@ -154,6 +156,9 @@ void NPGameEngine::DrawScene()
 	std::vector<BaseObject*> nonBlendedObjects;
 	for (auto& obj : allObjects)
 	{
+		if (!obj->enabled)
+			continue;
+
 		auto renderer = obj->GetComponent<Renderer>("Renderer");
 		if (renderer)
 		{

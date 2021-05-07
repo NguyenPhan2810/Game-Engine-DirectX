@@ -22,6 +22,13 @@ public:
 	void Rotate(const XMFLOAT3& rotationOrigin, float radian);
 	void Scale(const XMFLOAT3& scaleElements);
 
+	XMFLOAT3 GetWorldPosition() const;
+	XMFLOAT3 GetWorldRotation() const;
+	XMFLOAT3 GetWorldScale() const;
+
+	// Get the Y axis in world space
+	XMFLOAT3 GetWorldY() const;
+
 	XMMATRIX LocalToWorldMatrix() const;
 
 protected:

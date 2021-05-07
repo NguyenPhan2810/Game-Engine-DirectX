@@ -188,6 +188,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="NPGameEngine.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -215,6 +216,7 @@
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="NPGameEngine.h" />
     <ClInclude Include="NPInterfaces.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderStates.h" />
     <ClInclude Include="stdafx.h" />

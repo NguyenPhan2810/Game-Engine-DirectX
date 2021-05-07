@@ -9,6 +9,7 @@ std::vector<BaseObject*> BaseObject::mAllObjectsVec;
 
 BaseObject::BaseObject()
 : transform(nullptr)
+, enabled(true)
 {
 	mAllObjectsChanged = true;
 

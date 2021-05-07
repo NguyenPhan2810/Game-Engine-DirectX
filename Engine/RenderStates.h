@@ -11,6 +11,7 @@ public:
 	// Rasterizer states
 	static ID3D11RasterizerState* WireframeRS;
 	static ID3D11RasterizerState* NoCullRS;
+	static ID3D11RasterizerState* CullClockwiseRS;
 
 	// Blend states
 	static ID3D11BlendState* AlphaToCoverageBS;

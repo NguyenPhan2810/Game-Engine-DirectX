@@ -3,6 +3,7 @@
 
 ID3D11RasterizerState* RenderStates::WireframeRS = nullptr;
 ID3D11RasterizerState* RenderStates::NoCullRS = nullptr;
+ID3D11RasterizerState* RenderStates::CullClockwiseRS = nullptr;
 
 ID3D11BlendState* RenderStates::AlphaToCoverageBS = nullptr;
 ID3D11BlendState* RenderStates::TransparentBS = nullptr;
@@ -36,7 +37,23 @@ void RenderStates::InitAll(ID3D11Device* device)
 	noCullDesc.FrontCounterClockwise = false;
 	noCullDesc.DepthClipEnable = true;
 
-	HR(device->CreateRasterizerState(&noCullDesc, &NoCullRS));
+	HR(device->CreateRasterizerState(&noCullDesc, &NoCullRS));	
+	
+	//
+	// CullClockwiseRS
+	//
+
+	// Note: Define such that we still cull backfaces by making front faces CCW.
+	// If we did not cull backfaces, then we have to worry about the BackFace
+	// property in the D3D11_DEPTH_STENCIL_DESC.
+	D3D11_RASTERIZER_DESC cullClockwiseDesc;
+	ZeroMemory(&cullClockwiseDesc, sizeof(D3D11_RASTERIZER_DESC));
+	cullClockwiseDesc.FillMode = D3D11_FILL_SOLID;
+	cullClockwiseDesc.CullMode = D3D11_CULL_BACK;
+	cullClockwiseDesc.FrontCounterClockwise = true;
+	cullClockwiseDesc.DepthClipEnable = true;
+
+	HR(device->CreateRasterizerState(&cullClockwiseDesc, &CullClockwiseRS));
 
 	//
 	// AlphaToCoverageBS

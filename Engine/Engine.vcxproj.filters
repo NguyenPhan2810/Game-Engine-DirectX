@@ -47,9 +47,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="d3dUtil.cpp">
       <Filter>Helper Files</Filter>
     </ClCompile>
@@ -109,6 +106,12 @@
     </ClCompile>
     <ClCompile Include="DemoShowRoom.cpp">
       <Filter>Demos\ShowRoom</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Source Files\NPObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +180,9 @@
     </ClInclude>
     <ClInclude Include="DemoShowRoom.h">
       <Filter>Demos\ShowRoom</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Source Files\NPObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
