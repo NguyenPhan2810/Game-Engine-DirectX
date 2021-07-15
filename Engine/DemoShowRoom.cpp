@@ -38,7 +38,7 @@ void DemoShowRoom::UpdateScene()
 	NPGameEngine::UpdateScene();
 
 	mCenterObj->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
-	//mMirrorObj->transform->Rotate(XMFLOAT3(0, 0, 1), sin(GameTimer::TotalTime() * 5) / 1000);
+	mMirrorObj->transform->Rotate(XMFLOAT3(0, 0, 1), sin(GameTimer::TotalTime() * 5) / 1000);
 }
 
 void DemoShowRoom::DrawScene()
@@ -447,12 +447,11 @@ void DemoShowRoom::CreateObjects()
 	mRWallObj->transform->Scale(XMFLOAT3(10, 10, 0.1));
 	mRWallObj->transform->Translate(XMFLOAT3(0, 5 - 1, 5));
 
-	//mMirrorObj->enabled = false;
+	// The mirror will be specifically rendered so it should not render as with other objects
 	mMirrorObj->enabled = false;
 	mMirrorObj->transform->Scale(XMFLOAT3(3, 1, 4));
 	mMirrorObj->transform->Rotate(XMFLOAT3(0, 0, 1), -MathHelper::Pi / 2);
-	//mMirrorObj->transform->Translate(XMFLOAT3(-5 + 0.1, 3, 0));
-	//mMirrorObj->transform->Translate(XMFLOAT3(-5, 3, 0));
+	mMirrorObj->transform->Translate(XMFLOAT3(-5 + 0.1, 3, 0));
 }
 
 void DemoShowRoom::CreateTextures()
