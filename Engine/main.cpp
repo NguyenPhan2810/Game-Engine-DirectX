@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "DemoShape.h"
 #include "DemoWave.h"
 #include "DemoShowRoom.h"

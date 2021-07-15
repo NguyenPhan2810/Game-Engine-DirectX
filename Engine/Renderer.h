@@ -5,8 +5,6 @@
 #include "GeometryGenerator.h"
 #include "LightHelper.h"
 #include "Texture.h"
-#include <memory>
-
 /// <summary>
 /// Convinent macro for get this component
 /// </summary>

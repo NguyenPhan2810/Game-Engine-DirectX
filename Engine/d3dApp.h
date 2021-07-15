@@ -3,8 +3,6 @@
 #include "d3dUtil.h"
 #include "GameTimer.h"
 
-#include <sstream>
-
 class D3DApp
 {
 public:

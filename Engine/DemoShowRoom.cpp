@@ -1,4 +1,6 @@
 #include "stdafx.h"
+
+
 #include "DemoShowRoom.h"
 #include "Cube.h"
 #include "Plane.h"
@@ -10,7 +12,7 @@
 DemoShowRoom::DemoShowRoom(HINSTANCE hInstance)
 : NPGameEngine(hInstance)
 {
-	
+
 	mCamRadius = 11;
 }
 
@@ -35,6 +37,8 @@ void DemoShowRoom::UpdateScene()
 {
 	NPGameEngine::UpdateScene();
 
+	mCenterObj->transform->Rotate(XMFLOAT3(0, 1, 0), GameTimer::DeltaTime());
+	//mMirrorObj->transform->Rotate(XMFLOAT3(0, 0, 1), sin(GameTimer::TotalTime() * 5) / 1000);
 }
 
 void DemoShowRoom::DrawScene()
@@ -76,6 +80,7 @@ void DemoShowRoom::DrawScene()
 	std::vector<BaseObject*> blendedObjects;
 	std::vector<BaseObject*> nonBlendedObjects;
 	// Render mirror
+
 	for (auto& obj : allObjects)
 	{
 		if (!obj->enabled)
@@ -179,6 +184,58 @@ void DemoShowRoom::DrawScene()
 #pragma endregion
 
 #pragma region Mirror
+	//
+	// Draw the mirror to stencil buffer only.
+	//
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		auto obj = mMirrorObj;
+
+		// Update per object constants
+		XMMATRIX world = obj->transform->LocalToWorldMatrix();
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world * viewProj;
+
+		auto renderer = RENDERER(obj);
+		const Material& material = renderer->GetMaterial();
+
+		Effects::BasicFX->SetWorld(world);
+		Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+		Effects::BasicFX->SetWorldViewProj(worldViewProj);
+		Effects::BasicFX->SetMaterial(material);
+
+		auto& texture = renderer->Texture;
+		if (texture)
+		{
+			Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&renderer->TexTransform));
+			Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
+			Effects::BasicFX->SetUseTexture(mUseTexture);
+		}
+
+		// Do not write to render target.
+		mImmediateContext->OMSetBlendState(RenderStates::NoRenderTargetWritesBS, blendFactor, 0xfffffff);
+
+		// Render visible mirror pixels to stencil buffer.
+		// Do not write mirror depth to depth buffer at this point, otherwise it will occlude the reflection.
+		mImmediateContext->OMSetDepthStencilState(RenderStates::MarkMirrorDSS, 1);
+
+		activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+		obj->Draw();
+
+		// Restore default render state.
+		// Do not write to render target.
+		mImmediateContext->OMSetBlendState(RenderStates::NoRenderTargetWritesBS, blendFactor, 0xfffffff);
+
+		// Render visible mirror pixels to stencil buffer.
+		// Do not write mirror depth to depth buffer at this point, otherwise it will occlude the reflection.
+		mImmediateContext->OMSetDepthStencilState(0, 0);
+		mImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+		Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+		Effects::BasicFX->SetDiffuseMap(0);
+		Effects::BasicFX->SetUseTexture(0);
+	}
+
 	// Get all objects will be reflected
 	// Calculate dot product of vector d = object's pos - mirror pos and the normal of mirror
 	// If the dot product is positive then the object will be reflected
@@ -187,7 +244,7 @@ void DemoShowRoom::DrawScene()
 	XMVECTOR mirrorPos = XMLoadFloat3(&mirrorPosFloat);
 	XMFLOAT3 mirrorNormalFloat = mMirrorObj->transform->GetWorldY();
 	XMVECTOR mirrorNormal = XMLoadFloat3(&mirrorNormalFloat);
-	
+
 	for (auto& obj : allObjects)
 	{
 		if (!obj->enabled)
@@ -219,6 +276,7 @@ void DemoShowRoom::DrawScene()
 	}
 	Effects::BasicFX->SetDirLights(mDirLights);
 
+	// Draw reflected objects
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
 		for (auto& obj : reflectedObjects)
@@ -252,12 +310,18 @@ void DemoShowRoom::DrawScene()
 				Effects::BasicFX->SetUseTexture(mUseTexture);
 			}
 
+			// Cull clockwise triangles for reflection.
 			mImmediateContext->RSSetState(RenderStates::CullClockwiseRS);
+
+			// Only draw reflection into visible mirror pixels as marked by the stencil buffer. 
+			mImmediateContext->OMSetDepthStencilState(RenderStates::DrawReflectionDSS, 1);
+
 			activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
 
 			obj->Draw();
 
 			// Restore default render state.
+			mImmediateContext->OMSetDepthStencilState(0, 0);
 			mImmediateContext->RSSetState(0);
 			Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
 			Effects::BasicFX->SetDiffuseMap(0);
@@ -272,8 +336,88 @@ void DemoShowRoom::DrawScene()
 	}
 	Effects::BasicFX->SetDirLights(mDirLights);
 
+	//
+	// Draw the mirror to the back buffer as usual but with transparency
+	// blending so the reflection shows through.
+	// 
+
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		auto obj = mMirrorObj;
+
+		// Update per object constants
+		XMMATRIX world = obj->transform->LocalToWorldMatrix();
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world * viewProj;
+
+		auto renderer = RENDERER(obj);
+		const Material& material = renderer->GetMaterial();
+
+		Effects::BasicFX->SetWorld(world);
+		Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+		Effects::BasicFX->SetWorldViewProj(worldViewProj);
+		Effects::BasicFX->SetMaterial(material);
+
+		auto& texture = renderer->Texture;
+		if (texture)
+		{
+			Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&renderer->TexTransform));
+			Effects::BasicFX->SetDiffuseMap(texture->GetDiffuseMapSRV());
+			Effects::BasicFX->SetUseTexture(mUseTexture);
+		}
+
+		mImmediateContext->RSSetState(RenderStates::NoCullRS);
+
+		// Render with transparency
+		mImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xfffffff);
+
+		activeTech->GetPassByIndex(p)->Apply(0, mImmediateContext);
+
+		obj->Draw();
+
+		// Restore default render state.
+		mImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+		mImmediateContext->RSSetState(0);
+		Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+		Effects::BasicFX->SetDiffuseMap(0);
+		Effects::BasicFX->SetUseTexture(0);
+	}
+
 #pragma endregion
 
+	//
+	// Draw the skull shadow.
+	//
+
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		ID3DX11EffectPass* pass = activeTech->GetPassByIndex(p);
+
+		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f); // xz plane
+		XMVECTOR toMainLight = -XMLoadFloat3(&mDirLights[0].Direction);
+		XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+		XMMATRIX shadowOffsetY = XMMatrixTranslation(0.0f, 0.1f, 0.0f);
+
+		// Set per object constants
+		XMMATRIX world = mCenterObj->transform->LocalToWorldMatrix() * S * shadowOffsetY;
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world * view * proj;
+
+		Effects::BasicFX->SetWorld(world);
+		Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+		Effects::BasicFX->SetWorldViewProj(worldViewProj);
+		Effects::BasicFX->SetMaterial(mShadowMat);
+
+		mImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
+		mImmediateContext->OMSetDepthStencilState(RenderStates::NoDoubleBlendDSS, 0);
+		pass->Apply(0, mImmediateContext);
+
+		mCenterObj->Draw();
+
+		// Restore default states.
+		mImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+		mImmediateContext->OMSetDepthStencilState(0, 0);
+	}
 
 	// Present buffer
 	HR(mSwapChain->Present(0, 0));
@@ -296,6 +440,7 @@ void DemoShowRoom::CreateObjects()
 	mFloorObj->transform->Scale(XMFLOAT3(10, 0.1, 10));
 	mFloorObj->transform->Translate(XMFLOAT3(0, -1, 0));
 
+	mLWallObj->enabled = false;
 	mLWallObj->transform->Scale(XMFLOAT3(0.1, 10, 10));
 	mLWallObj->transform->Translate(XMFLOAT3(-5, 5 - 1, 0));
 
@@ -303,9 +448,11 @@ void DemoShowRoom::CreateObjects()
 	mRWallObj->transform->Translate(XMFLOAT3(0, 5 - 1, 5));
 
 	//mMirrorObj->enabled = false;
+	mMirrorObj->enabled = false;
 	mMirrorObj->transform->Scale(XMFLOAT3(3, 1, 4));
 	mMirrorObj->transform->Rotate(XMFLOAT3(0, 0, 1), -MathHelper::Pi / 2);
-	mMirrorObj->transform->Translate(XMFLOAT3(-5 + 0.1, 3, 0));
+	//mMirrorObj->transform->Translate(XMFLOAT3(-5 + 0.1, 3, 0));
+	//mMirrorObj->transform->Translate(XMFLOAT3(-5, 3, 0));
 }
 
 void DemoShowRoom::CreateTextures()
@@ -317,10 +464,10 @@ void DemoShowRoom::CreateTextures()
 
 	RENDERER(mFloorObj)->Texture = mCheckBoardTex.get();
 	XMStoreFloat4x4(&RENDERER(mFloorObj)->TexTransform, XMMatrixScaling(8, 8, 0));
-	
+
 	RENDERER(mLWallObj)->Texture = mDarkBrickTex.get();
 	XMStoreFloat4x4(&RENDERER(mLWallObj)->TexTransform, XMMatrixScaling(3, 3, 0));
-	
+
 	RENDERER(mRWallObj)->Texture = mDarkBrickTex.get();
 	XMStoreFloat4x4(&RENDERER(mRWallObj)->TexTransform, XMMatrixScaling(3, 3, 0));
 
@@ -339,4 +486,13 @@ void DemoShowRoom::CreateMaterials()
 	skullMat.Ambient = XMFLOAT4(0.4, 0.42, 0.37, 1);
 	skullMat.Diffuse = XMFLOAT4(0.65, 0.6, 0.45, 1);
 	skullMat.Specular = XMFLOAT4(0.3, 0.3, 0.3, 16);
+
+	auto& mirrorMat = RENDERER(mMirrorObj)->GetMaterial();
+	mirrorMat.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mirrorMat.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.33f);
+	mirrorMat.Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 16.0f);
+
+	mShadowMat.Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mShadowMat.Diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.5f);
+	mShadowMat.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 16.0f);
 }

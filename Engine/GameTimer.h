@@ -1,7 +1,5 @@
 #pragma once
 
-#include <chrono>
-
 // base unit of this timer's measurement is second
 class GameTimer
 {

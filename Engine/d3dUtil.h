@@ -1,16 +1,5 @@
 #pragma once
-#include "stdafx.h"
 
-#include "d3dx11effect.h"
-#include <d3dcompiler.h>
-#include <D3DX11.h>
-#include <xnamath.h>
-#include <cassert>
-#include <sal.h>
-#include <wchar.h>
-#include <vector>
-#include <string>
-#include <map>
 
 //----------------------------------------------------------------------------
 // Macro for safe releasing COM object

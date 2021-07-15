@@ -1,8 +1,6 @@
 #pragma once
 
 #include "NPInterfaces.h"
-#include <string>
-
 class BaseObject;
 
 class BaseComponent : public ILifeCycle

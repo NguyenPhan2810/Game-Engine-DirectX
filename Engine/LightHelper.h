@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-#include <xnamath.h>
 
 // Note: Make sure structure alignment agrees with HLSL structure padding rules. 
 //   Elements are packed into 4D vectors with the restriction that an element

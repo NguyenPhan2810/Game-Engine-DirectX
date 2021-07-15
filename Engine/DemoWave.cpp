@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "DemoWave.h"
 #include "Renderer.h"
 #include "Cube.h"
