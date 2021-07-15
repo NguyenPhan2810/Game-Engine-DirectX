@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "RenderStates.h"
 
 ID3D11RasterizerState* RenderStates::WireframeRS = nullptr;

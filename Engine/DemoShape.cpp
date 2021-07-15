@@ -1,5 +1,4 @@
-
-
+#include "stdafx.h"
 #include "DemoShape.h"
 #include "Renderer.h"
 #include "Cube.h"

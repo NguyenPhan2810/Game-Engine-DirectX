@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <Windows.h>
+#include <xnamath.h>
 
 class MathHelper
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "BaseComponent.h"
 #include "d3dUtil.h"
 #include "GeometryGenerator.h"

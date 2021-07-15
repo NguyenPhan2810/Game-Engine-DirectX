@@ -1,7 +1,4 @@
 #pragma once
-
-
-
 #include "NPGameEngine.h"
 #include "Waves.h"
 #include "MathHelper.h"

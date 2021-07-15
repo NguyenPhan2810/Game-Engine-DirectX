@@ -1,9 +1,12 @@
 //=======================================================================================
 // Waves.cpp by Frank Luna (C) 2008 All Rights Reserved.
 //=======================================================================================
-
+#include "stdafx.h"
 
 #include "Waves.h"
+#include <algorithm>
+#include <vector>
+#include <cassert>
 
 Waves::Waves()
 : mNumRows(0), mNumCols(0), mVertexCount(0), mTriangleCount(0), 

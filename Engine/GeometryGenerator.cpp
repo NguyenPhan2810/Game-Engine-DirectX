@@ -1,6 +1,8 @@
-
+#include "stdafx.h"
 #include "GeometryGenerator.h"
 #include "MathHelper.h"
+#include <map>
+#include <fstream>
 
 void GeometryGenerator::ConvertToBasic32(std::vector<GeometryGenerator::Vertex>& source, std::vector<Basic32>& Vertices)
 {

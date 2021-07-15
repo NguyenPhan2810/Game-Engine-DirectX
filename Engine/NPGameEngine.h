@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "d3dApp.h"
 #include "BaseObject.h"
 #include "LightHelper.h"

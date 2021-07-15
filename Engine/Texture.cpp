@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "Texture.h"
 #include "d3dApp.h"
 

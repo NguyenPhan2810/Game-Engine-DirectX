@@ -5,13 +5,12 @@
 // updated, the client must copy the current solution into vertex buffers for rendering.
 // This class only does the calculations, it does not do any drawing.
 //***************************************************************************************
-#pragma once
 
 #ifndef WAVES_H
 #define WAVES_H
-#endif // 
 
-
+#include <Windows.h>
+#include <xnamath.h>
 
 class Waves
 {
@@ -57,3 +56,5 @@ private:
 	XMFLOAT3* mNormals;
 	XMFLOAT3* mTangentX;
 };
+
+#endif // WAVES_H

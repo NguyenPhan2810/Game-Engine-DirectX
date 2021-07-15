@@ -1,6 +1,5 @@
 #pragma once
 
-
 // All class use NPGameEngine life cycle must implements this
 class ILifeCycle
 {

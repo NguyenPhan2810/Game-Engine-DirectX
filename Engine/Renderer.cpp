@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "Renderer.h"
 #include "BaseObject.h"
 #include "d3dApp.h"
