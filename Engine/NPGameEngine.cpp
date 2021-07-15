@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "NPGameEngine.h"
 #include "d3dx11effect.h"
 #include "MathHelper.h"

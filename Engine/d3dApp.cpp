@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "d3dApp.h"
-#include <windowsx.h>
+#include <d3dcompiler.h>
+#include <D3DX11.h>
 
 // An instance of the app is needed because MainWndProc
 // can not access to a method of a class

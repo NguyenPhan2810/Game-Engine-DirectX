@@ -1,7 +1,9 @@
 #pragma once
+
+
+
 #include "NPGameEngine.h"
 #include "Texture.h"
-#include <memory>
 
 class DemoShape : public NPGameEngine
 {
