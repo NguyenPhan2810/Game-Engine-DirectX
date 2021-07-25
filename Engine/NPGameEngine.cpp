@@ -70,6 +70,7 @@ bool NPGameEngine::Init()
 	if (!D3DApp::Init())
 		return false;
 
+	// Must init effects first since InputLayouts depends on a shader signature
 	Effects::InitAll(mDevice);
 	InputLayouts::InitAll(mDevice);
 	RenderStates::InitAll(mDevice);

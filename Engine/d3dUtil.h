@@ -45,6 +45,26 @@
 HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr, _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox);
 
 
+
+
+class d3dHelper
+{
+public:
+	///<summary>
+	/// 
+	/// Does not work with compressed formats.
+	///</summary>
+	static ID3D11ShaderResourceView* CreateTexture2DArraySRV(
+		ID3D11Device* device, ID3D11DeviceContext* context,
+		std::vector<std::wstring>& filenames,
+		DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE,
+		UINT filter = D3DX11_FILTER_NONE,
+		UINT mipFilter = D3DX11_FILTER_LINEAR);
+
+	//static ID3D11ShaderResourceView* CreateRandomTexture1DSRV(ID3D11Device* device);
+};
+
+
 namespace Colors
 {
 	XMGLOBALCONST XMVECTORF32 White = { 1.0f, 1.0f, 1.0f, 1.0f };
