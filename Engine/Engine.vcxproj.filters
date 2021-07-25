@@ -192,5 +192,8 @@
     <FxCompile Include="FX\Basic.fx">
       <Filter>Source Files\NPEffects\FX</Filter>
     </FxCompile>
+    <FxCompile Include="FX\TreeSprite.fx">
+      <Filter>Source Files\NPEffects\FX</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

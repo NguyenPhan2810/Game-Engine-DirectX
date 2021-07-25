@@ -118,10 +118,6 @@ void NPGameEngine::FixedUpdateScene()
 
 void NPGameEngine::DrawScene()
 {
-	// Clear buffer
-	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Black));
-	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 	// Set up
 	mImmediateContext->IASetInputLayout(InputLayouts::Basic32);
 	mImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -135,10 +131,15 @@ void NPGameEngine::DrawScene()
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(mEyePosW);
-	//Effects::BasicFX->SetFogColor(Colors::Silver);
-	//Effects::BasicFX->SetFogStart(15.0f);
-	//Effects::BasicFX->SetFogRange(70.0f);
+	Effects::BasicFX->SetFogColor(Colors::Silver);
+	Effects::BasicFX->SetFogStart(30.0f);
+	Effects::BasicFX->SetFogRange(70.0f);
 
+	// Clear buffer
+	mImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
+	mImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Pick technique
 	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3Tech;
 	switch (mLightCount)
 	{

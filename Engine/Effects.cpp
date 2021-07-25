@@ -70,18 +70,41 @@ BasicEffect::~BasicEffect()
 }
 #pragma endregion
 
+#pragma region TreeSpriteEffect
+TreeSpriteEffect::TreeSpriteEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	Light3Tech = mFX->GetTechniqueByName("Light3");
+
+	ViewProj = mFX->GetVariableByName("gViewProj")->AsMatrix();
+	EyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights = mFX->GetVariableByName("gDirLights");
+	Mat = mFX->GetVariableByName("gMaterial");
+	TreeTextureMapArray = mFX->GetVariableByName("gTreeMapArray")->AsShaderResource();
+}
+
+TreeSpriteEffect::~TreeSpriteEffect()
+{
+}
+#pragma endregion
 
 #pragma region Effects
-BasicEffect*  Effects::BasicFX = 0;
+BasicEffect*		Effects::BasicFX = nullptr;
+TreeSpriteEffect*	Effects::TreeSpriteFX = nullptr;
 
 void Effects::InitAll(ID3D11Device* device)
 {
 	BasicFX = new BasicEffect(device, L"FX/Basic.fx");
+	TreeSpriteFX = new TreeSpriteEffect(device, L"FX/TreeSprite.fx");
 }
 
 void Effects::DestroyAll()
 {
 	SafeDelete(BasicFX);
+	SafeDelete(TreeSpriteFX);
 }
 #pragma endregion
 

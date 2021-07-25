@@ -230,6 +230,7 @@
   <ItemGroup>
     <FxCompile Include="FX\LightHelper.fx" />
     <FxCompile Include="FX\Basic.fx" />
+    <FxCompile Include="FX\TreeSprite.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
